@@ -4,7 +4,8 @@ coffnix-ebuilds
 1- Get this overlay:
 
 ~~~~
-# mkdir -p /var/overlay/ ; cd /var/overlay/ ; git clone https://github.com/coffnix/coffnix-ebuilds.git
+# mkdir -p /var/overlay/ ; cd /var/overlay/ 
+# git clone https://github.com/coffnix/coffnix-ebuilds.git
 ~~~~
 
 
