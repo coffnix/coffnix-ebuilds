@@ -3,9 +3,7 @@ coffnix-ebuilds
 
 1- RTFM
 
-~~~~
 http://www.funtoo.org/Local_Overlay
-~~~~
 
 2- Get this overlay:
 
