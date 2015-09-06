@@ -15,3 +15,9 @@ coffnix-ebuilds
 echo 'PORTDIR_OVERLAY="/var/overlay/local/coffnix-ebuilds"' >> /etc/make.conf
 ~~~~
 
+3- Update your database:
+
+~~~
+# emerge app-portage/eix
+# eix-update
+~~~
