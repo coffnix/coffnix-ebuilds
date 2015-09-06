@@ -1,7 +1,13 @@
 coffnix-ebuilds
 ================
 
-1- Get this overlay:
+1- RTFM
+
+~~~~
+http://www.funtoo.org/Local_Overlay
+~~~~
+
+2- Get this overlay:
 
 ~~~~
 # mkdir -p /var/overlay/ ; cd /var/overlay/ 
@@ -9,15 +15,16 @@ coffnix-ebuilds
 ~~~~
 
 
-2- Configure /etc/make.conf:
+3- Configure /etc/make.conf:
 
 ~~~~
 echo 'PORTDIR_OVERLAY="/var/overlay/local/coffnix-ebuilds"' >> /etc/make.conf
 ~~~~
 
-3- Update your database:
+4- Update your database:
 
 ~~~
 # emerge app-portage/eix
 # eix-update
 ~~~
+
