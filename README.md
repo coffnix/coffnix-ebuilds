@@ -16,7 +16,7 @@ http://www.funtoo.org/Local_Overlay
 3- Configure /etc/make.conf:
 
 ~~~~
-echo 'PORTDIR_OVERLAY="/var/overlay/coffnix-ebuilds/local"' >> /etc/make.conf
+# echo 'PORTDIR_OVERLAY="/var/overlay/coffnix-ebuilds/local"' >> /etc/make.conf
 ~~~~
 
 4- Update your database:
