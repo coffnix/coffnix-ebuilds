@@ -1,0 +1,10 @@
+sys-fs/udev
+=dev-lang/erlang-17.3
+#>=app-emulation/virtualbox-5.0.0
+#>=app-emulation/virtualbox-additions-5.0.0
+#>=app-emulation/virtualbox-extpack-oracle-5.0.0.101573
+#>=app-emulation/virtualbox-modules-5.0.0
+#>=x11-drivers/xf86-video-virtualbox-5.0.0
+www-plugins/chrome-binary-plugins:unstable::gentoo
+www-plugins/chrome-binary-plugins:beta
+>=www-client/chromium-46.0.2490.6

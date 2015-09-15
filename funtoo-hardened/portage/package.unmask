@@ -1,0 +1,6 @@
+virtual/perl-Module-Build
+games-strategy/heroes3
+sys-libs/lib-compat-loki
+sys-libs/lib-compat
+=www-plugins/chrome-binary-plugins-9999
+=sys-auth/consolekit-0.9.4

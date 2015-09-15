@@ -1,0 +1,70 @@
+app-portage/eix
+=app-portage/eix-0.27.4
+=app-portage/eix-0.28.1
+=sys-kernel/gentoo-sources-3.7.3
+=app-portage/eix-0.28.1-r1
+net-analyzer/nagios-core
+net-analyzer/nagios-plugins
+net-analyzer/nagios-check_mysql_health
+net-analyzer/ndoutils
+app-portage/g-cpan
+dev-libs/geoip
+app-admin/swatch
+dev-db/phpmyadmin
+sys-cluster/drbd
+sys-cluster/heartbeat
+sys-cluster/glusterfs
+app-arch/star
+# move sys-fs/mdev-bb sys-fs/mdev
+sys-fs/mdev
+sys-fs/s3fs
+net-im/ejabberd
+www-servers/uwsgi
+# move app-admin/eselect-bashcomp app-eselect/eselect-bashcomp
+app-eselect/eselect-bashcomp
+app-emulation/lxc
+=net-misc/geoipupdate-2.0.0 ~amd64
+=x11-libs/libxcb-1.9.3
+=sys-kernel/linux-headers-3.7
+sys-process/glances
+=sys-libs/zlib-1.2.8-r1 **
+=www-servers/varnish-3.0.5-r3
+=dev-libs/liblognorm-0.3.6-r1
+=net-libs/nodejs-0.10.26
+www-client/phantomjs
+app-text/pdftk
+=dev-db/mysql-5.1.73
+=virtual/mysql-5.1
+#=www-apache/mod_perl-2.0.8
+=net-libs/libtirpc-0.2.4-r2 ~amd64
+=sys-process/audit-2.2.2-r2 ~amd64
+=sys-devel/flex-2.5.39-r1 ~amd64
+=virtual/libintl-0-r1 ~amd64
+=dev-libs/lzo-2.08 ~amd64
+=sys-libs/db-4.8.30-r1 ~amd64
+=dev-lang/tcl-8.6.1-r1 ~amd64
+=net-libs/nodejs-0.10.29
+=dev-lang/perl-5.14.2 **
+=dev-lang/perl-5.16.1 **
+=www-servers/apache-2.2.27-r3
+=sys-devel/gcc-4.6.2-r1
+# required by perl-core/Version-Requirements:0 (argument)
+=perl-core/Version-Requirements-0.101.22-r1 ~amd64
+www-servers/apache
+=app-admin/apache-tools-2.4.10 ~amd64
+=dev-libs/apr-1.5.1-r1 ~amd64
+=dev-db/mysql-5.5.39 ~amd64
+=virtual/mysql-5.5 ~amd64
+=sci-biology/pysam-0.6-r1 ~amd64
+app-text/wgetpaste
+=sys-apps/texinfo-5.2 ~amd64
+=app-admin/matter-292 ~amd64
+=sys-apps/entropy-292 ~amd64
+net-mail/imapsync
+=net-proxy/c-icap-modules-0.2.4 ~amd64
+=dev-perl/Shell-EnvImporter-1.70.0-r2 ~amd64
+=app-admin/apache-tools-2.4.12 ~amd64
+app-emulation/virtualbox-guest-additions ~amd64
+x11-drivers/xf86-video-virtualbox ~amd64
+virtual/perl-Module-Build
+=sys-auth/consolekit-0.9.4

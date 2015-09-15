@@ -1,0 +1,86 @@
+sys-apps/portage ipc xattr -python2 python3
+app-shells/bash nls afs bashlogger
+app-portage/eix bzip2 doc sqlite nls -debug -hardened -optimization -strong-optimization -tools security dep
+dev-lang/php apache2 bcmath bzip2 calendar cgi cli crypt ctype curl doc exif fileinfo ftp gd gdbm gmp hash iconv intl ipv6 -ldap mysql mysqli mysqlnd nls pdo posix -postgres readline session sharedext simplexml snmp soap sockets spell sqlite ssl -threads tidy truetype unicode xml xpm zip zlib filter phar json tokenizer xmlreader xmlrpc sysvipc xmlwriter xsl suhosin sqlite3 wddx pcntl odbc mhash -ldap-sasl imap kerberos iodbc inifile enchant -curlwrappers cjk cdb -sharedmem -recode -fpm xslt
+www-servers/apache apache2_modules_actions apache2_modules_alias apache2_modules_asis apache2_modules_auth_basic apache2_modules_auth_digest apache2_modules_authn_alias apache2_modules_authn_anon apache2_modules_authn_dbd apache2_modules_authn_dbm apache2_modules_authn_default apache2_modules_authn_file apache2_modules_authz_dbm apache2_modules_authz_default apache2_modules_authz_groupfile apache2_modules_authz_host apache2_modules_authz_owner apache2_modules_authz_user apache2_modules_autoindex apache2_modules_cache apache2_modules_cgid apache2_modules_dav apache2_modules_dav_fs apache2_modules_dav_lock apache2_modules_dbd apache2_modules_deflate apache2_modules_dir apache2_modules_disk_cache apache2_modules_env apache2_modules_expires apache2_modules_ext_filter apache2_modules_file_cache apache2_modules_filter apache2_modules_headers apache2_modules_ident apache2_modules_imagemap apache2_modules_include apache2_modules_info apache2_modules_log_config apache2_modules_logio apache2_modules_mem_cache apache2_modules_mime apache2_modules_mime_magic apache2_modules_negotiation apache2_modules_proxy apache2_modules_proxy_ajp apache2_modules_proxy_balancer apache2_modules_proxy_connect apache2_modules_proxy_http apache2_modules_rewrite apache2_modules_setenvif apache2_modules_speling apache2_modules_status apache2_modules_unique_id apache2_modules_userdir apache2_modules_usertrack apache2_modules_vhost_alias apache2_mpms_prefork doc -ldap ssl suexec -threads apache2_modules_slotmem_shm
+sys-kernel/gentoo-sources symlink
+sys-devel/gcc -fortran -gtk nls -objc cxx nptl mudflap openmp
+net-analyzer/nagios-core perl web apache2 vim-syntax
+dev-db/mysql big-tables latin1 perl ssl -static -berkdb -max-idx-128 -embedded cluster
+mail-mta/postfix berkdb pam sasl ssl
+sys-libs/pam audit berkdb cracklib nis nls vim-syntax -debug -selinux -test
+sys-process/audit -python -ldap
+media-libs/gd jpeg png
+dev-libs/geoip perl-geoipupdate
+dev-db/phpmyadmin -setup vhosts
+sys-cluster/drbd bash-completion udev heartbeat
+sys-cluster/glusterfs -emacs extras fuse vim-syntax -infiniband -static-libs 
+# move app-admin/eselect-php app-eselect/eselect-php
+>=app-eselect/eselect-php-0.7.1 -fpm apache2
+net-proxy/haproxy crypt pcre examples vim-syntax
+app-arch/star acl xattr
+net-analyzer/net-snmp -X bzip2 ipv6 perl python ssl tcpd zlib diskio elf extensible -lm_sensors mfd-rewrites -minimal -rpm sendmail smux -mysql netlink pci
+net-im/ejabberd -ldap pam ssl web zlib captcha mod_irc mod_muc mod_proxy65 mod_pubsub mod_statsdx -odbc
+www-servers/uwsgi caps carbon -ldap nagios pam pcre perl python syslog xml apache2 cgi erlang -gevent json lua -php -graylog2 -probepg rrdtool -rsyslog -ruby spooler sqlite yaml -zeromq
+net-dns/bind -berkdb caps idn ipv6 -ldap python ssl threads urandom xml -dlz -doc -filter-aaaa -geoip -gost -gssapi -mysql -odbc -postgres -rpz -rrl -sdb-ldap -static-libs
+dev-lang/erlang ssl -docs -emacs -java kpoll -smp sctp -tk -odbc hipe
+app-emulation/lxc examples
+>=x11-proto/xcb-proto-1.8-r1000 python_abis_3.2
+dev-python/lxml threads beautifulsoup3 -doc -examples
+net-misc/openvpn lzo pam plugins ssl down-root examples iproute2 passwordsave pkcs11 -polarssl -static
+mail-client/mutt berkdb crypt gdbm idn nls sasl ssl smtp debug -doc -gnutls -gpg -imap -kerberos -mbox -nntp -pop -qdbm -selinux -sidebar -slang -smime -tokyocabinet
+www-servers/nginx http http-cache ipv6 pcre ssl aio -debug -libatomic -luajit -pcre-jit -rtmp -selinux -systemd -vim-syntax
+sys-process/glances snmp web -chart -doc -hddtemp python_targets_python2_7
+app-admin/lib_users python_targets_python2_7 python_targets_python3_3
+=media-video/ffmpeg-2.2.14 mp3 truetype
+sys-fs/lvm2 lvm1 readline -static thin -clvm -cman -device-mapper-only -lvm2create_initrd -systemd -udev
+sys-apps/elfix -ptpax xtpax
+net-proxy/squid caps htcp ipv6 pam postgres sasl snmp ssl tproxy wccp wccpv2 esi logrotate ssl-crtd qos nis kerberos
+x11-libs/cairo X
+dev-libs/libpcre pcre16
+dev-qt/qtcore qt3support ssl
+www-client/firefox linguas_pt_BR system-icu system-jpeg system-sqlite system-libvpx system-cairo -pulseaudio gstreamer -debug -bindist -custom-cflags -custom-optimization
+dev-db/sqlite secure-delete
+media-libs/libvpx postproc
+media-video/vlc X a52 alsa avcodec avformat bluray cdda cddb dbus dts dvbpsi dvd encode faad ffmpeg flac ieee1394 jpeg kde libass libsamplerate lua matroska mp3 mpeg mtp ncurses ogg opengl png postproc -qt4 qt5 svg swscale taglib theora truetype twolame udev v4l vorbis vpx x264 x265 xcb xml
+dev-qt/qtquickcontrols widgets
+dev-qt/qtmultimedia qml
+app-crypt/qca qt4
+sys-auth/polkit-qt qt4
+media-libs/phonon qt4
+dev-libs/libdbusmenu-qt qt4
+app-text/poppler qt4
+media-libs/phonon-vlc qt4
+dev-util/cmake qt4 qt5 ncurses
+net-im/pidgin dbus gstreamer gtk idn ncurses -networkmanager nls perl python sasl tcl xscreensaver -debug -doc -eds -gadu -gnutls -groupwise -meanwhile
+app-office/akonadi-server -qt5 postgres qt4 soprano
+app-portage/layman sync-plugin-portage
+kde-plasma/plasma-desktop fontconfig -debug -gtk2 -gtk3 -handbook qt4 -pulseaudio -legacy-systray -touchpad usb
+net-misc/networkmanager consolekit
+media-libs/qt-gstreamer qt4
+dev-python/PyQt4 declarative script sql webkit
+app-emulation/virtualbox additions -alsa opengl pam python sdk udev -doc extensions qt4 -vboxwebsrv -vnc
+net-irc/hexchat dbus ipv6 nls perl plugins python ssl gtk libnotify plugin-checksum plugin-doat plugin-fishlim plugin-sysinfo spell
+dev-db/postgresql kerberos
+net-misc/connman -ethernet policykit wifi bluetooth -openvpn -pptp tools
+net-libs/gssdp introspection
+net-libs/libsoup introspection
+x11-libs/pango introspection
+dev-libs/atk introspection
+sys-power/upower ios -deprecated introspection
+sys-block/gparted btrfs fat hfs jfs kde ntfs policykit reiserfs xfs dmraid f2fs mdadm -reiser4
+sys-fs/ntfs3g acl external-fuse ntfsprogs xattr -debug ntfsdecrypt -static-libs -suid
+sys-auth/consolekit acl pam policykit -debug -doc -systemd-units
+dev-libs/libnl python utils
+lxqt-base/lxqt-meta filemanager icons oxygen powermanagement admin -lightdm lximage -minimal policykit sddm ssh-askpass
+x11-misc/sddm consolekit upower
+lxqt-base/lxqt-panel alsa clock desktopswitch kbindicator mainmenu mount quicklaunch showdesktop taskbar tray volume -colorpicker cpuload dom networkmonitor -pulseaudio screensaver sensors sysstat -worldclock
+app-emulation/wine X alsa cups dos fontconfig gecko jpeg lcms mp3 ncurses nls opengl perl png realtime run-exes samba ssl threads truetype v4l xcomposite xml -capi -custom-cflags -gphoto2 -gsm -gstreamer -ldap -mono -netapi -odbc -openal -opencl -osmesa -oss -pcap pipelight -pulseaudio -s3tc -scanner staging -udisks -vaapi xinerama abi_x86_32 abi_x86_64
+gnome-extra/zenity -webkit -debug -libnotify
+media-libs/mesa gles2
+app-crypt/johntheripper openmp opencl -cuda -custom-cflags -minimal mozilla mpi
+dev-qt/qtgui accessibility
+games-strategy/heroes3 maps music nocd sounds videos
+www-client/chromium cups pic proprietary-codecs tcmalloc widevine
+x11-drivers/ati-drivers pax_kernel qt4
+x11-libs/libdrm video_cards_radeon
