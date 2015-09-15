@@ -8,7 +8,7 @@ http://www.funtoo.org/Local_Overlay
 2- Get this overlay:
 
 ~~~~
-# mkdir -p /var/overlay/ ; cd /var/overlay/ 
+# mkdir -p /var/overlay/local ; cd /var/overlay/local
 # git clone https://github.com/coffnix/coffnix-ebuilds.git
 ~~~~
 
