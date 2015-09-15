@@ -1,8 +1,0 @@
-gentoo:funtoo/1.0/linux-gnu/arch/x86-64bit
-gentoo:funtoo/1.0/linux-gnu/arch/x86-64bit/subarch/intel64-ivybridge
-gentoo:funtoo/1.0/linux-gnu/build/current
-gentoo:funtoo/1.0/linux-gnu/flavor/desktop
-gentoo:funtoo/1.0/linux-gnu/mix-ins/hardened
-gentoo:funtoo/1.0/linux-gnu/mix-ins/X
-gentoo:funtoo/1.0/linux-gnu/mix-ins/lxqt
-gentoo:funtoo/1.0/linux-gnu/mix-ins/no-systemd
