@@ -4,3 +4,5 @@ sys-libs/lib-compat-loki
 sys-libs/lib-compat
 =www-plugins/chrome-binary-plugins-9999
 =sys-auth/consolekit-0.9.4
+=www-client/chromium-47.0.2522.1-r1
+=www-plugins/chrome-binary-plugins-47.0.2522.1_alpha1

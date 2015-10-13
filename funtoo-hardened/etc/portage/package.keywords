@@ -68,3 +68,4 @@ app-emulation/virtualbox-guest-additions ~amd64
 x11-drivers/xf86-video-virtualbox ~amd64
 virtual/perl-Module-Build
 =sys-auth/consolekit-0.9.4
+=net-firewall/nftables-9999 **

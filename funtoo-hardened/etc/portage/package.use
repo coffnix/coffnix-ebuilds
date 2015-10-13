@@ -32,7 +32,7 @@ mail-client/mutt berkdb crypt gdbm idn nls sasl ssl smtp debug -doc -gnutls -gpg
 www-servers/nginx http http-cache ipv6 pcre ssl aio -debug -libatomic -luajit -pcre-jit -rtmp -selinux -systemd -vim-syntax
 sys-process/glances snmp web -chart -doc -hddtemp python_targets_python2_7
 app-admin/lib_users python_targets_python2_7 python_targets_python3_3
-=media-video/ffmpeg-2.2.14 mp3 truetype
+media-video/ffmpeg mp3 truetype opus
 sys-fs/lvm2 lvm1 readline -static thin -clvm -cman -device-mapper-only -lvm2create_initrd -systemd -udev
 sys-apps/elfix -ptpax xtpax
 net-proxy/squid caps htcp ipv6 pam postgres sasl snmp ssl tproxy wccp wccpv2 esi logrotate ssl-crtd qos nis kerberos
@@ -84,3 +84,6 @@ games-strategy/heroes3 maps music nocd sounds videos
 www-client/chromium cups pic proprietary-codecs tcmalloc widevine
 x11-drivers/ati-drivers pax_kernel qt4
 x11-libs/libdrm video_cards_radeon
+www-client/links -X bzip2 gpm ipv6 jpeg lzma ssl tiff unicode zlib
+games-strategy/freeciv ipv6 nls readline server sound -aimodules -auth -dedicated gtk mapimg modpack -mysql (-qt5) sdl -sqlite
+www-client/w3m -X gpm nls ssl unicode -fbcon -gtk -imlib -lynxkeymap -nntp -vanilla -xface
