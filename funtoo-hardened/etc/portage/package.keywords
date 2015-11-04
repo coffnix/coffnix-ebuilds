@@ -69,3 +69,7 @@ x11-drivers/xf86-video-virtualbox ~amd64
 virtual/perl-Module-Build
 =sys-auth/consolekit-0.9.4
 =net-firewall/nftables-9999 **
+=app-pda/ipheth-pair-9999 **
+www-plugins/chrome-binary-plugins:beta
+=dev-lang/python-2.6.9 **
+=sys-devel/binutils-config-5-r1 **
