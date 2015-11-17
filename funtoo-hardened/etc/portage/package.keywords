@@ -73,3 +73,4 @@ virtual/perl-Module-Build
 www-plugins/chrome-binary-plugins:beta
 =dev-lang/python-2.6.9 **
 =sys-devel/binutils-config-5-r1 **
+=net-misc/connman-ui-9999 **

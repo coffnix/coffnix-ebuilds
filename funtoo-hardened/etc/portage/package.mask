@@ -7,3 +7,4 @@ sys-fs/udev
 #>=x11-drivers/xf86-video-virtualbox-5.0.0
 www-plugins/chrome-binary-plugins:unstable::gentoo
 www-plugins/chrome-binary-plugins:beta
+>=net-fs/samba-4
