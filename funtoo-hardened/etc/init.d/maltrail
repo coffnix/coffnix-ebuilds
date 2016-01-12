@@ -1,0 +1,54 @@
+#!/sbin/runscript
+#      Raphael Bastos aka coffnix        #
+#      Init Script for Funtoo Linux	 #
+##########################################
+#set -x
+
+	#need nftables
+depend() {
+	need net
+	}
+
+start(){
+##################### PARTE 1 #####################
+ebegin "Starting Maltrail"
+
+cd /opt/maltrail
+
+nohup python2.7 server.py > server.log &
+nohup python2.7 sensor.py > sensor.log &
+
+
+#######################################################################
+
+}
+
+stop(){
+ebegin "Stoping Firewall Maltrail"
+
+pgrep -f 'python2.7 server.py'|xargs kill
+pgrep -f 'python2.7 sensor.py'|xargs kill
+
+}
+
+status(){
+
+ebegin "Processo em execução"
+CHECK1=$(pgrep -f 'python2.7 sensor.py'|wc -l)
+if [ "$CHECK1" -ne 0 ]; then
+	echo -e "\nPIDs sensor.py: $(pgrep -f 'python2.7 sensor.py' | sed ':a;$!N;s/\n/ /g;ta'  )"
+else
+	echo -e "\nsensor.py NOT running. Please restart maltrail\n"
+fi
+
+CHECK2=$(pgrep -f 'python2.7 server.py'|wc -l)
+if [ "$CHECK2" -ne 0 ]; then
+	echo -e "PIDs server.py: $(pgrep -f 'python2.7 server.py' | sed ':a;$!N;s/\n/ /g;ta'  )"
+else
+	echo -e "server.py NOT running. Please restart maltrail"
+fi
+echo -e ""
+
+}
+
+# End

@@ -1,0 +1,94 @@
+#!/sbin/runscript
+#      Raphael Bastos aka coffnix        #
+#      Init Script for Funtoo Linux	 #
+##########################################
+#set -x
+
+	#need nftables
+depend() {
+	need net
+	}
+
+start(){
+##################### PARTE 1 #####################
+ebegin "Starting Firewall NFTables"
+
+
+# Cria link simbólico RCFIREWALL caso não exista
+if [ ! -L /usr/sbin/rcfirewall-nft ];then
+	ln -s /etc/init.d/firewall-nft /usr/sbin/rcfirewall-nft 2> /dev/null
+fi
+
+#######################################################################
+### Incompatibilities ###
+# You cannot use iptables and nft to perform NAT at the same time. So make sure that the iptable_nat module is unloaded
+#rmmod iptable_nat
+
+#######################################################################
+
+echo 1 > /proc/sys/net/ipv4/ip_forward
+echo 1 > /proc/sys/net/ipv4/ip_dynaddr
+echo 1 > /proc/sys/net/ipv4/conf/all/rp_filter
+for f in /proc/sys/net/ipv4/conf/*/rp_filter ; do echo 1 > $f ; done
+
+#######################################################################
+
+#iptables -t nat -F
+
+#######################################################################
+
+# ipv4
+nft -f /etc/nftables/ipv4-filter
+
+# ipv4 nat
+nft -f /etc/nftables/ipv4-nat
+
+# ipv6
+nft -f /etc/nftables/ipv6-filter
+
+# Rules firewall NTFtables
+nft -f /etc/nftables/firewall.rules
+
+
+# Drop swatch IDS blocked
+#for IP_SWATCH in $(cat /opt/yax/firewall/blocked/ips-blocked-swatch-ssh.txt); do nft add rule ip filter input ip saddr ${IP_SWATCH} drop; done
+
+
+#######################################################################
+
+}
+
+stop(){
+ebegin "Stoping Firewall NFTables"
+
+nft flush ruleset
+#######################################################################
+
+## Requerido em nftables anterior a .05 ###iptables -t nat -F
+## Requerido em nftables anterior a .05 ##NFT=nft
+## Requerido em nftables anterior a .05 ##FAMILIES="ip ip6 arp bridge"
+## Requerido em nftables anterior a .05 ##
+## Requerido em nftables anterior a .05 ##for FAMILY in $FAMILIES; do
+## Requerido em nftables anterior a .05 ##  TABLES=$($NFT list tables $FAMILY | grep "^table\s" | cut -d' ' -f2)
+## Requerido em nftables anterior a .05 ##  
+## Requerido em nftables anterior a .05 ##  for TABLE in $TABLES; do
+## Requerido em nftables anterior a .05 ##    CHAINS=$($NFT list table $FAMILY $TABLE | grep "^\schain\s" | cut -d' ' -f2)
+## Requerido em nftables anterior a .05 ##
+## Requerido em nftables anterior a .05 ##    for CHAIN in $CHAINS; do
+## Requerido em nftables anterior a .05 ##      echo "Flushing chain: $FAMILY->$TABLE->$CHAIN"
+## Requerido em nftables anterior a .05 ##      $NFT flush chain $FAMILY $TABLE $CHAIN
+## Requerido em nftables anterior a .05 ##      $NFT delete chain $FAMILY $TABLE $CHAIN
+## Requerido em nftables anterior a .05 ##    done
+## Requerido em nftables anterior a .05 ##
+## Requerido em nftables anterior a .05 ##    echo "Flushing table: $FAMILY->$TABLE"
+## Requerido em nftables anterior a .05 ##    $NFT flush table $FAMILY $TABLE
+## Requerido em nftables anterior a .05 ##    $NFT delete table $FAMILY $TABLE
+## Requerido em nftables anterior a .05 ##  done
+## Requerido em nftables anterior a .05 ##done
+}
+
+status(){
+nft list ruleset
+}
+
+# End
