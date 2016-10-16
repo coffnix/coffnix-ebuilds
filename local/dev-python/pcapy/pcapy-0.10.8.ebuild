@@ -14,7 +14,7 @@ RDEPEND="${DEPEND}
 inherit distutils
 
 DESCRIPTION="Python pcap extension"
-HOMEPAGE="http://www.coresecurity.com/corelabs-research/open-source-tools/pcapy"
+HOMEPAGE="http://oss.coresecurity.com/projects/pcapy.html"
 SRC_URI="mirror://pypi/${PN:0:1}/${PN}/${P}.tar.gz
 	http://oss.coresecurity.com/repo/${P}.tar.gz"
 

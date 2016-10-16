@@ -7,3 +7,9 @@ sys-libs/lib-compat
 =www-client/chromium-47.0.2522.1-r1
 =www-plugins/chrome-binary-plugins-47.0.2522.1_alpha1
 www-plugins/chrome-binary-plugins:beta
+sci-geosciences/googleearth
+=dev-lang/php-7.0.4-r1
+=sys-devel/crossdev-20151026-r1
+=net-firewall/iptables-1.6.0
+=sys-devel/crossdev-20160602
+

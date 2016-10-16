@@ -15,8 +15,8 @@ ebegin "Starting Maltrail"
 
 cd /opt/maltrail
 
-nohup python2.7 server.py > server.log &
-nohup python2.7 sensor.py > sensor.log &
+nohup python2.7 server.py &> server.log &
+nohup python2.7 sensor.py &> sensor.log &
 
 
 #######################################################################
@@ -24,10 +24,10 @@ nohup python2.7 sensor.py > sensor.log &
 }
 
 stop(){
-ebegin "Stoping Firewall Maltrail"
+ebegin "Stoping Maltrail"
 
-pgrep -f 'python2.7 server.py'|xargs kill
-pgrep -f 'python2.7 sensor.py'|xargs kill
+pgrep -f 'python2.7 server.py'|xargs kill -9
+pgrep -f 'python2.7 sensor.py'|xargs kill -9
 
 }
 
