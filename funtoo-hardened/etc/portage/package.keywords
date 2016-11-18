@@ -77,3 +77,6 @@ www-plugins/chrome-binary-plugins:beta
 dev-lang/ruby:2.3 **
 =media-libs/gegl-9999 **
 =media-libs/babl-9999 **
+=sys-kernel/spl-0.6.5.8 **
+=sys-fs/zfs-kmod-0.6.5.8 **
+=sys-fs/zfs-0.6.5.8 **

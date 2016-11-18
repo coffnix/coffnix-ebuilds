@@ -64,27 +64,27 @@ ebegin "Stoping Firewall NFTables"
 nft flush ruleset
 #######################################################################
 
-## Requerido em nftables anterior a .05 ###iptables -t nat -F
-## Requerido em nftables anterior a .05 ##NFT=nft
-## Requerido em nftables anterior a .05 ##FAMILIES="ip ip6 arp bridge"
-## Requerido em nftables anterior a .05 ##
-## Requerido em nftables anterior a .05 ##for FAMILY in $FAMILIES; do
-## Requerido em nftables anterior a .05 ##  TABLES=$($NFT list tables $FAMILY | grep "^table\s" | cut -d' ' -f2)
-## Requerido em nftables anterior a .05 ##  
-## Requerido em nftables anterior a .05 ##  for TABLE in $TABLES; do
-## Requerido em nftables anterior a .05 ##    CHAINS=$($NFT list table $FAMILY $TABLE | grep "^\schain\s" | cut -d' ' -f2)
-## Requerido em nftables anterior a .05 ##
-## Requerido em nftables anterior a .05 ##    for CHAIN in $CHAINS; do
-## Requerido em nftables anterior a .05 ##      echo "Flushing chain: $FAMILY->$TABLE->$CHAIN"
-## Requerido em nftables anterior a .05 ##      $NFT flush chain $FAMILY $TABLE $CHAIN
-## Requerido em nftables anterior a .05 ##      $NFT delete chain $FAMILY $TABLE $CHAIN
-## Requerido em nftables anterior a .05 ##    done
-## Requerido em nftables anterior a .05 ##
-## Requerido em nftables anterior a .05 ##    echo "Flushing table: $FAMILY->$TABLE"
-## Requerido em nftables anterior a .05 ##    $NFT flush table $FAMILY $TABLE
-## Requerido em nftables anterior a .05 ##    $NFT delete table $FAMILY $TABLE
-## Requerido em nftables anterior a .05 ##  done
-## Requerido em nftables anterior a .05 ##done
+## Requerido em nftables anterior a 0.5 ###iptables -t nat -F
+## Requerido em nftables anterior a 0.5 ##NFT=nft
+## Requerido em nftables anterior a 0.5 ##FAMILIES="ip ip6 arp bridge"
+## Requerido em nftables anterior a 0.5 ##
+## Requerido em nftables anterior a 0.5 ##for FAMILY in $FAMILIES; do
+## Requerido em nftables anterior a 0.5 ##  TABLES=$($NFT list tables $FAMILY | grep "^table\s" | cut -d' ' -f2)
+## Requerido em nftables anterior a 0.5 ##  
+## Requerido em nftables anterior a 0.5 ##  for TABLE in $TABLES; do
+## Requerido em nftables anterior a 0.5 ##    CHAINS=$($NFT list table $FAMILY $TABLE | grep "^\schain\s" | cut -d' ' -f2)
+## Requerido em nftables anterior a 0.5 ##
+## Requerido em nftables anterior a 0.5 ##    for CHAIN in $CHAINS; do
+## Requerido em nftables anterior a 0.5 ##      echo "Flushing chain: $FAMILY->$TABLE->$CHAIN"
+## Requerido em nftables anterior a 0.5 ##      $NFT flush chain $FAMILY $TABLE $CHAIN
+## Requerido em nftables anterior a 0.5 ##      $NFT delete chain $FAMILY $TABLE $CHAIN
+## Requerido em nftables anterior a 0.5 ##    done
+## Requerido em nftables anterior a 0.5 ##
+## Requerido em nftables anterior a 0.5 ##    echo "Flushing table: $FAMILY->$TABLE"
+## Requerido em nftables anterior a 0.5 ##    $NFT flush table $FAMILY $TABLE
+## Requerido em nftables anterior a 0.5 ##    $NFT delete table $FAMILY $TABLE
+## Requerido em nftables anterior a 0.5 ##  done
+## Requerido em nftables anterior a 0.5 ##done
 }
 
 status(){

@@ -19,3 +19,4 @@ www-plugins/chrome-binary-plugins:stable
 #=app-emulation/virtualbox-extpack-oracle-5.1.2.108956
 #=app-emulation/virtualbox-modules-5.1.2
 =kde-apps/kmix-16.04.3-r1
+=dev-libs/libclc-0.2.0_pre20160921

@@ -16,7 +16,7 @@ media-libs/gd jpeg png
 dev-libs/geoip perl-geoipupdate
 dev-db/phpmyadmin -setup vhosts
 sys-cluster/drbd bash-completion udev heartbeat
-sys-cluster/glusterfs -emacs extras fuse vim-syntax -infiniband -static-libs 
+sys-cluster/glusterfs -emacs extras fuse vim-syntax -infiniband -static-libs
 # move app-admin/eselect-php app-eselect/eselect-php
 >=app-eselect/eselect-php-0.7.1 -fpm apache2
 net-proxy/haproxy crypt pcre examples vim-syntax
@@ -79,7 +79,7 @@ x11-misc/sddm consolekit upower
 lxqt-base/lxqt-panel alsa clock desktopswitch kbindicator mainmenu mount quicklaunch showdesktop taskbar tray volume colorpicker cpuload dom networkmonitor -pulseaudio screensaver sensors sysstat -worldclock
 app-emulation/wine X alsa cups dos fontconfig gecko jpeg lcms mp3 ncurses nls opengl perl png realtime run-exes samba ssl threads truetype v4l xcomposite xml -capi -custom-cflags -gphoto2 -gsm -gstreamer -ldap -netapi -odbc -openal -opencl osmesa -oss -pcap pipelight -pulseaudio -s3tc -scanner staging -udisks -vaapi xinerama abi_x86_32 abi_x86_64 mono
 gnome-extra/zenity -webkit -debug -libnotify
-media-libs/mesa classic dri3 egl gallium gbm gles2 llvm nptl pax_kernel pic udev xa -bindist -d3d9 -debug -gles1 opencl -openmax osmesa -selinux -vaapi -vdpau wayland -xvmc
+media-libs/mesa classic dri3 egl gallium gbm gles2 amd64 llvm nptl pax_kernel pic udev xa -bindist -d3d9 -debug -gles1 opencl -openmax osmesa -selinux -vaapi -vdpau wayland -xvmc
 app-crypt/johntheripper openmp opencl -cuda -custom-cflags -minimal mozilla mpi
 dev-qt/qtgui accessibility dbus egl evdev gif jpeg png udev xcb -debug eglfs gles2 -gtkstyle -ibus -libinput -test -tslib -tuio
 games-strategy/heroes3 maps music nocd sounds videos
@@ -140,3 +140,7 @@ sys-libs/slang -abi_x86_32
 app-emulation/virtualbox-bin additions chm python rdesktop-vrdp vboxwebsrv-debug -headless -sdk
 >=app-eselect/eselect-php-0.9.1 fpm
 >=media-libs/libvpx-1.6.0-r1 svc
+app-cdr/k3b encode vorbis dvd ffmpeg flac mp3
+>=media-video/transcode-1.1.7-r3 dvd
+net-misc/ibrdtnd curl libdaemon zlib dtnsec lowpan sqlite tls
+>=kde-base/kdelibs-4.14.25 udisks
