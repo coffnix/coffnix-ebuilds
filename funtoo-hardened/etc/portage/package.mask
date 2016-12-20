@@ -20,3 +20,8 @@ www-plugins/chrome-binary-plugins:stable
 #=app-emulation/virtualbox-modules-5.1.2
 =kde-apps/kmix-16.04.3-r1
 =dev-libs/libclc-0.2.0_pre20160921
+=dev-lang/lua-5.1.5-r4
+dev-lang/php:7.0
+=dev-libs/elfutils-0.167
+>=www-client/chromium-56.0.2924.18
+media-plugins/gst-plugins-ffmpeg

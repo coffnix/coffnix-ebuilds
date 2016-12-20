@@ -144,3 +144,5 @@ app-cdr/k3b encode vorbis dvd ffmpeg flac mp3
 >=media-video/transcode-1.1.7-r3 dvd
 net-misc/ibrdtnd curl libdaemon zlib dtnsec lowpan sqlite tls
 >=kde-base/kdelibs-4.14.25 udisks
+media-plugins/gst-plugins-ffmpeg abi_x86_64 abi_x86_32
+media-plugins/gst-plugins-meta abi_x86_64 abi_x86_32 -ffmpeg
