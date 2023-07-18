@@ -10,13 +10,14 @@ http://www.funtoo.org/Local_Overlay
 ~~~~
 # mkdir -p /var/overlay ; cd /var/overlay
 # git clone https://github.com/coffnix/coffnix-ebuilds.git
+# mv /var/overlay/coffnix-ebuilds /var/overlay/overlay-local
 ~~~~
 
 
-3- Configure /etc/make.conf:
+3- Configure /etc/portage/repos.conf/overlay-local.conf::
 
 ~~~~
-# echo 'PORTDIR_OVERLAY="/var/overlay/coffnix-ebuilds/local"' >> /etc/make.conf
+# echo -e "[overlay-local]\nlocation = /var/overlay/overlay-local\nauto-sync = no\npriority = 10" > /etc/portage/repos.conf/overlay-local.conf
 ~~~~
 
 4- Update your database:
