@@ -100,6 +100,7 @@ BDEPEND="
 PATCHES=(
 	"${FILESDIR}/6/patches/${PN}-4.0.18-modulepathfix.patch"
 	"${FILESDIR}/6.4/patches/${PN}-3.0.30-security-disable-PidFile.patch"
+	"${FILESDIR}/6.4/patches/${PN}-6.4.0-configure-sscanf.patch"
 )
 
 S=${WORKDIR}/${MY_P}
