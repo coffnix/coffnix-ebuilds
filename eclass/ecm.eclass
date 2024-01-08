@@ -22,7 +22,7 @@
 # any phase functions are overridden the version here should also be called.
 
 case ${EAPI} in
-	8) ;;
+	7) ;;
 	*) die "${ECLASS}: EAPI ${EAPI:-0} not supported" ;;
 esac
 

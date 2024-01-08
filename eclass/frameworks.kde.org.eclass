@@ -18,7 +18,7 @@
 # part of this eclass's API.
 
 case ${EAPI} in
-	8) ;;
+	7) ;;
 	*) die "${ECLASS}: EAPI ${EAPI:-0} not supported" ;;
 esac
 
