@@ -3,7 +3,7 @@
 
 EAPI=7
 
-PYTHON_COMPAT=( python3_{10..12} )
+PYTHON_COMPAT=( python3+ )
 PVCUT=$(ver_cut 1-2)
 QTMIN=6.6.0
 inherit ecm frameworks.kde.org optfeature python-any-r1

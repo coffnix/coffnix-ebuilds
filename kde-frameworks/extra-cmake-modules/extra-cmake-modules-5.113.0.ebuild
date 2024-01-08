@@ -3,7 +3,7 @@
 
 EAPI=7
 
-PYTHON_COMPAT=( python3_{10..12} )
+PYTHON_COMPAT=( python3+ )
 QTMIN=5.15.9
 inherit cmake frameworks.kde.org python-any-r1
 
