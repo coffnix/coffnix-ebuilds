@@ -1,7 +1,7 @@
 # Copyright 2021-2024 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=8
+EAPI=7
 
 # 3.12 needs QTBUG-117979 (see also QTBUG-115512)
 PYTHON_COMPAT=( python3_{10..11} )

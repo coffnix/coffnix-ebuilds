@@ -1,7 +1,7 @@
 # Copyright 1999-2024 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=8
+EAPI=7
 
 PATCHSET="${PN}-5.15.10_p20230815-patchset"
 PYTHON_COMPAT=( python3_{10..11} )

@@ -1,9 +1,9 @@
 # Copyright 2021-2023 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=8
+EAPI=7
 
-PYTHON_COMPAT=( python3_{10..12} )
+PYTHON_COMPAT=( python3+ )
 inherit python-any-r1 qt6-build
 
 DESCRIPTION="Qt Declarative (Quick 2)"
