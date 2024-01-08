@@ -6,6 +6,7 @@ EAPI=7
 inherit cmake
 
 DESCRIPTION="User Tools from libqtxdg"
+KEYWORDS="*"
 HOMEPAGE="https://lxqt-project.org/"
 
 LICENSE="LGPL-2.1"
