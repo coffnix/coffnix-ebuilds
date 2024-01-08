@@ -4,7 +4,7 @@
 # @ECLASS: frameworks.kde.org.eclass
 # @MAINTAINER:
 # kde@gentoo.org
-# @SUPPORTED_EAPIS: 8
+# @SUPPORTED_EAPIS: 7
 # @PROVIDES: kde.org
 # @BLURB: Support eclass for KDE Frameworks packages.
 # @DESCRIPTION:

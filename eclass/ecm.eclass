@@ -4,7 +4,7 @@
 # @ECLASS: ecm.eclass
 # @MAINTAINER:
 # kde@gentoo.org
-# @SUPPORTED_EAPIS: 8
+# @SUPPORTED_EAPIS: 7 8
 # @PROVIDES: cmake virtualx
 # @BLURB: Support eclass for packages that use KDE Frameworks with ECM.
 # @DESCRIPTION:
