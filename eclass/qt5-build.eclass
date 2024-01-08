@@ -383,7 +383,10 @@ qt5_syncqt_version() {
 qt5_symlink_binary_to_path() {
 	[[ $# -ge 1 ]] || die "${FUNCNAME}() requires at least one argument"
 
-	dosym -r "${QT5_BINDIR}"/${1} /usr/bin/${1}${2}
+#	dosym -r "${QT5_BINDIR}"/${1} /usr/bin/${1}${2}
+	dosym qt5-"${CHOST}".conf /etc/xdg/qtchooser/5.conf
+	dosym qt5-"${CHOST}".conf /etc/xdg/qtchooser/qt5.conf
+	dosym qt5.conf /etc/xdg/qtchooser/default.conf
 }
 
 # @FUNCTION: qt_use
