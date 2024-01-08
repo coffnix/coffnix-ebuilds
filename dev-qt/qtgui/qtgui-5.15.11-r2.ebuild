@@ -1,23 +1,20 @@
-# Copyright 1999-2023 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
 
-if [[ ${PV} != *9999* ]]; then
-	QT5_KDEPATCHSET_REV=3
-	KEYWORDS="amd64 arm arm64 ~hppa ~loong ppc ppc64 ~riscv ~sparc x86"
-fi
-
 QT5_MODULE="qtbase"
 inherit qt5-build
+	QT5_PV="5.15.11"
 
 DESCRIPTION="The GUI module and platform plugins for the Qt5 framework"
 
-SLOT=5/${QT5_PV} # bug 707658
-IUSE="accessibility dbus egl eglfs evdev gles2-only ibus jpeg +libinput
-	linuxfb +png tslib tuio +udev vnc vulkan wayland +X"
+SLOT=5/5.15.2 # bug 707658
+
+KEYWORDS="*"
+IUSE="accessibility dbus egl eglfs evdev +gif gles2-only ibus jpeg
+	+libinput linuxfb +png tslib tuio +udev vnc vulkan wayland +X"
 REQUIRED_USE="
-	|| ( eglfs linuxfb vnc wayland X )
+	|| ( eglfs linuxfb vnc X )
 	accessibility? ( dbus X )
 	eglfs? ( egl )
 	ibus? ( dbus )
@@ -57,7 +54,7 @@ RDEPEND="
 		x11-libs/libICE
 		x11-libs/libSM
 		x11-libs/libX11
-		x11-libs/libxcb:=
+		x11-libs/libxcb:=[xkb]
 		x11-libs/libxkbcommon[X]
 		x11-libs/xcb-util-image
 		x11-libs/xcb-util-keysyms
@@ -99,6 +96,7 @@ QT5_GENTOO_CONFIG=(
 	:fontconfig:
 	:system-freetype:FREETYPE
 	!:no-freetype:
+	!gif:no-gif:
 	gles2-only::OPENGL_ES
 	gles2-only:opengles2:OPENGL_ES_2
 	!:no-gui:
@@ -151,15 +149,15 @@ src_prepare() {
 
 src_configure() {
 	local myconf=(
-		$(qt_use accessibility feature-accessibility-atspi-bridge)
-		$(usev dbus -dbus-linked)
+		$(usex dbus -dbus-linked '')
 		$(qt_use egl)
 		$(qt_use eglfs)
-		$(usev eglfs '-gbm -kms')
+		$(usex eglfs '-gbm -kms' '')
 		$(qt_use evdev)
 		$(qt_use evdev mtdev)
 		-fontconfig
 		-system-freetype
+		$(usex gif '' -no-gif)
 		-gui
 		-system-harfbuzz
 		$(qt_use jpeg libjpeg system)
@@ -171,7 +169,7 @@ src_configure() {
 		$(qt_use udev libudev)
 		$(qt_use vulkan)
 		$(qt_use X xcb)
-		$(usev X '-xcb-xlib')
+		$(usex X '-xcb-xlib' '')
 	)
 	if use libinput || use X; then
 		myconf+=( -xkbcommon )
