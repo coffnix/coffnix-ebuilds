@@ -16,13 +16,13 @@ DESCRIPTION="WYSIWYG tool for designing and building graphical user interfaces w
 IUSE="declarative"
 
 DEPEND="
-	=dev-qt/qtcore-${QT5_PV}*:5=
-	=dev-qt/qtgui-${QT5_PV}*:5=[png]
-	=dev-qt/qtnetwork-${QT5_PV}*
-	=dev-qt/qtprintsupport-${QT5_PV}*
-	=dev-qt/qtwidgets-${QT5_PV}*
-	=dev-qt/qtxml-${QT5_PV}*
-	declarative? ( =dev-qt/qtdeclarative-${QT5_PV}*[widgets] )
+	=dev-qt/qtcore-5.15.11*:5=
+	=dev-qt/qtgui-5.15.11*:5=[png]
+	=dev-qt/qtnetwork-5.15.11*
+	=dev-qt/qtprintsupport-5.15.11*
+	=dev-qt/qtwidgets-5.15.11*
+	=dev-qt/qtxml-5.15.11*
+	declarative? ( =dev-qt/qtdeclarative-5.15.11*[widgets] )
 "
 RDEPEND="${DEPEND}"
 

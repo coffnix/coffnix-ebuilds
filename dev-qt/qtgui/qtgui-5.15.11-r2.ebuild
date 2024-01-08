@@ -24,14 +24,14 @@ REQUIRED_USE="
 
 RDEPEND="
 	dev-libs/glib:2
-	=dev-qt/qtcore-${QT5_PV}*:5=
+	=dev-qt/qtcore-5.15.11*:5=
 	dev-util/gtk-update-icon-cache
 	media-libs/fontconfig
 	media-libs/freetype:2
 	media-libs/harfbuzz:=
 	sys-libs/zlib:=
 	accessibility? ( app-accessibility/at-spi2-core:2 )
-	dbus? ( =dev-qt/qtdbus-${QT5_PV}* )
+	dbus? ( =dev-qt/qtdbus-5.15.11* )
 	eglfs? (
 		media-libs/mesa[gbm(+)]
 		x11-libs/libdrm
@@ -46,9 +46,9 @@ RDEPEND="
 	)
 	png? ( media-libs/libpng:= )
 	tslib? ( >=x11-libs/tslib-1.21 )
-	tuio? ( =dev-qt/qtnetwork-${QT5_PV}* )
+	tuio? ( =dev-qt/qtnetwork-5.15.11* )
 	udev? ( virtual/libudev:= )
-	vnc? ( =dev-qt/qtnetwork-${QT5_PV}* )
+	vnc? ( =dev-qt/qtnetwork-5.15.11* )
 	vulkan? ( dev-util/vulkan-headers )
 	X? (
 		x11-libs/libICE
@@ -70,7 +70,7 @@ DEPEND="${RDEPEND}
 "
 PDEPEND="
 	ibus? ( app-i18n/ibus )
-	wayland? ( =dev-qt/qtwayland-${QT5_PV}* )
+	wayland? ( =dev-qt/qtwayland-5.15.11* )
 "
 
 QT5_TARGET_SUBDIRS=(

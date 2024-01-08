@@ -13,14 +13,14 @@ inherit qt5-build
 
 DESCRIPTION="SQL abstraction library for the Qt5 framework"
 
-SLOT=5/${QT5_PV} # bug 639140
+SLOT=5/5.15.11 # bug 639140
 IUSE="freetds mysql oci8 odbc postgres +sqlite"
 REQUIRED_USE="
 	|| ( freetds mysql oci8 odbc postgres sqlite )
 "
 
 DEPEND="
-	=dev-qt/qtcore-${QT5_PV}*:5=
+	=dev-qt/qtcore-5.15.11*:5=
 	freetds? ( dev-db/freetds )
 	mysql? ( dev-db/mysql-connector-c:= )
 	oci8? ( dev-db/oracle-instantclient:=[sdk] )

@@ -15,10 +15,10 @@ DESCRIPTION="Customizable input framework and virtual keyboard for Qt"
 IUSE="handwriting +spell +X"
 
 DEPEND="
-	=dev-qt/qtcore-${QT5_PV}*
-	=dev-qt/qtdeclarative-${QT5_PV}*
-	=dev-qt/qtgui-${QT5_PV}*
-	=dev-qt/qtsvg-${QT5_PV}*
+	=dev-qt/qtcore-5.15.11*
+	=dev-qt/qtdeclarative-5.15.11*
+	=dev-qt/qtgui-5.15.11*
+	=dev-qt/qtsvg-5.15.11*
 	spell? ( app-text/hunspell:= )
 	X? ( x11-libs/libxcb:= )
 "

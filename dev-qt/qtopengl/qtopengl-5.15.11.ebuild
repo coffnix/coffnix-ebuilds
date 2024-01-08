@@ -17,9 +17,9 @@ DESCRIPTION="OpenGL support library for the Qt5 framework (deprecated)"
 IUSE="gles2-only"
 
 DEPEND="
-	=dev-qt/qtcore-${QT5_PV}*:5=
-	=dev-qt/qtgui-${QT5_PV}*[gles2-only=]
-	=dev-qt/qtwidgets-${QT5_PV}*[gles2-only=]
+	=dev-qt/qtcore-5.15.11*:5=
+	=dev-qt/qtgui-5.15.11*[gles2-only=]
+	=dev-qt/qtwidgets-5.15.11*[gles2-only=]
 "
 RDEPEND="${DEPEND}"
 

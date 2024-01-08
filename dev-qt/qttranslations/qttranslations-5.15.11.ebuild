@@ -13,5 +13,5 @@ DESCRIPTION="Translation files for the Qt5 framework"
 
 IUSE=""
 
-DEPEND="=dev-qt/qtcore-${QT5_PV}*"
-BDEPEND="=dev-qt/linguist-tools-${QT5_PV}*"
+DEPEND="=dev-qt/qtcore-5.15.11*"
+BDEPEND="=dev-qt/linguist-tools-5.15.11*"

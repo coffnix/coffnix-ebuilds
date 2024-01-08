@@ -16,7 +16,7 @@ DESCRIPTION="Network abstraction library for the Qt5 framework"
 IUSE="gssapi libproxy sctp +ssl"
 
 DEPEND="
-	=dev-qt/qtcore-${QT5_PV}*:5=
+	=dev-qt/qtcore-5.15.11*:5=
 	sys-libs/zlib:=
 	gssapi? ( virtual/krb5 )
 	libproxy? ( net-libs/libproxy )

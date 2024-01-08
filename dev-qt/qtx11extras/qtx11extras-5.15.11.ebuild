@@ -14,9 +14,9 @@ fi
 IUSE=""
 
 RDEPEND="
-	=dev-qt/qtcore-${QT5_PV}*
-	=dev-qt/qtgui-${QT5_PV}*[X]
+	=dev-qt/qtcore-5.15.11*
+	=dev-qt/qtgui-5.15.11*[X]
 "
 DEPEND="${RDEPEND}
-	test? ( =dev-qt/qtwidgets-${QT5_PV}* )
+	test? ( =dev-qt/qtwidgets-5.15.11* )
 "

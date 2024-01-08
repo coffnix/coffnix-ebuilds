@@ -15,11 +15,11 @@ DESCRIPTION="SVG rendering library for the Qt5 framework"
 IUSE=""
 
 RDEPEND="
-	=dev-qt/qtcore-${QT5_PV}*
-	=dev-qt/qtgui-${QT5_PV}*
-	=dev-qt/qtwidgets-${QT5_PV}*
+	=dev-qt/qtcore-5.15.11*
+	=dev-qt/qtgui-5.15.11*
+	=dev-qt/qtwidgets-5.15.11*
 	sys-libs/zlib:=
 "
 DEPEND="${RDEPEND}
-	test? ( =dev-qt/qtxml-${QT5_PV}* )
+	test? ( =dev-qt/qtxml-5.15.11* )
 "

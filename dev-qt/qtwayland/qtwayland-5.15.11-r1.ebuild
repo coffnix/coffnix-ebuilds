@@ -12,18 +12,18 @@ inherit qt5-build
 
 DESCRIPTION="Wayland platform plugin for Qt"
 
-SLOT=5/${QT5_PV} # bug 815646
+SLOT=5/5.15.11 # bug 815646
 IUSE="compositor"
 
 RDEPEND="
 	dev-libs/wayland
-	=dev-qt/qtcore-${QT5_PV}*:5=
-	=dev-qt/qtgui-${QT5_PV}*:5=[egl,libinput]
+	=dev-qt/qtcore-5.15.11*:5=
+	=dev-qt/qtgui-5.15.11*:5=[egl,libinput]
 	media-libs/libglvnd
 	x11-libs/libxkbcommon
 	compositor? (
-		=dev-qt/qtdeclarative-${QT5_PV}*:5=
-		=dev-qt/qtgui-${QT5_PV}*:5=[vulkan]
+		=dev-qt/qtdeclarative-5.15.11*:5=
+		=dev-qt/qtgui-5.15.11*:5=[vulkan]
 	)
 "
 DEPEND="${RDEPEND}

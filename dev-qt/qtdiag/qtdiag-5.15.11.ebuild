@@ -16,10 +16,10 @@ DESCRIPTION="Tool for reporting diagnostic information about Qt and its environm
 IUSE="+network +widgets"
 
 DEPEND="
-	=dev-qt/qtcore-${QT5_PV}*:5=
-	=dev-qt/qtgui-${QT5_PV}*:5=
-	network? ( =dev-qt/qtnetwork-${QT5_PV}*[ssl] )
-	widgets? ( =dev-qt/qtwidgets-${QT5_PV}* )
+	=dev-qt/qtcore-5.15.11*:5=
+	=dev-qt/qtgui-5.15.11*:5=
+	network? ( =dev-qt/qtnetwork-5.15.11*[ssl] )
+	widgets? ( =dev-qt/qtwidgets-5.15.11* )
 "
 RDEPEND="${DEPEND}"
 

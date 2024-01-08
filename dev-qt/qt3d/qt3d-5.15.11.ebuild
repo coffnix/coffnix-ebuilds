@@ -14,13 +14,13 @@ DESCRIPTION="3D rendering module for the Qt5 framework"
 IUSE="gamepad gles2-only qml vulkan"
 
 RDEPEND="
-	=dev-qt/qtconcurrent-${QT5_PV}*
-	=dev-qt/qtcore-${QT5_PV}*
-	=dev-qt/qtgui-${QT5_PV}*:5=[vulkan=]
-	=dev-qt/qtnetwork-${QT5_PV}*
+	=dev-qt/qtconcurrent-5.15.11*
+	=dev-qt/qtcore-5.15.11*
+	=dev-qt/qtgui-5.15.11*:5=[vulkan=]
+	=dev-qt/qtnetwork-5.15.11*
 	>=media-libs/assimp-4.0.0:=
-	gamepad? ( =dev-qt/qtgamepad-${QT5_PV}* )
-	qml? ( =dev-qt/qtdeclarative-${QT5_PV}*[gles2-only=] )
+	gamepad? ( =dev-qt/qtgamepad-5.15.11* )
+	qml? ( =dev-qt/qtdeclarative-5.15.11*[gles2-only=] )
 "
 DEPEND="${RDEPEND}
 	vulkan? ( dev-util/vulkan-headers )

@@ -15,9 +15,9 @@ DESCRIPTION="Implementation of the WebSocket protocol for the Qt5 framework"
 IUSE="qml +ssl"
 
 DEPEND="
-	=dev-qt/qtcore-${QT5_PV}*
-	=dev-qt/qtnetwork-${QT5_PV}*[ssl=]
-	qml? ( =dev-qt/qtdeclarative-${QT5_PV}* )
+	=dev-qt/qtcore-5.15.11*
+	=dev-qt/qtnetwork-5.15.11*[ssl=]
+	qml? ( =dev-qt/qtdeclarative-5.15.11* )
 
 "
 RDEPEND="${DEPEND}"

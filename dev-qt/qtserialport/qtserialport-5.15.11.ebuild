@@ -14,7 +14,7 @@ fi
 IUSE=""
 
 DEPEND="
-	=dev-qt/qtcore-${QT5_PV}*
+	=dev-qt/qtcore-5.15.11*
 	virtual/libudev:=
 "
 RDEPEND="${DEPEND}"

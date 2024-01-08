@@ -18,12 +18,12 @@ IUSE="dbus gles2-only gtk +png +X"
 REQUIRED_USE="gtk? ( dbus )"
 
 DEPEND="
-	=dev-qt/qtcore-${QT5_PV}*:5=
-	=dev-qt/qtgui-${QT5_PV}*:5=[gles2-only=,png=,X?]
-	dbus? ( =dev-qt/qtdbus-${QT5_PV}* )
+	=dev-qt/qtcore-5.15.11*:5=
+	=dev-qt/qtgui-5.15.11*:5=[gles2-only=,png=,X?]
+	dbus? ( =dev-qt/qtdbus-5.15.11* )
 	gtk? (
 		dev-libs/glib:2
-		=dev-qt/qtgui-${QT5_PV}*:5=[dbus]
+		=dev-qt/qtgui-5.15.11*:5=[dbus]
 		x11-libs/gtk+:3[X]
 		x11-libs/libX11
 		x11-libs/pango

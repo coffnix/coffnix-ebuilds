@@ -15,7 +15,7 @@ DESCRIPTION="Qt5 plugin metadata dumper"
 
 IUSE=""
 
-DEPEND="=dev-qt/qtcore-${QT5_PV}*"
+DEPEND="=dev-qt/qtcore-5.15.11*"
 RDEPEND="${DEPEND}"
 
 QT5_TARGET_SUBDIRS=(

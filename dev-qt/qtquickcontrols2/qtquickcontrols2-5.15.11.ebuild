@@ -15,13 +15,13 @@ DESCRIPTION="Set of next generation Qt Quick controls for the Qt5 framework"
 IUSE="widgets"
 
 DEPEND="
-	=dev-qt/qtcore-${QT5_PV}*
-	=dev-qt/qtdeclarative-${QT5_PV}*
-	=dev-qt/qtgui-${QT5_PV}*
-	widgets? ( =dev-qt/qtwidgets-${QT5_PV}* )
+	=dev-qt/qtcore-5.15.11*
+	=dev-qt/qtdeclarative-5.15.11*
+	=dev-qt/qtgui-5.15.11*
+	widgets? ( =dev-qt/qtwidgets-5.15.11* )
 "
 RDEPEND="${DEPEND}
-	=dev-qt/qtgraphicaleffects-${QT5_PV}*
+	=dev-qt/qtgraphicaleffects-5.15.11*
 "
 
 src_prepare() {

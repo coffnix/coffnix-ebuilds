@@ -16,10 +16,10 @@ DESCRIPTION="Qt5 module for integrating online documentation into applications"
 IUSE=""
 
 DEPEND="
-	=dev-qt/qtcore-${QT5_PV}*:5=
-	=dev-qt/qtgui-${QT5_PV}*
-	=dev-qt/qtsql-${QT5_PV}*[sqlite]
-	=dev-qt/qtwidgets-${QT5_PV}*
+	=dev-qt/qtcore-5.15.11*:5=
+	=dev-qt/qtgui-5.15.11*
+	=dev-qt/qtsql-5.15.11*[sqlite]
+	=dev-qt/qtwidgets-5.15.11*
 "
 RDEPEND="${DEPEND}"
 

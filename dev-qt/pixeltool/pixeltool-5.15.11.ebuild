@@ -16,9 +16,9 @@ DESCRIPTION="Qt screen magnifier"
 IUSE=""
 
 DEPEND="
-	=dev-qt/qtcore-${QT5_PV}*:5=
-	=dev-qt/qtgui-${QT5_PV}*:5=[png]
-	=dev-qt/qtwidgets-${QT5_PV}*
+	=dev-qt/qtcore-5.15.11*:5=
+	=dev-qt/qtgui-5.15.11*:5=[png]
+	=dev-qt/qtwidgets-5.15.11*
 "
 RDEPEND="${DEPEND}
 	!dev-qt/${PN}:5

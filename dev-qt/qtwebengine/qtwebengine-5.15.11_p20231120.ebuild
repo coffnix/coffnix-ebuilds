@@ -13,7 +13,7 @@ HOMEPAGE="https://www.qt.io/"
 
 if [[ ${QT5_BUILD_TYPE} == release ]]; then
 	KEYWORDS="amd64 ~arm arm64 ~ppc64 ~x86"
-	if [[ ${PV} == ${QT5_PV}_p* ]]; then
+	if [[ ${PV} == 5.15.11_p* ]]; then
 		SRC_URI="https://dev.gentoo.org/~asturm/distfiles/${P}.tar.xz"
 		S="${WORKDIR}/${P}"
 		QT5_BUILD_DIR="${S}_build"
@@ -48,12 +48,12 @@ RDEPEND="
 	dev-libs/libxml2[icu]
 	dev-libs/libxslt
 	dev-libs/re2:=
-	=dev-qt/qtcore-${QT5_PV}*
-	=dev-qt/qtdeclarative-${QT5_PV}*
-	=dev-qt/qtgui-${QT5_PV}*
-	=dev-qt/qtnetwork-${QT5_PV}*
-	=dev-qt/qtprintsupport-${QT5_PV}*
-	=dev-qt/qtwebchannel-${QT5_PV}*[qml]
+	=dev-qt/qtcore-5.15.11*
+	=dev-qt/qtdeclarative-5.15.11*
+	=dev-qt/qtgui-5.15.11*
+	=dev-qt/qtnetwork-5.15.11*
+	=dev-qt/qtprintsupport-5.15.11*
+	=dev-qt/qtwebchannel-5.15.11*[qml]
 	media-libs/fontconfig
 	media-libs/freetype
 	media-libs/harfbuzz:=
@@ -81,15 +81,15 @@ RDEPEND="
 	x11-libs/libXScrnSaver
 	x11-libs/libXtst
 	alsa? ( media-libs/alsa-lib )
-	designer? ( =dev-qt/designer-${QT5_PV}* )
-	geolocation? ( =dev-qt/qtpositioning-${QT5_PV}* )
+	designer? ( =dev-qt/designer-5.15.11* )
+	geolocation? ( =dev-qt/qtpositioning-5.15.11* )
 	kerberos? ( virtual/krb5 )
 	pulseaudio? ( media-libs/libpulse )
 	screencast? ( media-video/pipewire:= )
 	system-icu? ( >=dev-libs/icu-69.1:= )
 	widgets? (
-		=dev-qt/qtdeclarative-${QT5_PV}*[widgets]
-		=dev-qt/qtwidgets-${QT5_PV}*
+		=dev-qt/qtdeclarative-5.15.11*[widgets]
+		=dev-qt/qtwidgets-5.15.11*
 	)
 "
 DEPEND="${RDEPEND}
@@ -170,14 +170,14 @@ src_prepare() {
 		PATCHES+=( "${FILESDIR}/${P}-libxml2-2.12.patch" ) # bug 917601
 	fi
 
-	if [[ ${PV} == ${QT5_PV}_p* ]]; then
+	if [[ ${PV} == 5.15.11_p* ]]; then
 		# This is made from git, and for some reason will fail w/o .git directories.
 		mkdir -p .git src/3rdparty/chromium/.git || die
 	fi
 	# We need to make sure this integrates well into Qt 5.15.3 installation.
 	# Otherwise revdeps fail w/o heavy changes. This is the simplest way to do it.
 	# See also: https://www.qt.io/blog/building-qt-webengine-against-other-qt-versions
-	sed -E "/^MODULE_VERSION/s/5\.15\.[0-9]+/${QT5_PV}/" -i .qmake.conf || die
+	sed -E "/^MODULE_VERSION/s/5\.15\.[0-9]+/5.15.11/" -i .qmake.conf || die
 
 	# QTBUG-88657 - jumbo-build could still make trouble
 	if ! use jumbo-build; then

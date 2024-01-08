@@ -16,11 +16,11 @@ DESCRIPTION="Graphical tool that lets you introspect D-Bus objects and messages"
 IUSE=""
 
 DEPEND="
-	=dev-qt/qtcore-${QT5_PV}*
-	=dev-qt/qtdbus-${QT5_PV}*
-	=dev-qt/qtgui-${QT5_PV}*
-	=dev-qt/qtwidgets-${QT5_PV}*
-	=dev-qt/qtxml-${QT5_PV}*
+	=dev-qt/qtcore-5.15.11*
+	=dev-qt/qtdbus-5.15.11*
+	=dev-qt/qtgui-5.15.11*
+	=dev-qt/qtwidgets-5.15.11*
+	=dev-qt/qtxml-5.15.11*
 "
 RDEPEND="${DEPEND}
 	!dev-qt/${PN}:5

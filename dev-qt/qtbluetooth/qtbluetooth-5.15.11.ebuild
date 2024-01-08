@@ -16,12 +16,12 @@ DESCRIPTION="Bluetooth support library for the Qt5 framework"
 IUSE="qml"
 
 DEPEND="
-	=dev-qt/qtconcurrent-${QT5_PV}*
-	=dev-qt/qtcore-${QT5_PV}*:5=
-	=dev-qt/qtdbus-${QT5_PV}*
-	=dev-qt/qtnetwork-${QT5_PV}*
+	=dev-qt/qtconcurrent-5.15.11*
+	=dev-qt/qtcore-5.15.11*:5=
+	=dev-qt/qtdbus-5.15.11*
+	=dev-qt/qtnetwork-5.15.11*
 	>=net-wireless/bluez-5:=
-	qml? ( =dev-qt/qtdeclarative-${QT5_PV}* )
+	qml? ( =dev-qt/qtdeclarative-5.15.11* )
 "
 RDEPEND="${DEPEND}"
 

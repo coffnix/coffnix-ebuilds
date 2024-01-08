@@ -16,9 +16,9 @@ DESCRIPTION="Interface to Qt applications communicating over D-Bus"
 IUSE=""
 
 DEPEND="
-	=dev-qt/qtcore-${QT5_PV}*
-	=dev-qt/qtdbus-${QT5_PV}*
-	=dev-qt/qtxml-${QT5_PV}*
+	=dev-qt/qtcore-5.15.11*
+	=dev-qt/qtdbus-5.15.11*
+	=dev-qt/qtxml-5.15.11*
 "
 RDEPEND="${DEPEND}
 	!dev-qt/${PN}:5

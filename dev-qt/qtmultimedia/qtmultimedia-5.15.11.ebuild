@@ -15,9 +15,9 @@ DESCRIPTION="Multimedia (audio, video, radio, camera) library for the Qt5 framew
 IUSE="alsa gles2-only gstreamer openal pulseaudio qml widgets"
 
 RDEPEND="
-	=dev-qt/qtcore-${QT5_PV}*
-	=dev-qt/qtgui-${QT5_PV}*[gles2-only=]
-	=dev-qt/qtnetwork-${QT5_PV}*
+	=dev-qt/qtcore-5.15.11*
+	=dev-qt/qtgui-5.15.11*[gles2-only=]
+	=dev-qt/qtnetwork-5.15.11*
 	alsa? ( media-libs/alsa-lib )
 	gstreamer? (
 		dev-libs/glib:2
@@ -27,12 +27,12 @@ RDEPEND="
 	)
 	pulseaudio? ( media-libs/libpulse[glib] )
 	qml? (
-		=dev-qt/qtdeclarative-${QT5_PV}*
-		gles2-only? ( =dev-qt/qtgui-${QT5_PV}*[egl] )
+		=dev-qt/qtdeclarative-5.15.11*
+		gles2-only? ( =dev-qt/qtgui-5.15.11*[egl] )
 		openal? ( media-libs/openal )
 	)
 	widgets? (
-		=dev-qt/qtwidgets-${QT5_PV}*[gles2-only=]
+		=dev-qt/qtwidgets-5.15.11*[gles2-only=]
 		media-libs/libglvnd
 	)
 "

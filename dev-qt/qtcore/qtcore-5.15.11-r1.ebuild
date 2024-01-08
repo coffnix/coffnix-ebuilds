@@ -12,7 +12,7 @@ QT5_MODULE="qtbase"
 inherit linux-info flag-o-matic toolchain-funcs qt5-build
 
 DESCRIPTION="Cross-platform application development framework"
-SLOT=5/${QT5_PV}
+SLOT=5/5.15.11
 
 IUSE="icu old-kernel"
 

@@ -15,8 +15,8 @@ DESCRIPTION="Qt5 module for integrating C++ and QML applications with HTML/JavaS
 IUSE="qml"
 
 DEPEND="
-	=dev-qt/qtcore-${QT5_PV}*
-	qml? ( =dev-qt/qtdeclarative-${QT5_PV}* )
+	=dev-qt/qtcore-5.15.11*
+	qml? ( =dev-qt/qtdeclarative-5.15.11* )
 "
 RDEPEND="${DEPEND}"
 

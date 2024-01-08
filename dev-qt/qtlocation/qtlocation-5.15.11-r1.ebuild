@@ -17,16 +17,16 @@ fi
 
 RDEPEND="
 	dev-libs/icu:=
-	=dev-qt/qtcore-${QT5_PV}*
-	=dev-qt/qtdeclarative-${QT5_PV}*
-	=dev-qt/qtgui-${QT5_PV}*
-	=dev-qt/qtnetwork-${QT5_PV}*
-	=dev-qt/qtpositioning-${QT5_PV}*[qml]
-	=dev-qt/qtsql-${QT5_PV}*
+	=dev-qt/qtcore-5.15.11*
+	=dev-qt/qtdeclarative-5.15.11*
+	=dev-qt/qtgui-5.15.11*
+	=dev-qt/qtnetwork-5.15.11*
+	=dev-qt/qtpositioning-5.15.11*[qml]
+	=dev-qt/qtsql-5.15.11*
 	sys-libs/zlib
 "
 DEPEND="${RDEPEND}
-	=dev-qt/qtconcurrent-${QT5_PV}*
+	=dev-qt/qtconcurrent-5.15.11*
 "
 
 QT5_TARGET_SUBDIRS=(

@@ -16,12 +16,12 @@ DESCRIPTION="Graphical tool for translating Qt applications"
 IUSE=""
 
 DEPEND="
-	=dev-qt/designer-${QT5_PV}*
-	=dev-qt/qtcore-${QT5_PV}*:5=
-	=dev-qt/qtgui-${QT5_PV}*:5=[png]
-	=dev-qt/qtprintsupport-${QT5_PV}*
-	=dev-qt/qtwidgets-${QT5_PV}*
-	=dev-qt/qtxml-${QT5_PV}*
+	=dev-qt/designer-5.15.11*
+	=dev-qt/qtcore-5.15.11*:5=
+	=dev-qt/qtgui-5.15.11*:5=[png]
+	=dev-qt/qtprintsupport-5.15.11*
+	=dev-qt/qtwidgets-5.15.11*
+	=dev-qt/qtxml-5.15.11*
 "
 RDEPEND="${DEPEND}
 	!dev-qt/${PN}:5

@@ -16,10 +16,10 @@ IUSE="alsa flite"
 
 RDEPEND="
 	>=app-accessibility/speech-dispatcher-0.8.7
-	=dev-qt/qtcore-${QT5_PV}*
+	=dev-qt/qtcore-5.15.11*
 	flite? (
 		>=app-accessibility/flite-2[alsa?]
-		=dev-qt/qtmultimedia-${QT5_PV}*[alsa?]
+		=dev-qt/qtmultimedia-5.15.11*[alsa?]
 		alsa? ( media-libs/alsa-lib )
 	)
 "

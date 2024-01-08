@@ -16,9 +16,9 @@ DESCRIPTION="Tools for working with Qt translation data files"
 IUSE="qml"
 
 DEPEND="
-	=dev-qt/qtcore-${QT5_PV}*:5=
-	=dev-qt/qtxml-${QT5_PV}*
-	qml? ( =dev-qt/qtdeclarative-${QT5_PV}* )
+	=dev-qt/qtcore-5.15.11*:5=
+	=dev-qt/qtxml-5.15.11*
+	qml? ( =dev-qt/qtdeclarative-5.15.11* )
 "
 RDEPEND="${DEPEND}"
 

@@ -16,7 +16,7 @@ DESCRIPTION="Qt5 module for inter-process communication over the D-Bus protocol"
 IUSE=""
 
 DEPEND="
-	=dev-qt/qtcore-${QT5_PV}*:5=
+	=dev-qt/qtcore-5.15.11*:5=
 	sys-apps/dbus
 "
 RDEPEND="${DEPEND}"

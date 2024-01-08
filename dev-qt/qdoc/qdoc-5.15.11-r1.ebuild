@@ -16,9 +16,9 @@ DESCRIPTION="Qt documentation generator"
 IUSE="qml"
 
 DEPEND="
-	=dev-qt/qtcore-${QT5_PV}*:5=
+	=dev-qt/qtcore-5.15.11*:5=
 	sys-devel/clang:=
-	qml? ( =dev-qt/qtdeclarative-${QT5_PV}* )
+	qml? ( =dev-qt/qtdeclarative-5.15.11* )
 "
 RDEPEND="${DEPEND}"
 
