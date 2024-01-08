@@ -1,0 +1,20 @@
+# Distributed under the terms of the GNU General Public License v2
+
+EAPI=7
+KDE_ORG_COMMIT="{{commit_hash}}"
+
+inherit qt5-build
+
+DESCRIPTION="Qt module to access CAN, ModBus, and other industrial serial buses and protocols"
+SRC_URI="{{artifacts[0].src_uri}}"
+
+KEYWORDS="*"
+
+IUSE=""
+
+DEPEND="
+	=dev-qt/qtcore-{{qt5_ver}}*
+	=dev-qt/qtnetwork-{{qt5_ver}}*
+	=dev-qt/qtserialport-{{qt5_ver}}*
+"
+RDEPEND="${DEPEND}"

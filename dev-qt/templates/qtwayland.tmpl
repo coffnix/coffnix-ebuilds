@@ -1,0 +1,40 @@
+# Distributed under the terms of the GNU General Public License v2
+
+EAPI=7
+KDE_ORG_COMMIT="{{commit_hash}}"
+
+inherit qt5-build
+
+DESCRIPTION="Wayland platform plugin for Qt"
+SRC_URI="{{artifacts[0].src_uri}}"
+SLOT=5/5.15.2 # bug 815646
+
+KEYWORDS="*"
+
+IUSE="vulkan X"
+
+DEPEND="
+	dev-libs/wayland
+	=dev-qt/qtcore-{{qt5_ver}}*:5=
+	=dev-qt/qtdeclarative-{{qt5_ver}}*:5=
+	=dev-qt/qtgui-{{qt5_ver}}*:5=[egl,libinput,vulkan=,X?]
+	media-libs/libglvnd
+	>=x11-libs/libxkbcommon-0.2.0
+	vulkan? ( dev-util/vulkan-headers )
+	X? (
+		=dev-qt/qtgui-{{qt5_ver}}*[-gles2-only]
+		x11-libs/libX11
+		x11-libs/libXcomposite
+	)
+"
+RDEPEND="${DEPEND}"
+
+src_configure() {
+	local myqmakeargs=(
+		--
+		$(qt_use vulkan feature-wayland-vulkan-server-buffer)
+		$(qt_use X feature-xcomposite-egl)
+		$(qt_use X feature-xcomposite-glx)
+	)
+	qt5-build_src_configure
+}

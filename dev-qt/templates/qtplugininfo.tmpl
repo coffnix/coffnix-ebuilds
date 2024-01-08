@@ -1,0 +1,23 @@
+# Distributed under the terms of the GNU General Public License v2
+
+EAPI=7
+KDE_ORG_COMMIT="{{commit_hash}}"
+
+QT5_MODULE="{{qt5_module}}"
+inherit qt5-build
+
+DESCRIPTION="Qt5 plugin metadata dumper"
+SRC_URI="{{artifacts[0].src_uri}}"
+
+KEYWORDS="*"
+
+IUSE=""
+
+DEPEND="
+	=dev-qt/qtcore-{{qt5_ver}}*
+"
+RDEPEND="${DEPEND}"
+
+QT5_TARGET_SUBDIRS=(
+	src/qtplugininfo
+)

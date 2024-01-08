@@ -1,0 +1,52 @@
+From f3e9f2c3db0b90c2e72a7c3ebe26b24da87cd8b7 Mon Sep 17 00:00:00 2001
+From: Tsvetomir Bonev <inva@riseup.net>
+Date: Thu, 24 Aug 2023 16:52:42 +0300
+Subject: [PATCH] fix build with gcc 12
+
+---
+ src/3rdparty/chromium/base/third_party/symbolize/symbolize.h      | 2 ++
+ src/3rdparty/chromium/v8/src/heap/cppgc/prefinalizer-handler.h    | 1 +
+ src/3rdparty/chromium/third_party/skia/src/utils/SkParseColor.cpp | 3 +++
+ 3 files changed, 6 insertions(+)
+
+diff --git a/src/3rdparty/chromium/base/third_party/symbolize/symbolize.h b/src/3rdparty/chromium/base/third_party/symbolize/symbolize.h
+index c6f9ec436..94731e3a4 100644
+--- a/src/3rdparty/chromium/base/third_party/symbolize/symbolize.h
++++ b/src/3rdparty/chromium/base/third_party/symbolize/symbolize.h
+@@ -60,6 +60,8 @@
+ 
+ #ifdef HAVE_SYMBOLIZE
+ 
++#include <utility>
++
+ #if defined(__ELF__)  // defined by gcc
+ #if defined(__OpenBSD__)
+ #include <sys/exec_elf.h>
+diff --git a/src/3rdparty/chromium/v8/src/heap/cppgc/prefinalizer-handler.h b/src/3rdparty/chromium/v8/src/heap/cppgc/prefinalizer-handler.h
+index bc17c99b1..c82c91ff5 100644
+--- a/src/3rdparty/chromium/v8/src/heap/cppgc/prefinalizer-handler.h
++++ b/src/3rdparty/chromium/v8/src/heap/cppgc/prefinalizer-handler.h
+@@ -5,6 +5,7 @@
+ #ifndef V8_HEAP_CPPGC_PREFINALIZER_HANDLER_H_
+ #define V8_HEAP_CPPGC_PREFINALIZER_HANDLER_H_
+ 
++#include <utility>
+ #include <vector>
+ 
+ #include "include/cppgc/prefinalizer.h"
+diff --git a/src/3rdparty/chromium/third_party/skia/src/utils/SkParseColor.cpp b/src/3rdparty/chromium/third_party/skia/src/utils/SkParseColor.cpp
+index 7260365b2..0fdcf22fa 100644
+--- a/src/3rdparty/chromium/third_party/skia/src/utils/SkParseColor.cpp
++++ b/src/3rdparty/chromium/third_party/skia/src/utils/SkParseColor.cpp
+@@ -8,6 +8,9 @@
+
+ #include "include/utils/SkParse.h"
+
++#include <algorithm>
++#include <iterator>
++
+ static constexpr const char* gColorNames[] = {
+     "aliceblue",
+     "antiquewhite",
+-- 
+2.42.0

@@ -1,0 +1,27 @@
+# Distributed under the terms of the GNU General Public License v2
+
+EAPI=7
+KDE_ORG_COMMIT="{{commit_hash}}"
+
+inherit qt5-build
+
+DESCRIPTION="Implementation of the WebSocket protocol for the Qt5 framework"
+SRC_URI="{{artifacts[0].src_uri}}"
+
+KEYWORDS="*"
+
+IUSE="qml +ssl"
+
+DEPEND="
+	=dev-qt/qtcore-{{qt5_ver}}*
+	=dev-qt/qtnetwork-{{qt5_ver}}*[ssl=]
+	qml? ( =dev-qt/qtdeclarative-{{qt5_ver}}* )
+
+"
+RDEPEND="${DEPEND}"
+
+src_prepare() {
+	qt_use_disable_mod qml quick src/src.pro
+
+	qt5-build_src_prepare
+}

@@ -1,0 +1,933 @@
+diff --git a/src/3rdparty/chromium/content/renderer/render_process_impl.cc b/src/3rdparty/chromium/content/renderer/render_process_impl.cc
+index ab0a696a29b..c9ba393ac56 100644
+--- a/src/3rdparty/chromium/content/renderer/render_process_impl.cc
++++ b/src/3rdparty/chromium/content/renderer/render_process_impl.cc
+@@ -124,10 +124,6 @@ RenderProcessImpl::RenderProcessImpl()
+   SetV8FlagIfHasSwitch(switches::kEnableUnsafeFastJSCalls,
+                        "--turbo-fast-api-calls");
+ 
+-  constexpr char kModuleFlags[] =
+-      "--harmony-dynamic-import --harmony-import-meta";
+-  v8::V8::SetFlagsFromString(kModuleFlags, sizeof(kModuleFlags));
+-
+   SetV8FlagIfFeature(features::kV8VmFuture, "--future");
+   SetV8FlagIfNotFeature(features::kV8VmFuture, "--no-future");
+ 
+@@ -175,8 +171,6 @@ RenderProcessImpl::RenderProcessImpl()
+   SetV8FlagIfFeature(features::kWebAssemblyTiering, "--wasm-tier-up");
+   SetV8FlagIfNotFeature(features::kWebAssemblyTiering, "--no-wasm-tier-up");
+ 
+-  SetV8FlagIfNotFeature(features::kWebAssemblyTrapHandler,
+-                        "--no-wasm-trap-handler");
+ #if (defined(OS_LINUX) || defined(OS_CHROMEOS)) && defined(ARCH_CPU_X86_64)
+   if (base::FeatureList::IsEnabled(features::kWebAssemblyTrapHandler)) {
+     base::CommandLine* command_line = base::CommandLine::ForCurrentProcess();
+diff --git a/src/3rdparty/chromium/content/renderer/v8_value_converter_impl.cc b/src/3rdparty/chromium/content/renderer/v8_value_converter_impl.cc
+index 2deb79ba006..6082c9af545 100644
+--- a/src/3rdparty/chromium/content/renderer/v8_value_converter_impl.cc
++++ b/src/3rdparty/chromium/content/renderer/v8_value_converter_impl.cc
+@@ -338,9 +338,9 @@ v8::Local<v8::Value> V8ValueConverterImpl::ToArrayBuffer(
+     v8::Local<v8::Object> creation_context,
+     const base::Value* value) const {
+   DCHECK(creation_context->CreationContext() == isolate->GetCurrentContext());
+-  v8::Local<v8::ArrayBuffer> buffer =
++  auto buffer =
+       v8::ArrayBuffer::New(isolate, value->GetBlob().size());
+-  memcpy(buffer->GetContents().Data(), value->GetBlob().data(),
++  memcpy(buffer->GetBackingStore()->Data(), value->GetBlob().data(),
+          value->GetBlob().size());
+   return buffer;
+ }
+@@ -496,9 +496,9 @@ std::unique_ptr<base::Value> V8ValueConverterImpl::FromV8ArrayBuffer(
+   }
+ 
+   if (val->IsArrayBuffer()) {
+-    auto contents = val.As<v8::ArrayBuffer>()->GetContents();
++    auto contents = val.As<v8::ArrayBuffer>()->GetBackingStore();
+     return base::Value::CreateWithCopiedBuffer(
+-        static_cast<const char*>(contents.Data()), contents.ByteLength());
++        static_cast<const char*>(contents->Data()), contents->ByteLength());
+   } else if (val->IsArrayBufferView()) {
+     v8::Local<v8::ArrayBufferView> view = val.As<v8::ArrayBufferView>();
+     size_t byte_length = view->ByteLength();
+diff --git a/src/3rdparty/chromium/gin/array_buffer.cc b/src/3rdparty/chromium/gin/array_buffer.cc
+index 124c2f72a5c..769aa10920e 100644
+--- a/src/3rdparty/chromium/gin/array_buffer.cc
++++ b/src/3rdparty/chromium/gin/array_buffer.cc
+@@ -9,7 +9,6 @@
+ 
+ #include "base/allocator/partition_allocator/page_allocator.h"
+ #include "base/check_op.h"
+-#include "base/partition_alloc_buildflags.h"
+ #include "build/build_config.h"
+ #include "gin/per_isolate_data.h"
+ 
+@@ -23,12 +22,6 @@
+ 
+ namespace gin {
+ 
+-namespace {
+-
+-gin::WrapperInfo g_array_buffer_wrapper_info = {gin::kEmbedderNativeGin};
+-
+-}  // namespace
+-
+ static_assert(V8_ARRAY_BUFFER_INTERNAL_FIELD_COUNT == 2,
+               "array buffers must have two internal fields");
+ 
+@@ -52,113 +45,11 @@ ArrayBufferAllocator* ArrayBufferAllocator::SharedInstance() {
+   return instance;
+ }
+ 
+-// ArrayBuffer::Private -------------------------------------------------------
+-
+-// This class exists to solve a tricky lifetime problem. The V8 API doesn't
+-// want to expose a direct view into the memory behind an array buffer because
+-// V8 might deallocate that memory during garbage collection. Instead, the V8
+-// API forces us to externalize the buffer and take ownership of the memory.
+-// In order to know when to free the memory, we need to figure out both when
+-// we're done with it and when V8 is done with it.
+-//
+-// To determine whether we're done with the memory, every view we have into
+-// the array buffer takes a reference to the ArrayBuffer::Private object that
+-// actually owns the memory. To determine when V8 is done with the memory, we
+-// open a weak handle to the ArrayBuffer object. When we receive the weak
+-// callback, we know the object is about to be garbage collected and we can
+-// drop V8's implied reference to the memory.
+-//
+-// The final subtlety is that we need every ArrayBuffer into the same array
+-// buffer to AddRef the same ArrayBuffer::Private. To make that work, we store
+-// a pointer to the ArrayBuffer::Private object in an internal field of the
+-// ArrayBuffer object.
+-//
+-class ArrayBuffer::Private : public base::RefCounted<ArrayBuffer::Private> {
+- public:
+-  static scoped_refptr<Private> From(v8::Isolate* isolate,
+-                                     v8::Local<v8::ArrayBuffer> array);
+-
+-  void* buffer() const { return buffer_; }
+-  size_t length() const { return length_; }
+-
+- private:
+-  friend class base::RefCounted<Private>;
+-  using DataDeleter = void (*)(void* data, size_t length, void* info);
+-
+-  Private(v8::Isolate* isolate, v8::Local<v8::ArrayBuffer> array);
+-  ~Private();
+-
+-  static void FirstWeakCallback(const v8::WeakCallbackInfo<Private>& data);
+-  static void SecondWeakCallback(const v8::WeakCallbackInfo<Private>& data);
+-
+-  v8::Global<v8::ArrayBuffer> array_buffer_;
+-  scoped_refptr<Private> self_reference_;
+-  v8::Isolate* isolate_;
+-  void* buffer_;
+-  size_t length_;
+-  DataDeleter deleter_;
+-  void* deleter_data_;
+-};
+-
+-scoped_refptr<ArrayBuffer::Private> ArrayBuffer::Private::From(
+-    v8::Isolate* isolate, v8::Local<v8::ArrayBuffer> array) {
+-  if (array->IsExternal()) {
+-    CHECK_EQ(WrapperInfo::From(v8::Local<v8::Object>::Cast(array)),
+-             &g_array_buffer_wrapper_info)
+-        << "Cannot mix blink and gin ArrayBuffers";
+-    return base::WrapRefCounted(static_cast<Private*>(
+-        array->GetAlignedPointerFromInternalField(kEncodedValueIndex)));
+-  }
+-  return base::WrapRefCounted(new Private(isolate, array));
+-}
+-
+-ArrayBuffer::Private::Private(v8::Isolate* isolate,
+-                              v8::Local<v8::ArrayBuffer> array)
+-    : array_buffer_(isolate, array), isolate_(isolate) {
+-  // Take ownership of the array buffer.
+-  CHECK(!array->IsExternal());
+-  v8::ArrayBuffer::Contents contents = array->Externalize();
+-  buffer_ = contents.Data();
+-  length_ = contents.ByteLength();
+-  deleter_ = contents.Deleter();
+-  deleter_data_ = contents.DeleterData();
+-
+-  array->SetAlignedPointerInInternalField(kWrapperInfoIndex,
+-                                          &g_array_buffer_wrapper_info);
+-  array->SetAlignedPointerInInternalField(kEncodedValueIndex, this);
+-
+-  self_reference_ = this;  // Cleared in SecondWeakCallback.
+-  array_buffer_.SetWeak(this, FirstWeakCallback,
+-                        v8::WeakCallbackType::kParameter);
+-}
+-
+-ArrayBuffer::Private::~Private() {
+-  deleter_(buffer_, length_, deleter_data_);
+-}
+-
+-void ArrayBuffer::Private::FirstWeakCallback(
+-    const v8::WeakCallbackInfo<Private>& data) {
+-  Private* parameter = data.GetParameter();
+-  parameter->array_buffer_.Reset();
+-  data.SetSecondPassCallback(SecondWeakCallback);
+-}
+-
+-void ArrayBuffer::Private::SecondWeakCallback(
+-    const v8::WeakCallbackInfo<Private>& data) {
+-  Private* parameter = data.GetParameter();
+-  parameter->self_reference_.reset();
+-}
+-
+ // ArrayBuffer ----------------------------------------------------------------
++ArrayBuffer::ArrayBuffer() = default;
+ 
+-ArrayBuffer::ArrayBuffer() : bytes_(nullptr), num_bytes_(0) {}
+-
+-ArrayBuffer::ArrayBuffer(v8::Isolate* isolate,
+-                         v8::Local<v8::ArrayBuffer> array) {
+-  private_ = ArrayBuffer::Private::From(isolate, array);
+-  bytes_ = private_->buffer();
+-  num_bytes_ = private_->length();
+-}
++ArrayBuffer::ArrayBuffer(v8::Isolate* isolate, v8::Local<v8::ArrayBuffer> array)
++    : backing_store_(array->GetBackingStore()) {}
+ 
+ ArrayBuffer::~ArrayBuffer() = default;
+ 
+diff --git a/src/3rdparty/chromium/gin/array_buffer.h b/src/3rdparty/chromium/gin/array_buffer.h
+index 2aef366ac81..8dfcf65b5b5 100644
+--- a/src/3rdparty/chromium/gin/array_buffer.h
++++ b/src/3rdparty/chromium/gin/array_buffer.h
+@@ -9,11 +9,11 @@
+ #include <stdint.h>
+ 
+ #include "base/compiler_specific.h"
+-#include "base/macros.h"
+ #include "base/memory/ref_counted.h"
+ #include "gin/converter.h"
+ #include "gin/gin_export.h"
+-#include "v8/include/v8.h"
++#include "v8/include/v8-array-buffer.h"
++#include "v8/include/v8-forward.h"
+ 
+ namespace gin {
+ 
+@@ -30,20 +30,19 @@ class GIN_EXPORT ArrayBuffer {
+  public:
+   ArrayBuffer();
+   ArrayBuffer(v8::Isolate* isolate, v8::Local<v8::ArrayBuffer> buffer);
++  ArrayBuffer(const ArrayBuffer&) = delete;
+   ~ArrayBuffer();
+   ArrayBuffer& operator=(const ArrayBuffer& other);
+ 
+-  void* bytes() const { return bytes_; }
+-  size_t num_bytes() const { return num_bytes_; }
++  void* bytes() const {
++    return backing_store_ ? backing_store_->Data() : nullptr;
++  }
++  size_t num_bytes() const {
++    return backing_store_ ? backing_store_->ByteLength() : 0;
++  }
+ 
+  private:
+-  class Private;
+-
+-  scoped_refptr<Private> private_;
+-  void* bytes_;
+-  size_t num_bytes_;
+-
+-  DISALLOW_COPY(ArrayBuffer);
++  std::shared_ptr<v8::BackingStore> backing_store_;
+ };
+ 
+ template<>
+@@ -56,6 +55,7 @@ class GIN_EXPORT ArrayBufferView {
+  public:
+   ArrayBufferView();
+   ArrayBufferView(v8::Isolate* isolate, v8::Local<v8::ArrayBufferView> view);
++  ArrayBufferView(const ArrayBufferView&) = delete;
+   ~ArrayBufferView();
+   ArrayBufferView& operator=(const ArrayBufferView& other);
+ 
+@@ -68,8 +68,6 @@ class GIN_EXPORT ArrayBufferView {
+   ArrayBuffer array_buffer_;
+   size_t offset_;
+   size_t num_bytes_;
+-
+-  DISALLOW_COPY(ArrayBufferView);
+ };
+ 
+ template<>
+diff --git a/src/3rdparty/chromium/gin/v8_platform.cc b/src/3rdparty/chromium/gin/v8_platform.cc
+index e91edf19505..f6618fd8b84 100644
+--- a/src/3rdparty/chromium/gin/v8_platform.cc
++++ b/src/3rdparty/chromium/gin/v8_platform.cc
+@@ -305,8 +305,9 @@ class JobHandleImpl : public v8::JobHandle {
+   }
+   void Join() override { handle_.Join(); }
+   void Cancel() override { handle_.Cancel(); }
+-  bool IsCompleted() override { return handle_.IsCompleted(); }
+-  bool IsRunning() override { return !!handle_; }
++  void CancelAndDetach() override { handle_.CancelAndDetach(); }
++  bool IsActive() override { return !handle_.IsCompleted(); }
++  bool IsValid() override { return !!handle_; }
+ 
+  private:
+   base::JobHandle handle_;
+diff --git a/src/3rdparty/chromium/third_party/blink/renderer/bindings/core/v8/script_streamer.cc b/src/3rdparty/chromium/third_party/blink/renderer/bindings/core/v8/script_streamer.cc
+index 2d8b732dfc5..61af4014b24 100644
+--- a/src/3rdparty/chromium/third_party/blink/renderer/bindings/core/v8/script_streamer.cc
++++ b/src/3rdparty/chromium/third_party/blink/renderer/bindings/core/v8/script_streamer.cc
+@@ -5,6 +5,7 @@
+ #include "third_party/blink/renderer/bindings/core/v8/script_streamer.h"
+ 
+ #include <memory>
++#include <utility>
+ 
+ #include "base/macros.h"
+ #include "base/memory/ptr_util.h"
+@@ -12,6 +13,8 @@
+ #include "base/threading/thread_restrictions.h"
+ #include "mojo/public/cpp/system/wait.h"
+ #include "third_party/blink/public/common/features.h"
++#include "third_party/blink/public/mojom/script/script_type.mojom-blink-forward.h"
++#include "third_party/blink/public/mojom/script/script_type.mojom-shared.h"
+ #include "third_party/blink/renderer/bindings/core/v8/v8_code_cache.h"
+ #include "third_party/blink/renderer/core/dom/document.h"
+ #include "third_party/blink/renderer/core/dom/element.h"
+@@ -24,6 +27,7 @@
+ #include "third_party/blink/renderer/platform/loader/fetch/cached_metadata.h"
+ #include "third_party/blink/renderer/platform/loader/fetch/resource.h"
+ #include "third_party/blink/renderer/platform/loader/fetch/response_body_loader.h"
++#include "third_party/blink/renderer/platform/network/mime/mime_type_registry.h"
+ #include "third_party/blink/renderer/platform/scheduler/public/post_cross_thread_task.h"
+ #include "third_party/blink/renderer/platform/scheduler/public/thread_scheduler.h"
+ #include "third_party/blink/renderer/platform/scheduler/public/worker_pool.h"
+@@ -430,6 +434,16 @@ bool ScriptStreamer::TryStartStreamingTask() {
+   if (!CanStartStreaming())
+     return false;
+ 
++  // Skip non-JS modules based on the mime-type.
++  // TODO(crbug/1132413),TODO(crbug/1061857): Disable streaming for non-JS
++  // based the specific import statements.
++  if (script_type_ == v8::ScriptType::kModule &&
++      !MIMETypeRegistry::IsSupportedJavaScriptMIMEType(
++          script_resource_->GetResponse().HttpContentType())) {
++    SuppressStreaming(NotStreamingReason::kNonJavascriptModule);
++    return false;
++  }
++
+   // Even if the first data chunk is small, the script can still be big enough -
+   // wait until the next data chunk comes before deciding whether to start the
+   // streaming.
+@@ -487,10 +501,11 @@ bool ScriptStreamer::TryStartStreamingTask() {
+       std::move(stream_ptr), encoding_);
+ 
+   std::unique_ptr<v8::ScriptCompiler::ScriptStreamingTask>
+-      script_streaming_task(
+-          base::WrapUnique(v8::ScriptCompiler::StartStreamingScript(
++      script_streaming_task =
++          base::WrapUnique(v8::ScriptCompiler::StartStreaming(
+               V8PerIsolateData::MainThreadIsolate(), source_.get(),
+-              compile_options_)));
++              script_type_));
++
+   if (!script_streaming_task) {
+     // V8 cannot stream the script.
+     stream_ = nullptr;
+@@ -526,21 +541,44 @@ bool ScriptStreamer::TryStartStreamingTask() {
+   return true;
+ }
+ 
++v8::ScriptType ScriptStreamer::ScriptTypeForStreamingTask(
++    ScriptResource* script_resource) {
++  switch (script_resource->GetInitialRequestScriptType()) {
++    case mojom::blink::ScriptType::kModule:
++      return v8::ScriptType::kModule;
++    case mojom::blink::ScriptType::kClassic: {
++      // <link rel=preload as=script ref=module.mjs> is a common pattern instead
++      // of <link rel=modulepreload>. Try streaming parsing as module instead in
++      // these cases (https://crbug.com/1178198).
++      if (script_resource->IsUnusedPreload()) {
++        if (script_resource->Url().GetPath().EndsWithIgnoringCase(".mjs")) {
++          return v8::ScriptType::kModule;
++        }
++      }
++      return v8::ScriptType::kClassic;
++    }
++  }
++  NOTREACHED();
++}
++
++v8::ScriptType ScriptStreamer::GetScriptType() const {
++  return script_type_;
++}
++
+ ScriptStreamer::ScriptStreamer(
+     ScriptResource* script_resource,
+     mojo::ScopedDataPipeConsumerHandle data_pipe,
+     ResponseBodyLoaderClient* response_body_loader_client,
+-    v8::ScriptCompiler::CompileOptions compile_options,
+     scoped_refptr<base::SingleThreadTaskRunner> loading_task_runner)
+     : script_resource_(script_resource),
+       response_body_loader_client_(response_body_loader_client),
+       data_pipe_(std::move(data_pipe)),
+-      compile_options_(compile_options),
+       script_url_string_(script_resource->Url().Copy().GetString()),
+       script_resource_identifier_(script_resource->InspectorId()),
+       // Unfortunately there's no dummy encoding value in the enum; let's use
+       // one we don't stream.
+       encoding_(v8::ScriptCompiler::StreamedSource::TWO_BYTE),
++      script_type_(ScriptTypeForStreamingTask(script_resource)),
+       loading_task_runner_(std::move(loading_task_runner)) {
+   watcher_ = std::make_unique<mojo::SimpleWatcher>(
+       FROM_HERE, mojo::SimpleWatcher::ArmingPolicy::MANUAL,
+diff --git a/src/3rdparty/chromium/third_party/blink/renderer/bindings/core/v8/script_streamer.h b/src/3rdparty/chromium/third_party/blink/renderer/bindings/core/v8/script_streamer.h
+index bf042780c45..3f26dd8a2d8 100644
+--- a/src/3rdparty/chromium/third_party/blink/renderer/bindings/core/v8/script_streamer.h
++++ b/src/3rdparty/chromium/third_party/blink/renderer/bindings/core/v8/script_streamer.h
+@@ -6,15 +6,18 @@
+ #define THIRD_PARTY_BLINK_RENDERER_BINDINGS_CORE_V8_SCRIPT_STREAMER_H_
+ 
+ #include <memory>
++#include <tuple>
+ 
+ #include "base/macros.h"
+ #include "base/single_thread_task_runner.h"
+ #include "mojo/public/cpp/system/data_pipe.h"
+ #include "third_party/blink/renderer/core/core_export.h"
++#include "third_party/blink/renderer/core/script/script_scheduling_type.h"
+ #include "third_party/blink/renderer/platform/heap/handle.h"
+ #include "third_party/blink/renderer/platform/wtf/text/wtf_string.h"
+ #include "v8/include/v8.h"
+ 
++#include "third_party/blink/public/mojom/script/script_type.mojom-blink-forward.h"
+ namespace mojo {
+ class SimpleWatcher;
+ }
+@@ -58,10 +61,12 @@ class CORE_EXPORT ScriptStreamer final
+     kModuleScript,
+     kNoDataPipe,
+     kLoadingCancelled,
++    kNonJavascriptModule,
+     kDisabledByFeatureList,
++    kErrorScriptTypeMismatch,
+ 
+     // Pseudo values that should never be seen in reported metrics
+-    kMaxValue = kDisabledByFeatureList,
++    kMaxValue = kErrorScriptTypeMismatch,
+     kInvalid = -1,
+   };
+ 
+@@ -69,7 +74,6 @@ class CORE_EXPORT ScriptStreamer final
+       ScriptResource* resource,
+       mojo::ScopedDataPipeConsumerHandle data_pipe,
+       ResponseBodyLoaderClient* response_body_loader_client,
+-      v8::ScriptCompiler::CompileOptions compile_options,
+       scoped_refptr<base::SingleThreadTaskRunner> loading_task_runner);
+   ~ScriptStreamer();
+   void Trace(Visitor*) const;
+@@ -84,7 +88,10 @@ class CORE_EXPORT ScriptStreamer final
+   bool IsFinished() const;             // Has loading & streaming finished?
+   bool IsStreamingSuppressed() const;  // Has streaming been suppressed?
+ 
+-  v8::ScriptCompiler::StreamedSource* Source() { return source_.get(); }
++  v8::ScriptCompiler::StreamedSource* Source(v8::ScriptType expected_type) {
++    DCHECK_EQ(expected_type, script_type_);
++    return source_.get();
++  }
+ 
+   // Called when the script is not needed any more (e.g., loading was
+   // cancelled). After calling cancel, ClassicPendingScript can drop its
+@@ -118,6 +125,8 @@ class CORE_EXPORT ScriptStreamer final
+   //      kLoaded   kFailed  kCancelled
+   enum class LoadingState { kLoading, kLoaded, kFailed, kCancelled };
+ 
++  v8::ScriptType GetScriptType() const;
++
+   static const char* str(LoadingState state) {
+     switch (state) {
+       case LoadingState::kLoading:
+@@ -149,6 +158,8 @@ class CORE_EXPORT ScriptStreamer final
+   // streaming task. Returns true if the task was started.
+   bool TryStartStreamingTask();
+ 
++  static v8::ScriptType ScriptTypeForStreamingTask(ScriptResource*);
++
+   void Prefinalize();
+ 
+   // When the streaming is suppressed, the data is not given to V8, but
+@@ -201,9 +212,6 @@ class CORE_EXPORT ScriptStreamer final
+   // The reason that streaming is disabled
+   NotStreamingReason suppressed_reason_ = NotStreamingReason::kInvalid;
+ 
+-  // What kind of cached data V8 produces during streaming.
+-  v8::ScriptCompiler::CompileOptions compile_options_;
+-
+   // Keep the script URL string for event tracing.
+   const String script_url_string_;
+ 
+@@ -213,6 +221,8 @@ class CORE_EXPORT ScriptStreamer final
+   // Encoding of the streamed script. Saved for sanity checking purposes.
+   v8::ScriptCompiler::StreamedSource::Encoding encoding_;
+ 
++  v8::ScriptType script_type_;
++
+   scoped_refptr<base::SingleThreadTaskRunner> loading_task_runner_;
+ 
+   DISALLOW_COPY_AND_ASSIGN(ScriptStreamer);
+diff --git a/src/3rdparty/chromium/third_party/blink/renderer/bindings/core/v8/source_location.cc b/src/3rdparty/chromium/third_party/blink/renderer/bindings/core/v8/source_location.cc
+index a7dada1068f..65b3edc272a 100644
+--- a/src/3rdparty/chromium/third_party/blink/renderer/bindings/core/v8/source_location.cc
++++ b/src/3rdparty/chromium/third_party/blink/renderer/bindings/core/v8/source_location.cc
+@@ -87,7 +87,7 @@ std::unique_ptr<SourceLocation> SourceLocation::FromMessage(
+     stack_trace = debugger->GetV8Inspector()->createStackTrace(stack);
+ 
+   int script_id =
+-      static_cast<int>(message->GetScriptOrigin().ScriptID()->Value());
++      static_cast<int>(message->GetScriptOrigin().ScriptId());
+   if (!stack.IsEmpty() && stack->GetFrameCount() > 0) {
+     int top_script_id = stack->GetFrame(isolate, 0)->GetScriptId();
+     if (top_script_id == script_id)
+@@ -167,7 +167,7 @@ void SourceLocation::ToTracedValue(TracedValue* value, const char* name) const {
+   value->BeginDictionary();
+   value->SetString("functionName",
+                    ToCoreString(stack_trace_->topFunctionName()));
+-  value->SetString("scriptId", ToCoreString(stack_trace_->topScriptId()));
++  value->SetInteger("scriptId", stack_trace_->topScriptId());
+   value->SetString("url", ToCoreString(stack_trace_->topSourceURL()));
+   value->SetInteger("lineNumber", stack_trace_->topLineNumber());
+   value->SetInteger("columnNumber", stack_trace_->topColumnNumber());
+diff --git a/src/3rdparty/chromium/third_party/blink/renderer/bindings/core/v8/v8_initializer.cc b/src/3rdparty/chromium/third_party/blink/renderer/bindings/core/v8/v8_initializer.cc
+index 3c7a7a5675f..d4afce5e158 100644
+--- a/src/3rdparty/chromium/third_party/blink/renderer/bindings/core/v8/v8_initializer.cc
++++ b/src/3rdparty/chromium/third_party/blink/renderer/bindings/core/v8/v8_initializer.cc
+@@ -412,7 +412,9 @@ TrustedTypesCodeGenerationCheck(v8::Local<v8::Context> context,
+ 
+ static v8::ModifyCodeGenerationFromStringsResult
+ CodeGenerationCheckCallbackInMainThread(v8::Local<v8::Context> context,
+-                                        v8::Local<v8::Value> source) {
++                                        v8::Local<v8::Value> source,
++                                        bool is_code_like) {
++
+   // With Trusted Types, we always run the TT check first because of reporting,
+   // and because a default policy might want to stringify or modify the original
+   // source. When TT enforcement is disabled, codegen is always allowed, and we
+@@ -464,22 +466,6 @@ static bool WasmCodeGenerationCheckCallbackInMainThread(
+   return false;
+ }
+ 
+-static bool WasmSimdEnabledCallback(v8::Local<v8::Context> context) {
+-  ExecutionContext* execution_context = ToExecutionContext(context);
+-  if (!execution_context)
+-    return false;
+-
+-  return RuntimeEnabledFeatures::WebAssemblySimdEnabled(execution_context);
+-}
+-
+-static bool WasmThreadsEnabledCallback(v8::Local<v8::Context> context) {
+-  ExecutionContext* execution_context = ToExecutionContext(context);
+-  if (!execution_context)
+-    return false;
+-
+-  return RuntimeEnabledFeatures::WebAssemblyThreadsEnabled(execution_context);
+-}
+-
+ v8::Local<v8::Value> NewRangeException(v8::Isolate* isolate,
+                                        const char* message) {
+   return v8::Exception::RangeError(
+@@ -631,8 +617,6 @@ static void InitializeV8Common(v8::Isolate* isolate) {
+   isolate->SetUseCounterCallback(&UseCounterCallback);
+   isolate->SetWasmModuleCallback(WasmModuleOverride);
+   isolate->SetWasmInstanceCallback(WasmInstanceOverride);
+-  isolate->SetWasmSimdEnabledCallback(WasmSimdEnabledCallback);
+-  isolate->SetWasmThreadsEnabledCallback(WasmThreadsEnabledCallback);
+   isolate->SetHostImportModuleDynamicallyCallback(HostImportModuleDynamically);
+   isolate->SetHostInitializeImportMetaObjectCallback(
+       HostGetImportMetaProperties);
+diff --git a/src/3rdparty/chromium/third_party/blink/renderer/bindings/core/v8/v8_metrics.cc b/src/3rdparty/chromium/third_party/blink/renderer/bindings/core/v8/v8_metrics.cc
+index 2fe305a01a9..0b888f997fb 100644
+--- a/src/3rdparty/chromium/third_party/blink/renderer/bindings/core/v8/v8_metrics.cc
++++ b/src/3rdparty/chromium/third_party/blink/renderer/bindings/core/v8/v8_metrics.cc
+@@ -26,7 +26,7 @@ void V8MetricsRecorder::AddMainThreadEvent(
+       .SetModuleSize(
+           ukm::GetExponentialBucketMinForBytes(event.module_size_in_bytes))
+       .SetFunctionCount(event.function_count)
+-      .SetWallClockTime(event.wall_clock_time_in_us)
++      .SetWallClockTime(event.wall_clock_duration_in_us)
+       .Record(ukm->recorder);
+ }
+ 
+@@ -46,7 +46,7 @@ void V8MetricsRecorder::AddMainThreadEvent(
+       .SetCodeSize(
+           ukm::GetExponentialBucketMinForBytes(event.code_size_in_bytes))
+       .SetLiftoffBailoutCount(event.liftoff_bailout_count)
+-      .SetWallClockTime(event.wall_clock_time_in_us)
++      .SetWallClockTime(event.wall_clock_duration_in_us)
+       .Record(ukm->recorder);
+ }
+ 
+@@ -59,7 +59,7 @@ void V8MetricsRecorder::AddMainThreadEvent(
+   ukm::builders::V8_Wasm_ModuleInstantiated(ukm->source_id)
+       .SetSuccess(event.success ? 1 : 0)
+       .SetImportedFunctionCount(event.imported_function_count)
+-      .SetWallClockTime(event.wall_clock_time_in_us)
++      .SetWallClockTime(event.wall_clock_duration_in_us)
+       .Record(ukm->recorder);
+ }
+ 
+@@ -73,7 +73,7 @@ void V8MetricsRecorder::AddMainThreadEvent(
+       .SetLazy(event.lazy ? 1 : 0)
+       .SetCodeSize(
+           ukm::GetExponentialBucketMinForBytes(event.code_size_in_bytes))
+-      .SetWallClockTime(event.wall_clock_time_in_us)
++      .SetWallClockTime(event.wall_clock_duration_in_us)
+       .Record(ukm->recorder);
+ }
+ 
+diff --git a/src/3rdparty/chromium/third_party/blink/renderer/bindings/core/v8/v8_script_runner.cc b/src/3rdparty/chromium/third_party/blink/renderer/bindings/core/v8/v8_script_runner.cc
+index ec7bcf34b5c..7e213bb29a3 100644
+--- a/src/3rdparty/chromium/third_party/blink/renderer/bindings/core/v8/v8_script_runner.cc
++++ b/src/3rdparty/chromium/third_party/blink/renderer/bindings/core/v8/v8_script_runner.cc
+@@ -123,7 +123,7 @@ v8::MaybeLocal<v8::Script> CompileScriptInternal(
+     DCHECK(streamer->IsFinished());
+     DCHECK(!streamer->IsStreamingSuppressed());
+     return v8::ScriptCompiler::Compile(isolate->GetCurrentContext(),
+-                                       streamer->Source(), code, origin);
++                                       streamer->Source(v8::ScriptType::kClassic), code, origin);
+   }
+ 
+   // Allow inspector to use its own compilation cache store.
+diff --git a/src/3rdparty/chromium/third_party/blink/renderer/bindings/templates/interface.cc.tmpl b/src/3rdparty/chromium/third_party/blink/renderer/bindings/templates/interface.cc.tmpl
+index b8f328b7817..a59c3ddc06d 100644
+--- a/src/3rdparty/chromium/third_party/blink/renderer/bindings/templates/interface.cc.tmpl
++++ b/src/3rdparty/chromium/third_party/blink/renderer/bindings/templates/interface.cc.tmpl
+@@ -1113,7 +1113,6 @@ v8::Local<v8::Object> {{v8_class}}::FindInstanceInPrototypeChain(
+   // Transfer the ownership of the allocated memory to an {{interface_name}} without
+   // copying.
+   auto backing_store = v8buffer->GetBackingStore();
+-  v8buffer->Externalize(backing_store);
+   ArrayBufferContents contents(std::move(backing_store));
+   {{cpp_class}}* buffer = {{cpp_class}}::Create(contents);
+   v8::Local<v8::Object> associatedWrapper = buffer->AssociateWithWrapper(v8::Isolate::GetCurrent(), buffer->GetWrapperTypeInfo(), object);
+diff --git a/src/3rdparty/chromium/third_party/blink/renderer/core/inspector/thread_debugger.cc b/src/3rdparty/chromium/third_party/blink/renderer/core/inspector/thread_debugger.cc
+index 5a3ef5062e9..5c633d4bd16 100644
+--- a/src/3rdparty/chromium/third_party/blink/renderer/core/inspector/thread_debugger.cc
++++ b/src/3rdparty/chromium/third_party/blink/renderer/core/inspector/thread_debugger.cc
+@@ -181,10 +181,6 @@ std::unique_ptr<v8_inspector::StringBuffer> ThreadDebugger::valueSubtype(
+   return nullptr;
+ }
+ 
+-bool ThreadDebugger::formatAccessorsAsProperties(v8::Local<v8::Value> value) {
+-  return V8DOMWrapper::IsWrapper(isolate_, value);
+-}
+-
+ double ThreadDebugger::currentTimeMS() {
+   return base::Time::Now().ToDoubleT() * 1000.0;
+ }
+diff --git a/src/3rdparty/chromium/third_party/blink/renderer/core/inspector/thread_debugger.h b/src/3rdparty/chromium/third_party/blink/renderer/core/inspector/thread_debugger.h
+index bc42095ace2..d6bd1d14576 100644
+--- a/src/3rdparty/chromium/third_party/blink/renderer/core/inspector/thread_debugger.h
++++ b/src/3rdparty/chromium/third_party/blink/renderer/core/inspector/thread_debugger.h
+@@ -85,7 +85,6 @@ class CORE_EXPORT ThreadDebugger : public v8_inspector::V8InspectorClient,
+   void beginUserGesture() override;
+   std::unique_ptr<v8_inspector::StringBuffer> valueSubtype(
+       v8::Local<v8::Value>) override;
+-  bool formatAccessorsAsProperties(v8::Local<v8::Value>) override;
+   double currentTimeMS() override;
+   bool isInspectableHeapObject(v8::Local<v8::Object>) override;
+   void consoleTime(const v8_inspector::StringView& title) override;
+diff --git a/src/3rdparty/chromium/third_party/blink/renderer/core/inspector/v8_inspector_string.h b/src/3rdparty/chromium/third_party/blink/renderer/core/inspector/v8_inspector_string.h
+index ba712a595a9..56430a3f21b 100644
+--- a/src/3rdparty/chromium/third_party/blink/renderer/core/inspector/v8_inspector_string.h
++++ b/src/3rdparty/chromium/third_party/blink/renderer/core/inspector/v8_inspector_string.h
+@@ -22,6 +22,7 @@
+ #include "third_party/inspector_protocol/crdtp/serializable.h"
+ #include "third_party/inspector_protocol/crdtp/serializer_traits.h"
+ #include "v8/include/v8-inspector.h"
++#include "v8/include/v8-script.h"
+ 
+ namespace blink {
+ 
+diff --git a/src/3rdparty/chromium/third_party/blink/renderer/core/loader/resource/script_resource.cc b/src/3rdparty/chromium/third_party/blink/renderer/core/loader/resource/script_resource.cc
+index 20b7d4d8834..cfbfd0dbdf2 100644
+--- a/src/3rdparty/chromium/third_party/blink/renderer/core/loader/resource/script_resource.cc
++++ b/src/3rdparty/chromium/third_party/blink/renderer/core/loader/resource/script_resource.cc
+@@ -81,31 +81,35 @@ ScriptResource* ScriptResource::Fetch(FetchParameters& params,
+   DCHECK(IsRequestContextSupported(
+       params.GetResourceRequest().GetRequestContext()));
+   ScriptResource* resource = ToScriptResource(fetcher->RequestResource(
+-      params, ScriptResourceFactory(streaming_allowed), client));
++      params, ScriptResourceFactory(streaming_allowed, params.GetScriptType()),
++      client));
+   return resource;
+ }
+ 
+ ScriptResource* ScriptResource::CreateForTest(
+     const KURL& url,
+-    const WTF::TextEncoding& encoding) {
++    const WTF::TextEncoding& encoding,
++    mojom::blink::ScriptType script_type) {
+   ResourceRequest request(url);
+   request.SetCredentialsMode(network::mojom::CredentialsMode::kOmit);
+   ResourceLoaderOptions options(nullptr /* world */);
+   TextResourceDecoderOptions decoder_options(
+       TextResourceDecoderOptions::kPlainTextContent, encoding);
+   return MakeGarbageCollected<ScriptResource>(request, options, decoder_options,
+-                                              kNoStreaming);
++                                              kNoStreaming, script_type);
+ }
+ 
+ ScriptResource::ScriptResource(
+     const ResourceRequest& resource_request,
+     const ResourceLoaderOptions& options,
+     const TextResourceDecoderOptions& decoder_options,
+-    StreamingAllowed streaming_allowed)
++    StreamingAllowed streaming_allowed,
++    mojom::blink::ScriptType initial_request_script_type)
+     : TextResource(resource_request,
+                    ResourceType::kScript,
+                    options,
+-                   decoder_options) {
++                   decoder_options),
++      initial_request_script_type_(initial_request_script_type) {
+   static bool script_streaming_enabled =
+       base::FeatureList::IsEnabled(features::kScriptStreaming);
+ 
+@@ -254,9 +258,9 @@ void ScriptResource::ResponseBodyReceived(
+   CheckStreamingState();
+   CHECK(!ErrorOccurred());
+ 
+-  streamer_ = MakeGarbageCollected<ScriptStreamer>(
+-      this, std::move(data_pipe), response_body_loader_client,
+-      v8::ScriptCompiler::kNoCompileOptions, loader_task_runner);
++  streamer_ = MakeGarbageCollected<ScriptStreamer>(this, std::move(data_pipe),
++                                                   response_body_loader_client,
++                                                   loader_task_runner);
+   CHECK_EQ(no_streamer_reason_, ScriptStreamer::NotStreamingReason::kInvalid);
+   AdvanceStreamingState(StreamingState::kStreaming);
+ }
+diff --git a/src/3rdparty/chromium/third_party/blink/renderer/core/loader/resource/script_resource.h b/src/3rdparty/chromium/third_party/blink/renderer/core/loader/resource/script_resource.h
+index 815a87ad57c..41aaad0ee4e 100644
+--- a/src/3rdparty/chromium/third_party/blink/renderer/core/loader/resource/script_resource.h
++++ b/src/3rdparty/chromium/third_party/blink/renderer/core/loader/resource/script_resource.h
+@@ -28,6 +28,8 @@
+ 
+ #include <memory>
+ 
++#include "third_party/blink/public/mojom/script/script_type.mojom-blink-forward.h"
++#include "third_party/blink/public/mojom/script/script_type.mojom-shared.h"
+ #include "third_party/blink/renderer/bindings/core/v8/script_streamer.h"
+ #include "third_party/blink/renderer/core/core_export.h"
+ #include "third_party/blink/renderer/core/loader/resource/text_resource.h"
+@@ -67,13 +69,16 @@ class CORE_EXPORT ScriptResource final : public TextResource {
+                                StreamingAllowed);
+ 
+   // Public for testing
+-  static ScriptResource* CreateForTest(const KURL& url,
+-                                       const WTF::TextEncoding& encoding);
++  static ScriptResource* CreateForTest(
++      const KURL& url,
++      const WTF::TextEncoding& encoding,
++      mojom::blink::ScriptType = mojom::blink::ScriptType::kClassic);
+ 
+   ScriptResource(const ResourceRequest&,
+                  const ResourceLoaderOptions&,
+                  const TextResourceDecoderOptions&,
+-                 StreamingAllowed);
++                 StreamingAllowed,
++                 mojom::blink::ScriptType);
+   ~ScriptResource() override;
+ 
+   void ResponseBodyReceived(
+@@ -95,6 +100,10 @@ class CORE_EXPORT ScriptResource final : public TextResource {
+ 
+   SingleCachedMetadataHandler* CacheHandler();
+ 
++  mojom::blink::ScriptType GetInitialRequestScriptType() const {
++    return initial_request_script_type_;
++  }
++
+   // Gets the script streamer from the ScriptResource, clearing the resource's
+   // streamer so that it cannot be used twice.
+   ScriptStreamer* TakeStreamer();
+@@ -145,21 +154,26 @@ class CORE_EXPORT ScriptResource final : public TextResource {
+ 
+   class ScriptResourceFactory : public ResourceFactory {
+    public:
+-    explicit ScriptResourceFactory(StreamingAllowed streaming_allowed)
++    explicit ScriptResourceFactory(
++        StreamingAllowed streaming_allowed,
++        mojom::blink::ScriptType initial_request_script_type)
+         : ResourceFactory(ResourceType::kScript,
+                           TextResourceDecoderOptions::kPlainTextContent),
+-          streaming_allowed_(streaming_allowed) {}
++          streaming_allowed_(streaming_allowed),
++          initial_request_script_type_(initial_request_script_type) {}
+ 
+     Resource* Create(
+         const ResourceRequest& request,
+         const ResourceLoaderOptions& options,
+         const TextResourceDecoderOptions& decoder_options) const override {
+       return MakeGarbageCollected<ScriptResource>(
+-          request, options, decoder_options, streaming_allowed_);
++          request, options, decoder_options, streaming_allowed_,
++          initial_request_script_type_);
+     }
+ 
+    private:
+     StreamingAllowed streaming_allowed_;
++    mojom::blink::ScriptType initial_request_script_type_;
+   };
+ 
+   bool CanUseCacheValidator() const override;
+@@ -180,6 +194,7 @@ class CORE_EXPORT ScriptResource final : public TextResource {
+   ScriptStreamer::NotStreamingReason no_streamer_reason_ =
+       ScriptStreamer::NotStreamingReason::kInvalid;
+   StreamingState streaming_state_ = StreamingState::kWaitingForDataPipe;
++  const mojom::blink::ScriptType initial_request_script_type_;
+ };
+ 
+ DEFINE_RESOURCE_TYPE_CASTS(Script);
+diff --git a/src/3rdparty/chromium/third_party/blink/renderer/core/typed_arrays/dom_array_buffer.cc b/src/3rdparty/chromium/third_party/blink/renderer/core/typed_arrays/dom_array_buffer.cc
+index c456d15f2f5..9637c749339 100644
+--- a/src/3rdparty/chromium/third_party/blink/renderer/core/typed_arrays/dom_array_buffer.cc
++++ b/src/3rdparty/chromium/third_party/blink/renderer/core/typed_arrays/dom_array_buffer.cc
+@@ -111,8 +111,6 @@ v8::Local<v8::Value> DOMArrayBuffer::Wrap(
+   {
+     v8::Context::Scope context_scope(creation_context->CreationContext());
+     wrapper = v8::ArrayBuffer::New(isolate, Content()->BackingStore());
+-
+-    wrapper->Externalize(Content()->BackingStore());
+   }
+ 
+   return AssociateWithWrapper(isolate, wrapper_type_info, wrapper);
+diff --git a/src/3rdparty/chromium/third_party/blink/renderer/core/typed_arrays/dom_shared_array_buffer.cc b/src/3rdparty/chromium/third_party/blink/renderer/core/typed_arrays/dom_shared_array_buffer.cc
+index 720f112b53d..f4169910bd8 100644
+--- a/src/3rdparty/chromium/third_party/blink/renderer/core/typed_arrays/dom_shared_array_buffer.cc
++++ b/src/3rdparty/chromium/third_party/blink/renderer/core/typed_arrays/dom_shared_array_buffer.cc
+@@ -16,8 +16,6 @@ v8::Local<v8::Value> DOMSharedArrayBuffer::Wrap(
+   const WrapperTypeInfo* wrapper_type_info = this->GetWrapperTypeInfo();
+   v8::Local<v8::SharedArrayBuffer> wrapper =
+       v8::SharedArrayBuffer::New(isolate, Content()->BackingStore());
+-  wrapper->Externalize(Content()->BackingStore());
+-
+   return AssociateWithWrapper(isolate, wrapper_type_info, wrapper);
+ }
+ 
+diff --git a/src/3rdparty/chromium/third_party/blink/renderer/modules/webaudio/audio_worklet_processor.cc b/src/3rdparty/chromium/third_party/blink/renderer/modules/webaudio/audio_worklet_processor.cc
+index e68b1c1b2f6..e3ae90dca69 100644
+--- a/src/3rdparty/chromium/third_party/blink/renderer/modules/webaudio/audio_worklet_processor.cc
++++ b/src/3rdparty/chromium/third_party/blink/renderer/modules/webaudio/audio_worklet_processor.cc
+@@ -326,10 +326,10 @@ void AudioWorkletProcessor::CopyPortToArrayBuffers(
+     unsigned number_of_channels = audio_bus ? audio_bus->NumberOfChannels() : 0;
+     for (uint32_t channel_index = 0; channel_index < number_of_channels;
+          ++channel_index) {
+-      const v8::ArrayBuffer::Contents& contents =
++      auto contents =
+           array_buffers[bus_index][channel_index].NewLocal(isolate)
+-              ->GetContents();
+-      memcpy(contents.Data(), audio_bus->Channel(channel_index)->Data(),
++              ->GetBackingStore();
++      memcpy(contents->Data(), audio_bus->Channel(channel_index)->Data(),
+              bus_length * sizeof(float));
+     }
+   }
+@@ -345,16 +345,16 @@ void AudioWorkletProcessor::CopyArrayBuffersToPort(
+     const scoped_refptr<AudioBus>& audio_bus = audio_port[bus_index];
+     for (uint32_t channel_index = 0;
+          channel_index < audio_bus->NumberOfChannels(); ++channel_index) {
+-      const v8::ArrayBuffer::Contents& contents =
++      auto contents =
+           array_buffers[bus_index][channel_index].NewLocal(isolate)
+-              ->GetContents();
++              ->GetBackingStore();
+       const size_t bus_length = audio_bus->length() * sizeof(float);
+ 
+       // An ArrayBuffer might be transferred. So we need to check the byte
+       // length and silence the output buffer if needed.
+-      if (contents.ByteLength() == bus_length) {
++      if (contents->ByteLength() == bus_length) {
+         memcpy(audio_bus->Channel(channel_index)->MutableData(),
+-               contents.Data(), bus_length);
++               contents->Data(), bus_length);
+       } else {
+         memset(audio_bus->Channel(channel_index)->MutableData(), 0, bus_length);
+       }
+@@ -368,10 +368,10 @@ void AudioWorkletProcessor::ZeroArrayBuffers(
+   for (uint32_t bus_index = 0; bus_index < array_buffers.size(); ++bus_index) {
+     for (uint32_t channel_index = 0;
+          channel_index < array_buffers[bus_index].size(); ++channel_index) {
+-      const v8::ArrayBuffer::Contents& contents =
++      auto contents =
+           array_buffers[bus_index][channel_index].NewLocal(isolate)
+-              ->GetContents();
+-      memset(contents.Data(), 0, contents.ByteLength());
++              ->GetBackingStore();
++      memset(contents->Data(), 0, contents->ByteLength());
+     }
+   }
+ }
+@@ -505,7 +505,7 @@ bool AudioWorkletProcessor::CopyParamValueMapToObject(
+         float32_array->Buffer()->ByteLength() == 0)
+       return false;
+ 
+-    memcpy(float32_array->Buffer()->GetContents().Data(), param_array->Data(),
++    memcpy(float32_array->Buffer()->GetBackingStore()->Data(), param_array->Data(),
+            array_length * sizeof(float));
+   }
+ 
+diff --git a/src/3rdparty/chromium/third_party/blink/renderer/platform/bindings/v8_per_isolate_data.cc b/src/3rdparty/chromium/third_party/blink/renderer/platform/bindings/v8_per_isolate_data.cc
+index 970411fc1f6..3096a352d3c 100644
+--- a/src/3rdparty/chromium/third_party/blink/renderer/platform/bindings/v8_per_isolate_data.cc
++++ b/src/3rdparty/chromium/third_party/blink/renderer/platform/bindings/v8_per_isolate_data.cc
+@@ -59,7 +59,7 @@ static void BeforeCallEnteredCallback(v8::Isolate* isolate) {
+   CHECK(!ScriptForbiddenScope::IsScriptForbidden());
+ }
+ 
+-static void MicrotasksCompletedCallback(v8::Isolate* isolate) {
++static void MicrotasksCompletedCallback(v8::Isolate* isolate, void* data) {
+   V8PerIsolateData::From(isolate)->RunEndOfScopeTasks();
+ }
+ 
+diff --git a/src/3rdparty/chromium/third_party/blink/renderer/platform/heap/unified_heap_controller.cc b/src/3rdparty/chromium/third_party/blink/renderer/platform/heap/unified_heap_controller.cc
+index df02a2d90ec..a743dfda284 100644
+--- a/src/3rdparty/chromium/third_party/blink/renderer/platform/heap/unified_heap_controller.cc
++++ b/src/3rdparty/chromium/third_party/blink/renderer/platform/heap/unified_heap_controller.cc
+@@ -22,7 +22,7 @@ namespace {
+ 
+ constexpr BlinkGC::StackState ToBlinkGCStackState(
+     v8::EmbedderHeapTracer::EmbedderStackState stack_state) {
+-  return stack_state == v8::EmbedderHeapTracer::EmbedderStackState::kEmpty
++  return stack_state == v8::EmbedderHeapTracer::EmbedderStackState::kNoHeapPointers
+              ? BlinkGC::kNoHeapPointersOnStack
+              : BlinkGC::kHeapPointersOnStack;
+ }
+diff --git a/src/3rdparty/chromium/third_party/blink/renderer/platform/loader/fetch/fetch_parameters.h b/src/3rdparty/chromium/third_party/blink/renderer/platform/loader/fetch/fetch_parameters.h
+index b35d9c286de..13273d312cd 100644
+--- a/src/3rdparty/chromium/third_party/blink/renderer/platform/loader/fetch/fetch_parameters.h
++++ b/src/3rdparty/chromium/third_party/blink/renderer/platform/loader/fetch/fetch_parameters.h
+@@ -26,6 +26,8 @@
+ #ifndef THIRD_PARTY_BLINK_RENDERER_PLATFORM_LOADER_FETCH_FETCH_PARAMETERS_H_
+ #define THIRD_PARTY_BLINK_RENDERER_PLATFORM_LOADER_FETCH_FETCH_PARAMETERS_H_
+ 
++#include "third_party/blink/public/mojom/script/script_type.mojom-blink-forward.h"
++#include "third_party/blink/public/mojom/script/script_type.mojom-shared.h"
+ #include "third_party/blink/public/platform/web_url_request.h"
+ #include "third_party/blink/renderer/platform/loader/fetch/client_hints_preferences.h"
+ #include "third_party/blink/renderer/platform/loader/fetch/cross_origin_attribute_value.h"
+@@ -191,6 +193,8 @@ class PLATFORM_EXPORT FetchParameters {
+   void SetLazyImageDeferred();
+   void SetLazyImageNonBlocking();
+ 
++  mojom::blink::ScriptType GetScriptType() const { return script_type_; }
++
+   // See documentation in blink::ResourceRequest.
+   bool IsFromOriginDirtyStyleSheet() const {
+     return is_from_origin_dirty_style_sheet_;
+@@ -215,6 +219,7 @@ class PLATFORM_EXPORT FetchParameters {
+   ResourceWidth resource_width_;
+   ClientHintsPreferences client_hint_preferences_;
+   ImageRequestBehavior image_request_behavior_;
++  mojom::blink::ScriptType script_type_ = mojom::blink::ScriptType::kClassic;
+   bool is_stale_revalidation_ = false;
+   bool is_from_origin_dirty_style_sheet_ = false;
+ };

@@ -7,7 +7,7 @@ inherit qt5-build
 
 DESCRIPTION="The GUI module and platform plugins for the Qt5 framework"
 
-SLOT=5/5.15.2 # bug 707658
+SLOT=5/5.5.11 # bug 707658
 
 KEYWORDS="*"
 IUSE="accessibility dbus egl eglfs evdev +gif gles2-only ibus jpeg

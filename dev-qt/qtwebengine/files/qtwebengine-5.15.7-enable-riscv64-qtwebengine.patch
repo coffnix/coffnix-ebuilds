@@ -1,0 +1,24 @@
+diff --git a/configure.pri b/configure.pri
+index e072961f..d8f385cf 100644
+--- a/configure.pri
++++ b/configure.pri
+@@ -144,6 +144,7 @@ defineTest(qtConfTest_detectArch) {
+     contains(QT_ARCH, "arm")|contains(QT_ARCH, "arm64"): return(true)
+     contains(QT_ARCH, "mips"): return(true)
+     contains(QT_ARCH, "mips64"): return(true)
++    contains(QT_ARCH, "riscv64"): return(true)
+     qtLog("Architecture not supported.")
+     return(false)
+ }
+diff --git a/mkspecs/features/functions.prf b/mkspecs/features/functions.prf
+index 2750d707..993fdfc2 100644
+--- a/mkspecs/features/functions.prf
++++ b/mkspecs/features/functions.prf
+@@ -107,6 +107,7 @@ defineReplace(gnArch) {
+     contains(qtArch, "mips"): return(mipsel)
+     contains(qtArch, "mips64"): return(mips64el)
+     contains(qtArch, "mips64el"): return(mips64el)
++    contains(qtArch, "riscv64"): return(riscv64)
+     return(unknown)
+ }
+ 

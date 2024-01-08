@@ -1,0 +1,33 @@
+# Distributed under the terms of the GNU General Public License v2
+
+EAPI=7
+KDE_ORG_COMMIT="{{commit_hash}}"
+
+QT5_MODULE="{{qt5_module}}"
+VIRTUALX_REQUIRED="test"
+inherit qt5-build
+
+DESCRIPTION="OpenGL support library for the Qt5 framework (deprecated)"
+SRC_URI="{{artifacts[0].src_uri}}"
+
+KEYWORDS="*"
+
+IUSE="gles2-only"
+
+DEPEND="
+	=dev-qt/qtcore-{{qt5_ver}}*:5=
+	=dev-qt/qtgui-{{qt5_ver}}*[gles2-only=]
+	=dev-qt/qtwidgets-{{qt5_ver}}*[gles2-only=]
+"
+RDEPEND="${DEPEND}"
+
+QT5_TARGET_SUBDIRS=(
+	src/opengl
+)
+
+src_configure() {
+	local myconf=(
+		-opengl $(usex gles2-only es2 desktop)
+	)
+	qt5-build_src_configure
+}

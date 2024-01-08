@@ -1,0 +1,56 @@
+# Distributed under the terms of the GNU General Public License v2
+
+EAPI=7
+KDE_ORG_COMMIT="{{commit_hash}}"
+
+PYTHON_COMPAT=( python3_7 python3_8 python3_9 python3_10 )
+inherit python-any-r1 qt5-build
+
+DESCRIPTION="The QML and Quick modules for the Qt5 framework"
+SRC_URI="{{artifacts[0].src_uri}}"
+
+KEYWORDS="*"
+
+IUSE="gles2-only +jit localstorage vulkan +widgets"
+
+# qtgui[gles2-only=] is needed because of bug 504322
+DEPEND="
+	=dev-qt/qtcore-{{qt5_ver}}*
+	=dev-qt/qtgui-{{qt5_ver}}*:5=[gles2-only=,vulkan=]
+	=dev-qt/qtnetwork-{{qt5_ver}}*
+	=dev-qt/qttest-{{qt5_ver}}*
+	media-libs/libglvnd
+	localstorage? ( =dev-qt/qtsql-{{qt5_ver}}* )
+	widgets? ( =dev-qt/qtwidgets-{{qt5_ver}}*[gles2-only=] )
+"
+RDEPEND="${DEPEND}"
+BDEPEND="${PYTHON_DEPS}"
+
+PATCHES=(
+	"${FILESDIR}/${PN}-5.14.2-QQuickItemView-fix-maxXY-extent.patch" # QTBUG-83890
+	"${FILESDIR}/${PN}-5.15.2-riscv-atomic.patch" # bug 790689
+)
+
+src_prepare() {
+	qt_use_disable_mod localstorage sql \
+		src/imports/imports.pro
+
+	qt_use_disable_mod widgets widgets \
+		src/src.pro \
+		src/qmltest/qmltest.pro \
+		tests/auto/auto.pro \
+		tools/tools.pro \
+		tools/qmlscene/qmlscene.pro \
+		tools/qml/qml.pro
+
+	qt5-build_src_prepare
+}
+
+src_configure() {
+	local myqmakeargs=(
+		--
+		-qml-debug
+		$(qt_use jit feature-qml-jit)
+	)
+	qt5-build_src_configure
+}

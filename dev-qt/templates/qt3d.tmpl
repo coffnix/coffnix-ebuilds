@@ -1,0 +1,44 @@
+# Distributed under the terms of the GNU General Public License v2
+
+EAPI=7
+KDE_ORG_COMMIT="{{commit_hash}}"
+
+inherit qt5-build
+
+DESCRIPTION="3D rendering module for the Qt5 framework"
+SRC_URI="{{artifacts[0].src_uri}}"
+
+KEYWORDS="*"
+
+# TODO: tools
+IUSE="gamepad gles2-only qml vulkan"
+
+RDEPEND="
+	=dev-qt/qtconcurrent-{{qt5_ver}}*
+	=dev-qt/qtcore-{{qt5_ver}}*
+	=dev-qt/qtgui-{{qt5_ver}}*:5=[vulkan=]
+	=dev-qt/qtnetwork-{{qt5_ver}}*
+	>=media-libs/assimp-4.0.0
+	gamepad? ( =dev-qt/qtgamepad-{{qt5_ver}}* )
+	qml? ( =dev-qt/qtdeclarative-{{qt5_ver}}*[gles2-only=] )
+"
+DEPEND="${RDEPEND}
+	vulkan? ( dev-util/vulkan-headers )
+"
+
+src_configure() {
+	local myqmakeargs=(
+		--
+		-system-assimp
+	)
+	qt5-build_src_configure
+}
+
+src_prepare() {
+	rm -r src/3rdparty/assimp/{code,contrib,include} || die
+
+	qt_use_disable_mod gamepad gamepad src/input/frontend/frontend.pri
+	qt_use_disable_mod qml quick src/src.pro
+
+	qt5-build_src_prepare
+}

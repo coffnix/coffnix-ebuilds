@@ -1,0 +1,45 @@
+# Distributed under the terms of the GNU General Public License v2
+
+EAPI=7
+KDE_ORG_COMMIT="{{commit_hash}}"
+
+QT5_MODULE="{{qt5_module}}"
+inherit desktop qt5-build xdg-utils
+
+DESCRIPTION="Graphical tool that lets you introspect D-Bus objects and messages"
+SRC_URI="{{artifacts[0].src_uri}}"
+
+KEYWORDS="*"
+
+IUSE=""
+
+DEPEND="
+	=dev-qt/qtcore-{{qt5_ver}}*
+	=dev-qt/qtdbus-{{qt5_ver}}*
+	=dev-qt/qtgui-{{qt5_ver}}*
+	=dev-qt/qtwidgets-{{qt5_ver}}*
+	=dev-qt/qtxml-{{qt5_ver}}*
+"
+RDEPEND="${DEPEND}"
+
+QT5_TARGET_SUBDIRS=(
+	src/qdbus/qdbusviewer
+)
+
+src_install() {
+	qt5-build_src_install
+
+	doicon -s 32 src/qdbus/qdbusviewer/images/qdbusviewer.png
+	newicon -s 128 src/qdbus/qdbusviewer/images/qdbusviewer-128.png qdbusviewer.png
+	make_desktop_entry "${QT5_BINDIR}"/qdbusviewer 'Qt 5 QDBusViewer' qdbusviewer 'Qt;Development'
+}
+
+pkg_postinst() {
+	qt5-build_pkg_postinst
+	xdg_icon_cache_update
+}
+
+pkg_postrm() {
+	qt5-build_pkg_postrm
+	xdg_icon_cache_update
+}

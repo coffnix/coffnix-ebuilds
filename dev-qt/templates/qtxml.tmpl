@@ -1,0 +1,29 @@
+# Distributed under the terms of the GNU General Public License v2
+
+EAPI=7
+KDE_ORG_COMMIT="{{commit_hash}}"
+
+QT5_MODULE="{{qt5_module}}"
+inherit qt5-build
+
+DESCRIPTION="Implementation of SAX and DOM for the Qt5 framework"
+SRC_URI="{{artifacts[0].src_uri}}"
+
+KEYWORDS="*"
+
+IUSE=""
+
+RDEPEND="
+	=dev-qt/qtcore-{{qt5_ver}}*:5=
+"
+DEPEND="${RDEPEND}
+	test? ( =dev-qt/qtnetwork-{{qt5_ver}}* )
+"
+
+QT5_TARGET_SUBDIRS=(
+	src/xml
+)
+
+QT5_GENTOO_PRIVATE_CONFIG=(
+	:xml
+)

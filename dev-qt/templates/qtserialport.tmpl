@@ -1,0 +1,27 @@
+# Distributed under the terms of the GNU General Public License v2
+
+EAPI=7
+KDE_ORG_COMMIT="{{commit_hash}}"
+
+inherit qt5-build
+
+DESCRIPTION="Serial port abstraction library for the Qt5 framework"
+SRC_URI="{{artifacts[0].src_uri}}"
+
+KEYWORDS="*"
+
+IUSE=""
+
+DEPEND="
+	=dev-qt/qtcore-{{qt5_ver}}*
+	virtual/libudev:=
+"
+RDEPEND="${DEPEND}"
+
+src_prepare() {
+	# make sure we link against libudev
+	sed -i -e 's/:qtConfig(libudev)//' \
+		src/serialport/serialport-lib.pri || die
+
+	qt5-build_src_prepare
+}

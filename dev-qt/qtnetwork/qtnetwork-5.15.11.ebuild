@@ -1,29 +1,32 @@
-# Copyright 1999-2023 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
-
-if [[ ${PV} != *9999* ]]; then
-	QT5_KDEPATCHSET_REV=1
-	KEYWORDS="amd64 arm arm64 ~hppa ~loong ppc ppc64 ~riscv ~sparc x86"
-fi
+#KDE_ORG_COMMIT="56faf7249c3857f80f6483c5070e7408c2d53961"
 
 QT5_MODULE="qtbase"
 inherit qt5-build
 
 DESCRIPTION="Network abstraction library for the Qt5 framework"
+#SRC_URI="https://invent.kde.org/qt/qt/qtbase/-/archive/56faf7249c3857f80f6483c5070e7408c2d53961/qtbase-56faf7249c3857f80f6483c5070e7408c2d53961.tar.bz2 -> qtbase-56faf7249c3857f80f6483c5070e7408c2d53961.tar.bz2"
 
-IUSE="gssapi libproxy sctp +ssl"
+KEYWORDS="*"
+
+IUSE="bindist connman gssapi libproxy networkmanager sctp +ssl"
 
 DEPEND="
 	=dev-qt/qtcore-5.15.11*:5=
 	sys-libs/zlib:=
+	connman? ( =dev-qt/qtdbus-5.15.11* )
 	gssapi? ( virtual/krb5 )
 	libproxy? ( net-libs/libproxy )
+	networkmanager? ( =dev-qt/qtdbus-5.15.11* )
 	sctp? ( kernel_linux? ( net-misc/lksctp-tools ) )
-	ssl? ( >=dev-libs/openssl-1.1.1:0= )
+	ssl? ( >=dev-libs/openssl-1.1.1:0=[bindist(-)=] )
 "
-RDEPEND="${DEPEND}"
+RDEPEND="${DEPEND}
+	connman? ( net-misc/connman )
+	networkmanager? ( net-misc/networkmanager )
+"
 
 QT5_TARGET_SUBDIRS=(
 	src/network
@@ -41,12 +44,19 @@ QT5_GENTOO_PRIVATE_CONFIG=(
 	:network
 )
 
+pkg_setup() {
+	use connman && QT5_TARGET_SUBDIRS+=(src/plugins/bearer/connman)
+	use networkmanager && QT5_TARGET_SUBDIRS+=(src/plugins/bearer/networkmanager)
+}
+
 src_configure() {
 	local myconf=(
+		$(usex connman -dbus-linked '')
 		$(qt_use gssapi feature-gssapi)
 		$(qt_use libproxy)
+		$(usex networkmanager -dbus-linked '')
 		$(qt_use sctp)
-		$(usev ssl -openssl-linked)
+		$(usex ssl -openssl-linked '')
 	)
 	qt5-build_src_configure
 }

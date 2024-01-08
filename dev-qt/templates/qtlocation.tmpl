@@ -1,0 +1,53 @@
+# Distributed under the terms of the GNU General Public License v2
+
+EAPI=7
+KDE_ORG_COMMIT="{{commit_hash}}"
+
+inherit qt5-build
+
+DESCRIPTION="Location (places, maps, navigation) library for the Qt5 framework"
+SRC_URI="{{artifacts[0].src_uri}}
+		{{artifacts[1].src_uri}}"
+
+KEYWORDS="*"
+
+IUSE=""
+
+RDEPEND="
+	dev-libs/icu:=
+	=dev-qt/qtcore-{{qt5_ver}}*
+	=dev-qt/qtdeclarative-{{qt5_ver}}*
+	=dev-qt/qtgui-{{qt5_ver}}*
+	=dev-qt/qtnetwork-{{qt5_ver}}*
+	=dev-qt/qtpositioning-{{qt5_ver}}*[qml]
+	=dev-qt/qtsql-{{qt5_ver}}*
+	sys-libs/zlib
+"
+DEPEND="${RDEPEND}
+	=dev-qt/qtconcurrent-{{qt5_ver}}*
+"
+
+QT5_TARGET_SUBDIRS=(
+	src/3rdparty/clipper
+	src/3rdparty/poly2tri
+	src/3rdparty/clip2tri
+	src/3rdparty/mapbox-gl-native
+	src/location
+	src/imports/location
+	src/imports/locationlabs
+	src/plugins/geoservices
+)
+
+src_prepare() {
+	mv "${WORKDIR}"/${PN}-mapboxgl-*/* src/3rdparty/mapbox-gl-native || die
+	qt5-build_src_prepare
+}
+
+src_configure() {
+	# src/plugins/geoservices requires files that are only generated when
+	# qmake is run in the root directory. Bug 633776.
+	mkdir -p "${QT5_BUILD_DIR}"/src/location || die
+	qt5_qmake "${QT5_BUILD_DIR}"
+	cp "${S}"/src/location/qtlocation-config.pri "${QT5_BUILD_DIR}"/src/location || die
+	qt5-build_src_configure
+}

@@ -1,0 +1,29 @@
+# Distributed under the terms of the GNU General Public License v2
+
+EAPI=7
+KDE_ORG_COMMIT="{{commit_hash}}"
+
+QT5_MODULE="{{qt5_module}}"
+inherit qt5-build
+
+DESCRIPTION="Qt5 module for integrating online documentation into applications"
+SRC_URI="{{artifacts[0].src_uri}}"
+
+KEYWORDS="*"
+
+IUSE=""
+
+DEPEND="
+	=dev-qt/qtcore-{{qt5_ver}}*:5=
+	=dev-qt/qtgui-{{qt5_ver}}*
+	=dev-qt/qtnetwork-{{qt5_ver}}*
+	=dev-qt/qtsql-{{qt5_ver}}*[sqlite]
+	=dev-qt/qtwidgets-{{qt5_ver}}*
+"
+RDEPEND="${DEPEND}"
+
+QT5_TARGET_SUBDIRS=(
+	src/assistant/help
+	src/assistant/qcollectiongenerator
+	src/assistant/qhelpgenerator
+)

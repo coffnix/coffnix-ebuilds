@@ -3,11 +3,6 @@
 
 EAPI=7
 
-if [[ ${PV} != *9999* ]]; then
-	QT5_KDEPATCHSET_REV=3
-	KEYWORDS="amd64 arm arm64 ~hppa ~loong ppc ppc64 ~riscv ~sparc x86"
-fi
-
 QT5_MODULE="qtbase"
 inherit qt5-build
 
@@ -24,7 +19,7 @@ DEPEND="
 	gtk? (
 		dev-libs/glib:2
 		=dev-qt/qtgui-5.15.11*:5=[dbus]
-		x11-libs/gtk+:3[X]
+		x11-libs/gtk+:3
 		x11-libs/libX11
 		x11-libs/pango
 	)
@@ -51,13 +46,13 @@ QT5_GENTOO_PRIVATE_CONFIG=(
 src_configure() {
 	local myconf=(
 		-opengl $(usex gles2-only es2 desktop)
-		$(usev dbus -dbus-linked)
+		$(qt_use dbus)
 		$(qt_use gtk)
 		-gui
 		$(qt_use png libpng system)
 		-widgets
 		$(qt_use X xcb)
-		$(usev X '-xcb-xlib -xkbcommon')
+		$(usex X '-xcb-xlib -xkbcommon' '')
 	)
 	qt5-build_src_configure
 }

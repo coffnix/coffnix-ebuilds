@@ -31,7 +31,7 @@ fi
 # ppc64 ffmpeg patchset backported from chromium 98 on https://ppa.quickbuild.io/raptor-engineering-public/chromium/ubuntu/pool/main/c/chromium/
 SRC_URI+=" https://dev.gentoo.org/~asturm/distfiles/${PATCHSET}.tar.xz
 	ppc64? (
-		https://dev.gentoo.org/~gyakovlev/distfiles/${PN}-5.15.2-r1-chromium87-ppc64le.tar.xz
+		https://dev.gentoo.org/~gyakovlev/distfiles/${PN}-5.5.11-r1-chromium87-ppc64le.tar.xz
 		https://dev.gentoo.org/~asturm/distfiles/${PN}-5.15-ffmpeg-ppc64le.tar.xz
 	)"
 
@@ -205,7 +205,7 @@ src_prepare() {
 	# src/3rdparty/gn fails with libc++ due to passing of `-static-libstdc++`
 	if tc-is-clang ; then
 		if has_version 'sys-devel/clang[default-libcxx(-)]' || has_version 'sys-devel/clang-common[default-libcxx(-)]' ; then
-			eapply "${FILESDIR}/${PN}-5.15.2_p20210521-clang-libc++.patch"
+			eapply "${FILESDIR}/${PN}-5.5.11_p20210521-clang-libc++.patch"
 		fi
 	fi
 
@@ -218,7 +218,7 @@ src_prepare() {
 
 	if use ppc64; then
 		einfo "Patching for ppc64le and generating build files"
-		eapply "${FILESDIR}/qtwebengine-5.15.2-enable-ppc64.patch"
+		eapply "${FILESDIR}/qtwebengine-5.5.11-enable-ppc64.patch"
 		pushd src/3rdparty/chromium > /dev/null || die
 		eapply -p0 "${WORKDIR}/${PN}-ppc64le"
 		eapply -p1 "${WORKDIR}/${PN}-ffmpeg-ppc64le"
