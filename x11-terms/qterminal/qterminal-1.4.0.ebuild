@@ -5,34 +5,26 @@ EAPI=7
 inherit cmake xdg-utils
 
 DESCRIPTION="Qt-based multitab terminal emulator"
+HOMEPAGE="https://lxqt.github.io/"
+
+SRC_URI="https://github.com/lxqt/qterminal/releases/download/1.4.0/qterminal-1.4.0.tar.xz -> qterminal-1.4.0.tar.xz"
 KEYWORDS="*"
-HOMEPAGE="https://lxqt-project.org/"
 
 LICENSE="GPL-2 GPL-2+"
 SLOT="0"
-IUSE="test"
-RESTRICT="!test? ( test )"
 
-BDEPEND=">=dev-util/lxqt-build-tools-0.13.0"
+BDEPEND="dev-util/lxqt-build-tools
+	dev-qt/qttest"
 DEPEND="
-	>=dev-qt/qtcore-5.15:5
-	>=dev-qt/qtdbus-5.15:5
-	>=dev-qt/qtgui-5.15:5
-	>=dev-qt/qtwidgets-5.15:5
-	>=dev-qt/qtx11extras-5.15:5
+	dev-qt/qtcore:5
+	dev-qt/qtdbus:5
+	dev-qt/qtgui:5
+	dev-qt/qtwidgets:5
+	dev-qt/qtx11extras:5
 	x11-libs/libX11
-	~x11-libs/qtermwidget-${PV}:=
-	test? ( dev-qt/qttest:5 )
+	~x11-libs/qtermwidget-${PV}
 "
 RDEPEND="${DEPEND}"
-
-src_configure() {
-	local mycmakeargs=(
-		-DBUILD_TESTS=$(usex test)
-	)
-
-	cmake_src_configure
-}
 
 pkg_postinst() {
 	xdg_icon_cache_update
@@ -40,4 +32,10 @@ pkg_postinst() {
 
 pkg_postrm() {
 	xdg_icon_cache_update
+}
+
+post_src_unpack() {
+	if [ ! -d "${S}" ]; then
+		mv "${WORKDIR}"/* "${S}" || die
+	fi
 }
