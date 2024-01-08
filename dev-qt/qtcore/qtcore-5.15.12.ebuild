@@ -70,13 +70,13 @@ src_prepare() {
 	# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105709
 	# https://bugreports.qt.io/browse/QTBUG-103782
 	# bug #847145
-	if tc-enables-fortify-source ; then
+#	if tc-enables-fortify-source ; then
 		# We can't unconditionally do this b/c we fortify needs
 		# some level of optimisation.
-		filter-flags -D_FORTIFY_SOURCE=3
+#		filter-flags -D_FORTIFY_SOURCE=3
 		# (Qt doesn't seem to respect CPPFLAGS?)
-		append-flags -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2
-	fi
+#		append-flags -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2
+#	fi
 
 	qt5-build_src_prepare
 
