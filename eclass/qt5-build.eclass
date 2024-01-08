@@ -124,17 +124,17 @@ if [[ ${PN} != qtwebengine ]]; then
 	esac
 fi
 
-if [[ ${QT5_MODULE} == qtbase ]]; then
-	case ${PV} in
-		5.15.11)
-			_QT5_GENTOOPATCHSET_REV=4
-			;;
-		*)
-			_QT5_GENTOOPATCHSET_REV=5
-			;;
-	esac
-	SRC_URI+=" https://dev.gentoo.org/~asturm/distfiles/qtbase-5.15-gentoo-patchset-${_QT5_GENTOOPATCHSET_REV}.tar.xz"
-fi
+#if [[ ${QT5_MODULE} == qtbase ]]; then
+#	case ${PV} in
+#		5.15.11)
+#			_QT5_GENTOOPATCHSET_REV=4
+#			;;
+#		*)
+#			_QT5_GENTOOPATCHSET_REV=5
+#			;;
+#	esac
+#	SRC_URI+=" https://dev.gentoo.org/~asturm/distfiles/qtbase-5.15-gentoo-patchset-${_QT5_GENTOOPATCHSET_REV}.tar.xz"
+#fi
 
 # @ECLASS_VARIABLE: QT5_BUILD_DIR
 # @OUTPUT_VARIABLE
