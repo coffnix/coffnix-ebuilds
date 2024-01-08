@@ -4,7 +4,6 @@ EAPI=7
 
 QT5_MODULE="qtbase"
 inherit qt5-build
-	QT5_PV="5.15.11"
 
 DESCRIPTION="The GUI module and platform plugins for the Qt5 framework"
 
