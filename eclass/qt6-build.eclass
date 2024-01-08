@@ -204,24 +204,24 @@ qt_feature() {
 # Create links for user facing tools (bug #863395) as suggested in:
 # https://doc.qt.io/qt-6/packaging-recommendations.html
 _qt6-build_create_user_facing_links() {
-	# user_facing_tool_links.txt is always created (except for qttranslations)
-	# even if no links (empty), if missing will assume that it is an error
-	[[ ${PN} == qttranslations ]] && return
+    # user_facing_tool_links.txt is always created (except for qttranslations)
+    # even if no links (empty), if missing will assume that it is an error
+    [[ ${PN} == qttranslations ]] && return
 
-	# loop and match using paths (upstream suggests `xargs ln -s < ${links}`
-	# but, for what it is worth, that will fail if paths have spaces)
-	local link
-	while IFS= read -r link; do
-		if [[ -z ${link} ]]; then
-			continue
-		elif [[ ${link} =~ ^("${QT6_PREFIX}"/.+)\ ("${QT6_PREFIX}"/bin/.+) ]]
-		then
-			dosym -r "${BASH_REMATCH[1]#"${EPREFIX}"}" \
-				"${BASH_REMATCH[2]#"${EPREFIX}"}"
-		else
-			die "unrecognized line '${link}' in '${links}'"
-		fi
-	done < "${BUILD_DIR}"/user_facing_tool_links.txt || die
+    # loop and match using paths (upstream suggests `xargs ln -s < ${links}`
+    # but, for what it is worth, that will fail if paths have spaces)
+    local link
+    while IFS= read -r link; do
+        if [[ -z ${link} ]]; then
+            continue
+        elif [[ ${link} =~ ^("${QT6_PREFIX}"/.+)\ ("${QT6_PREFIX}"/bin/.+) ]]
+        then
+            dosym "${BASH_REMATCH[1]#"${EPREFIX}"}" \
+                  "${BASH_REMATCH[2]#"${EPREFIX}"}"
+        else
+            die "unrecognized line '${link}' in '${links}'"
+        fi
+    done < "${BUILD_DIR}"/user_facing_tool_links.txt || die
 }
 
 # @FUNCTION: _qt6-build_match_cpu_flags
