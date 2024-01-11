@@ -7,6 +7,7 @@ inherit bash-completion-r1 optfeature systemd toolchain-funcs
 
 DESCRIPTION="Generic initramfs generation tool"
 KEYWORDS="*"
+SRC_URI="https://github.com/dracutdevs/dracut/archive/${PV}.tar.gz -> ${P}.tar.gz"
 HOMEPAGE="https://github.com/dracutdevs/dracut/wiki"
 
 LICENSE="GPL-2"
