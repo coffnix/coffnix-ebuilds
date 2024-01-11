@@ -6,6 +6,7 @@ EAPI=7
 inherit bash-completion-r1 optfeature systemd toolchain-funcs
 
 DESCRIPTION="Generic initramfs generation tool"
+KEYWORDS="*"
 HOMEPAGE="https://github.com/dracutdevs/dracut/wiki"
 
 LICENSE="GPL-2"
