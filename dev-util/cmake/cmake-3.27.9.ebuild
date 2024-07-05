@@ -36,7 +36,7 @@ else
 	SRC_URI="https://cmake.org/files/v$(ver_cut 1-2)/${MY_P}.tar.gz"
 
 	if [[ ${CMAKE_DOCS_PREBUILT} == 1 ]] ; then
-		SRC_URI+=" !doc? ( https://dev.gentoo.org/~${CMAKE_DOCS_PREBUILT_DEV}/distfiles/${CATEGORY}/${PN}/${PN}-${CMAKE_DOCS_VERSION}-docs.tar.xz )"
+		SRC_URI+=" !doc? ( https://dev.gentoo.org/~${CMAKE_DOCS_PREBUILT_DEV}/distfiles/dev-build/${PN}/${PN}-${CMAKE_DOCS_VERSION}-docs.tar.xz )"
 	fi
 
 	if [[ ${PV} != *_rc* ]] ; then
