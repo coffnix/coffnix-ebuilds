@@ -1,0 +1,17 @@
+#!/sbin/openrc-run
+
+description="PulseAudio in system-wide mode"
+command="/usr/bin/pulseaudio"
+command_args="--system"
+pidfile="/var/run/pulse/pulse.pid"
+command_user="pulse"
+
+depend() {
+    need dbus
+    after alsa
+    use logger
+}
+
+start_pre() {
+    checkpath -d -m 0755 -o pulse:pulse /var/run/pulse
+}
