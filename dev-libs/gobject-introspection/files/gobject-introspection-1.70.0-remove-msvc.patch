@@ -1,0 +1,492 @@
+diff -urN gobject-introspection-1.70.0/giscanner/ccompiler.py gobject-introspection-1.70.0.fixed/giscanner/ccompiler.py
+--- gobject-introspection-1.70.0/giscanner/ccompiler.py	2021-09-17 10:02:42.520052200 -0600
++++ gobject-introspection-1.70.0.fixed/giscanner/ccompiler.py	2022-08-17 08:31:25.248057348 -0600
+@@ -26,7 +26,6 @@
+ import sys
+ import distutils
+ 
+-from distutils.msvccompiler import MSVCCompiler
+ from distutils.unixccompiler import UnixCCompiler
+ from distutils.cygwinccompiler import Mingw32CCompiler
+ from distutils.sysconfig import get_config_vars
+@@ -120,24 +119,14 @@
+                     compiler_name = 'mingw32'
+                 else:
+                     compiler_name = distutils.ccompiler.get_default_compiler()
+-            if compiler_name != 'msvc' and \
+-               compiler_name != 'mingw32':
++            if compiler_name != 'mingw32':
+                 raise SystemExit('Specified Compiler \'%s\' is unsupported.' % compiler_name)
+         else:
+             # XXX: Is it common practice to use a non-Unix compiler
+             #      class instance on non-Windows on platforms g-i supports?
+             compiler_name = distutils.ccompiler.get_default_compiler()
+ 
+-        # Now, create the distutils ccompiler instance based on the info we have.
+-        if compiler_name == 'msvc':
+-            # For MSVC, we need to create a instance of a subclass of distutil's
+-            # MSVC9Compiler class, as it does not provide a preprocess()
+-            # implementation
+-            from . import msvccompiler
+-            self.compiler = msvccompiler.get_msvc_compiler()
+-
+-        else:
+-            self.compiler = distutils.ccompiler.new_compiler(compiler=compiler_name)
++        self.compiler = distutils.ccompiler.new_compiler(compiler=compiler_name)
+         customize_compiler(self.compiler)
+ 
+         # customize_compiler() from distutils only does customization
+@@ -150,31 +139,12 @@
+             if self.compiler.preprocessor is None:
+                 self.compiler.preprocessor = self.compiler.compiler + ['-E']
+ 
+-        if self.check_is_msvc():
+-            # We trick distutils to believe that we are (always) using a
+-            # compiler supplied by a Windows SDK, so that we avoid launching
+-            # a new build environment to detect the compiler that is used to
+-            # build Python itself, which is not desirable, so that we use the
+-            # compiler commands (and env) as-is.
+-            os.environ['DISTUTILS_USE_SDK'] = '1'
+-            if 'MSSdk' not in os.environ:
+-                if 'WindowsSDKDir' in os.environ:
+-                    os.environ['MSSdk'] = os.environ.get('WindowsSDKDir')
+-                elif os.environ.get('VCInstallDir'):
+-                    os.environ['MSSdk'] = os.environ.get('VCInstallDir')
+-
+-            if self.compiler.check_is_clang_cl():
+-                self.compiler_cmd = os.environ.get('CC').split()[0]
+-            else:
+-                self.compiler_cmd = 'cl.exe'
+-                self._cflags_no_deprecation_warnings = "-wd4996"
++        if (isinstance(self.compiler, Mingw32CCompiler)):
++            self.compiler_cmd = self.compiler.compiler[0]
+         else:
+-            if (isinstance(self.compiler, Mingw32CCompiler)):
+-                self.compiler_cmd = self.compiler.compiler[0]
+-            else:
+-                self.compiler_cmd = ' '.join(self.compiler.compiler)
++            self.compiler_cmd = ' '.join(self.compiler.compiler)
+ 
+-            self._cflags_no_deprecation_warnings = "-Wno-deprecated-declarations"
++        self._cflags_no_deprecation_warnings = "-Wno-deprecated-declarations"
+ 
+     def get_internal_link_flags(self, args, libtool, libraries, extra_libraries, libpaths, lib_dirs_envvar):
+         # An "internal" link is where the library to be introspected
+@@ -203,31 +173,22 @@
+         for library_path in libpaths:
+             # The dumper program needs to look for dynamic libraries
+             # in the library paths first
+-            if self.check_is_msvc():
+-                library_path = library_path.replace('/', '\\')
+-                args.append('-libpath:' + library_path)
+-            else:
+-                args.append('-L' + library_path)
+-                if os.path.isabs(library_path):
+-                    if libtool:
+-                        args.append('-rpath')
+-                        args.append(library_path)
+-                    else:
+-                        args.append('-Wl,-rpath,' + library_path)
++            args.append('-L' + library_path)
++            if os.path.isabs(library_path):
++                if libtool:
++                    args.append('-rpath')
++                    args.append(library_path)
++                else:
++                    args.append('-Wl,-rpath,' + library_path)
+ 
+             runtime_paths.append(library_path)
+ 
+         for library in libraries + extra_libraries:
+-            if self.check_is_msvc():
+-                # Note that Visual Studio builds do not use libtool!
+-                if library != 'm':
+-                    args.append(library + '.lib')
++            # If we get a real filename, just use it as-is
++            if library.endswith(".la") or os.path.isfile(library):
++                args.append(library)
+             else:
+-                # If we get a real filename, just use it as-is
+-                if library.endswith(".la") or os.path.isfile(library):
+-                    args.append(library)
+-                else:
+-                    args.append('-l' + library)
++                args.append('-l' + library)
+ 
+         for envvar in runtime_path_envvar:
+             if envvar in os.environ:
+@@ -242,15 +203,10 @@
+         # of GLib in gobject-introspection itself.
+ 
+         for library in libraries:
+-            if self.check_is_msvc():
+-                # Visual Studio: don't attempt to link to m.lib
+-                if library != 'm':
+-                    args.append(library + ".lib")
++            if library.endswith(".la"):  # explicitly specified libtool library
++                args.append(library)
+             else:
+-                if library.endswith(".la"):  # explicitly specified libtool library
+-                    args.append(library)
+-                else:
+-                    args.append('-l' + library)
++                args.append('-l' + library)
+ 
+     def preprocess(self, source, output, cpp_options):
+         extra_postargs = ['-C']
+@@ -262,15 +218,6 @@
+         include_dirs.extend(include_paths)
+         extra_postargs.extend(postargs)
+ 
+-        # Define these macros when using Visual C++ to silence many warnings,
+-        # and prevent stepping on many Visual Studio-specific items, so that
+-        # we don't have to handle them specifically in scannerlexer.l
+-        if self.check_is_msvc() and not self.compiler.check_is_clang_cl():
+-            macros.append(('_USE_DECLSPECS_FOR_SAL', None))
+-            macros.append(('_CRT_SECURE_NO_WARNINGS', None))
+-            macros.append(('_CRT_NONSTDC_NO_WARNINGS', None))
+-            macros.append(('SAL_NO_ATTRIBUTE_DECLARATIONS', None))
+-
+         self.compiler.preprocess(source=source,
+                                  output_file=output,
+                                  macros=macros,
+@@ -320,38 +267,18 @@
+         args = []
+         libsearch = []
+ 
+-        # When we are using Visual C++ or clang-cl...
+-        if self.check_is_msvc():
+-            # The search path of the .lib's on Visual C++
+-            # is dependent on the LIB environmental variable,
+-            # so just query for that
+-            libpath = os.environ.get('LIB')
+-            libsearch = libpath.split(';')
+-
+-            # Use the dumpbin utility that's included in
+-            # every Visual C++ installation to find out which
+-            # DLL the .lib gets linked to.
+-            # dumpbin -symbols something.lib gives the
+-            # filename of DLL without the '.dll' extension that something.lib
+-            # links to, in the line that contains
+-            # __IMPORT_DESCRIPTOR_<dll_filename_that_something.lib_links_to>
+-            args.append('dumpbin.exe')
+-            args.append('-symbols')
+-
+-        # When we are not using Visual C++ nor clang-cl (i.e. we are using GCC)...
+-        else:
+-            libtool = utils.get_libtool_command(options)
+-            if libtool:
+-                args.extend(libtool)
+-                args.append('--mode=execute')
+-            args.extend([os.environ.get('DLLTOOL', 'dlltool.exe'), '--identify'])
+-            proc = subprocess.Popen([self.compiler_cmd, '-print-search-dirs'],
+-                                    stdout=subprocess.PIPE)
+-            o, e = proc.communicate()
+-            libsearch = options.library_paths
+-            for line in o.decode('ascii').splitlines():
+-                if line.startswith('libraries: '):
+-                    libsearch += line[len('libraries: '):].split(os.pathsep)
++        libtool = utils.get_libtool_command(options)
++        if libtool:
++            args.extend(libtool)
++            args.append('--mode=execute')
++        args.extend([os.environ.get('DLLTOOL', 'dlltool.exe'), '--identify'])
++        proc = subprocess.Popen([self.compiler_cmd, '-print-search-dirs'],
++                                stdout=subprocess.PIPE)
++        o, e = proc.communicate()
++        libsearch = options.library_paths
++        for line in o.decode('ascii').splitlines():
++            if line.startswith('libraries: '):
++                libsearch += line[len('libraries: '):].split(os.pathsep)
+ 
+         shlibs = []
+         not_resolved = []
+@@ -374,39 +301,13 @@
+                         break
+                     implib = os.path.join(l, c)
+                     if os.path.exists(implib):
+-                        if self.check_is_msvc():
+-                            tmp_fd, tmp_filename = \
+-                                tempfile.mkstemp(prefix='g-ir-win32-resolve-lib-')
+-
+-                            # This is dumb, but it is life... Windows does not like one
+-                            # trying to write to a file when its FD is not closed first,
+-                            # when we use a flag in a program to do so.  So, close,
+-                            # write to temp file with dumpbin and *then* re-open the
+-                            # file for reading.
+-                            os.close(tmp_fd)
+-                            output_flag = ['-out:' + tmp_filename]
+-                            proc = subprocess.call(args + [implib] + output_flag,
+-                                                   stdout=subprocess.PIPE)
+-                            with open(tmp_filename, 'r', encoding='utf-8') as tmp_fileobj:
+-                                for line in tmp_fileobj.read().splitlines():
+-
+-                                    if '__IMPORT_DESCRIPTOR_' in line:
+-                                        line_tokens = line.split()
+-                                        for item in line_tokens:
+-                                            if item.startswith('__IMPORT_DESCRIPTOR_'):
+-                                                shlibs.append(item[20:] + '.dll')
+-                                                found = True
+-                                                break
+-                            tmp_fileobj.close()
+-                            os.unlink(tmp_filename)
+-                        else:
+-                            proc = subprocess.Popen(args + [implib],
+-                                                    stdout=subprocess.PIPE)
+-                            o, e = proc.communicate()
+-                            for line in o.decode('ascii').splitlines():
+-                                shlibs.append(line)
+-                                found = True
+-                                break
++                        proc = subprocess.Popen(args + [implib],
++                                                stdout=subprocess.PIPE)
++                        o, e = proc.communicate()
++                        for line in o.decode('ascii').splitlines():
++                            shlibs.append(line)
++                            found = True
++                            break
+             if not found:
+                 not_resolved.append(lib)
+         if len(not_resolved) > 0:
+@@ -417,15 +318,7 @@
+ 
+     @property
+     def linker_cmd(self):
+-        if self.check_is_msvc():
+-            if not self.compiler.initialized:
+-                self.compiler.initialize()
+-            return [self.compiler.linker]
+-        else:
+-            return self.compiler.linker_exe
+-
+-    def check_is_msvc(self):
+-        return isinstance(self.compiler, MSVCCompiler)
++        return self.compiler.linker_exe
+ 
+     # Private APIs
+     def _set_cpp_options(self, options):
+@@ -446,13 +339,6 @@
+                 else:
+                     macro_name = macro[:macro_index]
+                     macro_value = macro[macro_index + 1:]
+-
+-                    # Somehow the quotes used in defining
+-                    # macros for compiling using distutils
+-                    # get dropped for MSVC builds, so
+-                    # escape the escape character.
+-                    if isinstance(self.compiler, MSVCCompiler):
+-                        macro_value = macro_value.replace('\"', '\\\"')
+                 macros.append((macro_name, macro_value))
+             elif option.startswith('-U'):
+                 macros.append((option[len('-U'):],))
+diff -urN gobject-introspection-1.70.0/giscanner/dumper.py gobject-introspection-1.70.0.fixed/giscanner/dumper.py
+--- gobject-introspection-1.70.0/giscanner/dumper.py	2021-09-17 10:02:42.523052200 -0600
++++ gobject-introspection-1.70.0.fixed/giscanner/dumper.py	2022-08-17 08:39:33.616070538 -0600
+@@ -179,8 +179,7 @@
+         return os.path.join(tmpdir, tmpl)
+ 
+     def _compile(self, *sources):
+-        cflags = pkgconfig.cflags(self._packages,
+-                                  msvc_syntax=self._compiler.check_is_msvc())
++        cflags = pkgconfig.cflags(self._packages)
+         cflags.extend(self._options.cflags)
+         return self._compiler.compile(cflags,
+                                       self._options.cpp_includes,
+@@ -200,27 +199,17 @@
+ 
+         args.extend(self._compiler.linker_cmd)
+ 
+-        # We can use -o for the Microsoft compiler/linker,
+-        # but it is considered deprecated usage
+-        if self._compiler.check_is_msvc():
+-            args.extend(['-out:' + output])
+-        else:
+-            args.extend(['-o', output])
+-            if libtool:
+-                if utils.host_os() == 'nt':
+-                    args.append('-Wl,--export-all-symbols')
+-                else:
+-                    args.append('-export-dynamic')
+-
+-        if not self._compiler.check_is_msvc():
+-            # These envvars are not used for MSVC Builds!
+-            # MSVC Builds use the INCLUDE, LIB envvars,
+-            # which are automatically picked up during
+-            # compilation and linking
+-            for cppflag in shlex.split(os.environ.get('CPPFLAGS', '')):
+-                args.append(cppflag)
+-            for cflag in shlex.split(os.environ.get('CFLAGS', '')):
+-                args.append(cflag)
++        args.extend(['-o', output])
++        if libtool:
++            if utils.host_os() == 'nt':
++                args.append('-Wl,--export-all-symbols')
++            else:
++                args.append('-export-dynamic')
++
++        for cppflag in shlex.split(os.environ.get('CPPFLAGS', '')):
++            args.append(cppflag)
++        for cflag in shlex.split(os.environ.get('CFLAGS', '')):
++            args.append(cflag)
+ 
+         # Make sure to list the library to be introspected first since it's
+         # likely to be uninstalled yet and we want the uninstalled RPATHs have
+@@ -232,8 +221,7 @@
+ 
+         args.extend(sources)
+ 
+-        pkg_config_libs = pkgconfig.libs(self._packages,
+-                                         msvc_syntax=self._compiler.check_is_msvc())
++        pkg_config_libs = pkgconfig.libs(self._packages)
+ 
+         if not self._options.external_library:
+             self._compiler.get_internal_link_flags(args,
+@@ -248,9 +236,8 @@
+             args.extend(pkg_config_libs)
+             self._compiler.get_external_link_flags(args, self._options.libraries)
+ 
+-        if not self._compiler.check_is_msvc():
+-            for ldflag in shlex.split(os.environ.get('LDFLAGS', '')):
+-                args.append(ldflag)
++        for ldflag in shlex.split(os.environ.get('LDFLAGS', '')):
++            args.append(ldflag)
+ 
+         dll_dirs = utils.dll_dirs()
+         dll_dirs.add_dll_dirs(self._packages)
+diff -urN gobject-introspection-1.70.0/giscanner/meson.build gobject-introspection-1.70.0.fixed/giscanner/meson.build
+--- gobject-introspection-1.70.0/giscanner/meson.build	2021-09-17 10:02:42.526052200 -0600
++++ gobject-introspection-1.70.0.fixed/giscanner/meson.build	2022-08-17 08:32:05.640058439 -0600
+@@ -16,7 +16,6 @@
+   'maintransformer.py',
+   'mdextensions.py',
+   'message.py',
+-  'msvccompiler.py',
+   'pkgconfig.py',
+   'shlibs.py',
+   'scannermain.py',
+diff -urN gobject-introspection-1.70.0/giscanner/msvccompiler.py gobject-introspection-1.70.0.fixed/giscanner/msvccompiler.py
+--- gobject-introspection-1.70.0/giscanner/msvccompiler.py	2021-09-17 10:02:42.527052400 -0600
++++ gobject-introspection-1.70.0.fixed/giscanner/msvccompiler.py	1969-12-31 17:00:00.000000000 -0700
+@@ -1,122 +0,0 @@
+-# -*- Mode: Python -*-
+-# GObject-Introspection - a framework for introspecting GObject libraries
+-# Copyright (C) 2014  Chun-wei Fan
+-#
+-# This library is free software; you can redistribute it and/or
+-# modify it under the terms of the GNU Lesser General Public
+-# License as published by the Free Software Foundation; either
+-# version 2 of the License, or (at your option) any later version.
+-#
+-# This library is distributed in the hope that it will be useful,
+-# but WITHOUT ANY WARRANTY; without even the implied warranty of
+-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+-# Lesser General Public License for more details.
+-#
+-# You should have received a copy of the GNU Lesser General Public
+-# License along with this library; if not, write to the
+-# Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+-# Boston, MA 02111-1307, USA.
+-#
+-
+-import os
+-import distutils
+-
+-from distutils.errors import DistutilsExecError, CompileError
+-from distutils.ccompiler import CCompiler, gen_preprocess_options
+-from distutils.dep_util import newer
+-
+-# Distutil's MSVCCompiler does not provide a preprocess()
+-# Implementation, so do our own here.
+-
+-
+-def get_msvc_compiler():
+-    return MSVCCompiler()
+-
+-
+-class MSVCCompiler(distutils.msvccompiler.MSVCCompiler):
+-
+-    def __init__(self, verbose=0, dry_run=0, force=0):
+-        super(distutils.msvccompiler.MSVCCompiler, self).__init__()
+-        CCompiler.__init__(self, verbose, dry_run, force)
+-        self.__paths = []
+-        self.__arch = None  # deprecated name
+-        if os.name == 'nt':
+-            if isinstance(self, distutils.msvc9compiler.MSVCCompiler):
+-                self.__version = distutils.msvc9compiler.VERSION
+-        self.initialized = False
+-        self.preprocess_options = None
+-        if self.check_is_clang_cl():
+-            cc_cmd = os.environ.get('CC').split()
+-            self.cc = cc_cmd[0]
+-            self.linker = 'lld-link'
+-            self.compile_options = []
+-            # Add any arguments added to clang-cl to self.compile_options
+-            # such as cross-compilation flags
+-            if len(cc_cmd) > 1:
+-                self.compile_options.extend(cc_cmd[1:])
+-            self.initialized = True
+-
+-    def preprocess(self,
+-                   source,
+-                   output_file=None,
+-                   macros=None,
+-                   include_dirs=None,
+-                   extra_preargs=None,
+-                   extra_postargs=None):
+-        if self.initialized is False:
+-            self.initialize()
+-
+-        (_, macros, include_dirs) = \
+-            self._fix_compile_args(None, macros, include_dirs)
+-        pp_opts = gen_preprocess_options(macros, include_dirs)
+-        preprocess_options = ['-E']
+-        source_basename = None
+-
+-        if output_file is not None:
+-            preprocess_options.append('-P')
+-            source_basename = self._get_file_basename(source)
+-        cpp_args = self.cc.split()
+-        if extra_preargs is not None:
+-            cpp_args[:0] = extra_preargs
+-        if extra_postargs is not None:
+-            preprocess_options.extend(extra_postargs)
+-        cpp_args.extend(preprocess_options)
+-        cpp_args.extend(pp_opts)
+-        cpp_args.append(source)
+-
+-        # We need to preprocess: either we're being forced to, or the
+-        # source file is newer than the target (or the target doesn't
+-        # exist).
+-        if self.force or output_file is None or newer(source, output_file):
+-            try:
+-                self.spawn(cpp_args)
+-            except DistutilsExecError as msg:
+-                print(msg)
+-                raise CompileError
+-
+-        # The /P option for the MSVC preprocessor will output the results
+-        # of the preprocessor to a file, as <source_without_extension>.i,
+-        # so in order to output the specified filename, we need to rename
+-        # that file
+-        if output_file is not None:
+-            if output_file != source_basename + '.i':
+-                os.rename(source_basename + '.i', output_file)
+-
+-    def _get_file_basename(self, filename):
+-        if filename is None:
+-            return None
+-        if filename.rfind('.') == -1:
+-            return filename[filename.rfind('\\') + 1:]
+-        else:
+-            return filename[filename.rfind('\\') + 1:filename.rfind('.')]
+-
+-    def check_is_clang_cl(self):
+-        # To run g-ir-scanner under Windows using clang-cl, set both `CC` and
+-        # `CXX` to `clang-cl [<arch_args>]` and ensure that clang-cl.exe and
+-        # lld-link.exe are in the PATH in a Visual Studio command prompt.  Note
+-        # that the Windows SDK is still needed in this case.  This is in line
+-        # with what is done in Meson
+-        return (os.environ.get('CC') is not None and
+-                os.environ.get('CXX') is not None and
+-                os.environ.get('CC').split()[0] == 'clang-cl' and
+-                os.environ.get('CXX').split()[0] == 'clang-cl')

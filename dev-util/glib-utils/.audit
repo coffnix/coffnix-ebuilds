@@ -1,0 +1,3 @@
+FL-5671.
+add meta ebuild for glib-utils that installs nothing but depedns on glib.
+glib has helper python binaries (glib-genmarshal, glib-mkenums, etc) that used by build time. Gentoo split those binaries into a separate ebuild and introduced the block for older glib. For Funtoo, until, decided, to ease the update we will use the meta ebuild that will just satisfy deps. python binaries are in glib itself.
