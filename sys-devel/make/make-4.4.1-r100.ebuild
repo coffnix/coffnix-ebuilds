@@ -18,9 +18,9 @@ CDEPEND="guile? ( >=dev-scheme/guile-1.8:= )"
 DEPEND="${CDEPEND}
 	nls? ( sys-devel/gettext )"
 RDEPEND="${CDEPEND}
+	app-arch/plzip
 	nls? ( virtual/libintl )"
 BDEPEND="
-	app-arch/plzip
 	doc? ( virtual/texi2dvi )
 	nls? ( sys-devel/gettext )
 	verify-sig? ( sec-keys/openpgp-keys-make )
