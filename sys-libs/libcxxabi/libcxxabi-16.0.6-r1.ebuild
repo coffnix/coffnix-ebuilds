@@ -12,7 +12,7 @@ SRC_URI="https://github.com/llvm/llvm-project/releases/download/llvmorg-16.0.6/l
 LICENSE="Apache-2.0-with-LLVM-exceptions UoI-NCSA BSD public-domain rc"
 SLOT="0"
 KEYWORDS="*"
-IUSE="+libunwind clang static-libs"
+IUSE="+libunwind clang debug static-libs"
 DEPEND="sys-devel/llvm:16"
 BDEPEND="
     dev-util/cmake
