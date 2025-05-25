@@ -13,7 +13,7 @@ DESCRIPTION="A vector graphics library with cross-device output support"
 HOMEPAGE="https://www.cairographics.org/ https://gitlab.freedesktop.org/cairo/cairo"
 LICENSE="|| ( LGPL-2.1 MPL-1.1 )"
 SLOT="0"
-IUSE="X aqua debug +glib gtk-doc lzo test +svg"
+IUSE="X aqua debug +glib gtk-doc lzo test +svg +harfbuzz"
 # Tests need more wiring up like e.g. https://gitlab.freedesktop.org/cairo/cairo/-/blob/master/.gitlab-ci.yml
 # any2ppm tests seem to hang for now.
 RESTRICT="test !test? ( test )"
