@@ -19,6 +19,7 @@ IUSE=""
 RDEPEND="${PYTHON_DEPS}"
 DEPEND="${RDEPEND}
 	dev-libs/libxslt
+	dev-python/docutils
 	app-text/docbook-xsl-stylesheets
 "
 
