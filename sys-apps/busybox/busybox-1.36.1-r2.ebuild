@@ -8,7 +8,10 @@ inherit flag-o-matic savedconfig toolchain-funcs
 
 DESCRIPTION="Utilities for rescue and embedded systems"
 HOMEPAGE="https://www.busybox.net/"
-SRC_URI="https://github.com/mirror/busybox/tarball/70f77e4617e06077231b8b63c3fb3406d7f8865d -> busybox-1.36.0-70f77e4.tar.gz"
+#SRC_URI="https://github.com/mirror/busybox/tarball/70f77e4617e06077231b8b63c3fb3406d7f8865d -> busybox-1.36.0-70f77e4.tar.gz"
+MY_P="${PN}-${PV/_/-}"
+SRC_URI="https://www.busybox.net/downloads/${MY_P}.tar.bz2"
+S="${WORKDIR}/${MY_P}"
 KEYWORDS="*"
 
 LICENSE="GPL-2" # GPL-2 only
@@ -59,11 +62,24 @@ busybox_config_enabled() {
 	esac
 }
 
-# patches go here!
+## patches go here!
+#PATCHES=(
+#	"${FILESDIR}"/${PN}-1.26.2-bb.patch
+#	# "${FILESDIR}"/${P}-*.patch
+#)
+
 PATCHES=(
 	"${FILESDIR}"/${PN}-1.26.2-bb.patch
+	"${FILESDIR}"/${PN}-1.34.1-skip-selinux-search.patch
+
+	"${FILESDIR}"/${PN}-1.36.0-fortify-source-3-fixdep.patch
+	"${FILESDIR}"/${PN}-1.36.1-kernel-6.8.patch
+
+	"${FILESDIR}"/${PN}-1.36.1-skip-dynamic-relocations.patch
+
 	# "${FILESDIR}"/${P}-*.patch
 )
+
 
 src_prepare() {
 	default
