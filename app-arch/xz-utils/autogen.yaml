@@ -1,0 +1,9 @@
+xz-utils:
+  generator: github-1
+  packages:
+    - xz-utils:
+        github:
+          user: tukaani-project
+          repo: xz
+          query: releases
+          tarball: xz-{version}.tar.gz
