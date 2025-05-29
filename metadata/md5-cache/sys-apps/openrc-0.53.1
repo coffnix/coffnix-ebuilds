@@ -1,0 +1,14 @@
+BDEPEND=>=dev-util/meson-0.48.2 >=dev-util/ninja-1.7.2
+DEFINED_PHASES=compile configure install postinst preinst prepare test
+DEPEND=ncurses? ( sys-libs/ncurses:0= ) pam? ( sys-libs/pam ) audit? ( sys-process/audit ) sys-process/psmisc !<sys-process/procps-3.3.9-r2 selinux? ( sys-apps/policycoreutils >=sys-libs/libselinux-2.6 ) !<sys-apps/baselayout-2.1-r1 virtual/os-headers ncurses? ( virtual/pkgconfig )
+EAPI=7
+HOMEPAGE=https://github.com/OpenRC/openrc
+IUSE=audit +bash debug ncurses pam newnet prefix -netifrc selinux static-libs unicode zsh-completion
+KEYWORDS=*
+LICENSE=BSD-2
+PDEPEND=netifrc? ( net-misc/netifrc )
+RDEPEND=ncurses? ( sys-libs/ncurses:0= ) pam? ( sys-libs/pam ) audit? ( sys-process/audit ) sys-process/psmisc !<sys-process/procps-3.3.9-r2 selinux? ( sys-apps/policycoreutils >=sys-libs/libselinux-2.6 ) !<sys-apps/baselayout-2.1-r1 bash? ( app-shells/bash ) sys-apps/corenetwork !prefix? ( >=sys-apps/sysvinit-2.86-r6[selinux?] virtual/tmpfiles ) selinux? ( >=sec-policy/selinux-base-policy-2.20170204-r4 >=sec-policy/selinux-openrc-2.20170204-r4 ) !<app-shells/gentoo-bashcomp-20180302 !<app-shells/gentoo-zsh-completions-20180228
+SLOT=0
+SRC_URI=https://github.com/OpenRC/openrc/tarball/5c5955f10b2f65bdf4bf9fe7b797aa9cf12fc20b -> openrc-0.53.1-5c5955f.tar.gz
+_eclasses_=eapi8-dosym	cd7d420bb5be5ee079f27239ce76b8f5	eutils	6e6c2737b59a4b982de6fb3ecefd87f8	flag-o-matic	d0939f99dd528dd0c5ec25284877bf5c	meson	05aa1843efaa1d580f7007e5482fc201	multilib	d410501a125f99ffb560b0c523cd3d1e	multiprocessing	cac3169468f893670dac3e7cb940e045	ninja-utils	e7575bc4a90349d76e72777013b2bbc2	pam	756a09f72c4cdbb55f2694c95f1e0860	python-utils-r1	d3f9ec72badd0291b655682d67876adc	toolchain-funcs	24921b57d6561d87cbef4916a296ada4
+_md5_=4bc2de97f2ecd965ee27cde66df73698

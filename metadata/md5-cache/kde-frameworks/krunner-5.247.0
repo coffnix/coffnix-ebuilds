@@ -1,0 +1,15 @@
+BDEPEND=>=dev-util/cmake-3.20.5 doc? ( >=app-doc/doxygen-1.8.13-r1 ) dev-qt/qttools:6[assistant] dev-libs/libpcre2:* >=kde-frameworks/extra-cmake-modules-5.247:*
+DEFINED_PHASES=compile configure install nofetch postinst postrm preinst prepare setup test unpack
+DEPEND=>=dev-qt/qtbase-6.6.0:6[dbus,gui] =kde-frameworks/kconfig-5.247*:6 =kde-frameworks/kcoreaddons-5.247*:6 =kde-frameworks/ki18n-5.247*:6 =kde-frameworks/kitemmodels-5.247*:6 doc? ( dev-qt/qt-docs:6 ) dev-qt/qtbase:6
+DESCRIPTION=Framework for providing different actions given a string query
+EAPI=7
+HOMEPAGE=https://develop.kde.org/products/frameworks/
+IUSE=debug doc test
+KEYWORDS=~amd64
+LICENSE=LGPL-2+
+RDEPEND=>=dev-qt/qtbase-6.6.0:6[dbus,gui] =kde-frameworks/kconfig-5.247*:6 =kde-frameworks/kcoreaddons-5.247*:6 =kde-frameworks/ki18n-5.247*:6 =kde-frameworks/kitemmodels-5.247*:6 >=kde-frameworks/kf-env-4 doc? ( dev-qt/qt-docs:6 ) dev-qt/qtbase:6
+RESTRICT=!test? ( test ) mirror
+SLOT=6/5.247
+SRC_URI=mirror://kde/unstable/frameworks/5.247.0/krunner-5.247.0.tar.xz
+_eclasses_=cmake	0f2e0c197fad0312f3c4765c9cf36271	ecm	14e58a9a9acd2f0911713de2f072510a	eutils	6e6c2737b59a4b982de6fb3ecefd87f8	flag-o-matic	d0939f99dd528dd0c5ec25284877bf5c	frameworks.kde.org	390b11bb889973dbedc555710db7def5	kde.org	7d9003612310df330b80fdcf04c222f8	multilib	d410501a125f99ffb560b0c523cd3d1e	multiprocessing	cac3169468f893670dac3e7cb940e045	ninja-utils	e7575bc4a90349d76e72777013b2bbc2	toolchain-funcs	24921b57d6561d87cbef4916a296ada4	xdg-utils	baea6080dd821f5562d715887954c9d3
+_md5_=5754baba993cfa613216309ee58090a5

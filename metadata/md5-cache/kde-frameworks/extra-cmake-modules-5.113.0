@@ -1,0 +1,14 @@
+BDEPEND=doc? ( || ( dev-lang/python:3.8 dev-lang/python:3.9 dev-lang/python:3.7 dev-lang/python:3.10 ) || ( ( dev-lang/python:3.8 dev-python/sphinx[python_targets_python3_8(-),python_single_target_python3_8(+)] ) ( dev-lang/python:3.9 dev-python/sphinx[python_targets_python3_9(-),python_single_target_python3_9(+)] ) ( dev-lang/python:3.7 dev-python/sphinx[python_targets_python3_7(-),python_single_target_python3_7(+)] ) ( dev-lang/python:3.10 dev-python/sphinx[python_targets_python3_10(-),python_single_target_python3_10(+)] ) ) >=dev-qt/qthelp-5.15.9:5 ) test? ( >=dev-qt/linguist-tools-5.15.9:5 >=dev-qt/qtcore-5.15.9:5 ) >=dev-util/cmake-3.20.5
+DEFINED_PHASES=compile configure install nofetch prepare setup test unpack
+DESCRIPTION=Extra modules and scripts for CMake
+EAPI=7
+HOMEPAGE=https://invent.kde.org/frameworks/extra-cmake-modules
+IUSE=doc test
+KEYWORDS=amd64 arm arm64 ~hppa ~loong ppc ppc64 ~riscv x86
+LICENSE=BSD
+RDEPEND=app-arch/libarchive[bzip2]
+RESTRICT=!test? ( test )
+SLOT=0
+SRC_URI=mirror://kde/stable/frameworks/5.113/extra-cmake-modules-5.113.0.tar.xz
+_eclasses_=cmake	0f2e0c197fad0312f3c4765c9cf36271	eapi8-dosym	cd7d420bb5be5ee079f27239ce76b8f5	eutils	6e6c2737b59a4b982de6fb3ecefd87f8	flag-o-matic	d0939f99dd528dd0c5ec25284877bf5c	frameworks.kde.org	390b11bb889973dbedc555710db7def5	kde.org	7d9003612310df330b80fdcf04c222f8	multilib	d410501a125f99ffb560b0c523cd3d1e	multiprocessing	cac3169468f893670dac3e7cb940e045	ninja-utils	e7575bc4a90349d76e72777013b2bbc2	python-any-r1	54a3178500786b0a7ede4a23b7f2a6ad	python-utils-r1	d3f9ec72badd0291b655682d67876adc	toolchain-funcs	24921b57d6561d87cbef4916a296ada4	xdg-utils	baea6080dd821f5562d715887954c9d3
+_md5_=2f343788d3e7163f9cc4aa8024b0bac2

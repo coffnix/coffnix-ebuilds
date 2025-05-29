@@ -1,0 +1,15 @@
+BDEPEND=>=app-portage/elt-patches-20170815 app-arch/xz-utils
+DEFINED_PHASES=compile configure install postinst postrm preinst prepare
+DEPEND=>=x11-themes/hicolor-icon-theme-0.10 >=x11-libs/gtk+-3.24.12:3 sys-devel/gettext virtual/pkgconfig dev-util/desktop-file-utils x11-misc/shared-mime-info
+DESCRIPTION=GNOME default icon theme
+EAPI=7
+HOMEPAGE=https://git.gnome.org/browse/adwaita-icon-theme/
+IUSE=branding
+KEYWORDS=*
+LICENSE=|| ( LGPL-3 CC-BY-SA-3.0 ) branding? ( CC-Sampling-Plus-1.0 )
+RDEPEND=>=x11-themes/hicolor-icon-theme-0.10 gnome-base/librsvg:2 !<x11-themes/gnome-themes-standard-3.14
+RESTRICT=binchecks strip
+SLOT=0
+SRC_URI=mirror://gnome/sources/adwaita-icon-theme/3.32/adwaita-icon-theme-3.32.0.tar.xz branding? ( https://www.mail-archive.com/tango-artists@lists.freedesktop.org/msg00043/tango-gentoo-v1.1.tar.gz )
+_eclasses_=eutils	6e6c2737b59a4b982de6fb3ecefd87f8	gnome.org	532d56d07b9eace4831aaa817d2b756a	gnome3	fe2aa61bf7cc35d026458d06f875ef53	gnome3-utils	2e056188c1b3f3d82982454b3b2f1810	libtool	f143db5a74ccd9ca28c1234deffede96	ltprune	22f9f14d105434e9c400ccac3bbb64ae	multilib	d410501a125f99ffb560b0c523cd3d1e	toolchain-funcs	24921b57d6561d87cbef4916a296ada4	xdg	4a14c5c24f121e7da66e5aab4a168c6e	xdg-utils	baea6080dd821f5562d715887954c9d3
+_md5_=ba292797370178fc50849257a81d78be

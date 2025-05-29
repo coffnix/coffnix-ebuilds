@@ -1,0 +1,10 @@
+sqlite:
+  generator: github-1
+  packages:
+    - sqlite:
+        github:
+          query: tags
+          transform:
+            - kind: string
+              match: 'version-'
+              replace: ''

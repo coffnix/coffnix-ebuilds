@@ -1,0 +1,13 @@
+DEFINED_PHASES=configure install prepare unpack
+DEPEND=dev-qt/qtcore:5 dev-qt/qtlockedfile[qt5(+)] dev-qt/qtnetwork:5 X? ( dev-qt/qtgui:5 dev-qt/qtwidgets:5 )
+DESCRIPTION=Qt library to start applications only once per user
+EAPI=7
+HOMEPAGE=https://code.qt.io/cgit/qt-solutions/qt-solutions.git/
+IUSE=doc X
+KEYWORDS=*
+LICENSE=|| ( LGPL-2.1 GPL-3 )
+RDEPEND=dev-qt/qtcore:5 dev-qt/qtlockedfile[qt5(+)] dev-qt/qtnetwork:5 X? ( dev-qt/qtgui:5 dev-qt/qtwidgets:5 )
+SLOT=0
+SRC_URI=https://github.com/qtproject/qt-solutions/archive/a8dda66d7738cde9042b87db27993f710ae3eeeb.tar.gz -> qtsingleapplication-2.6.1_p20200404.tar.gz
+_eclasses_=estack	43ddf5aaffa7a8d0482df54d25a66a1f	multilib	d410501a125f99ffb560b0c523cd3d1e	qmake-utils	bdf97e69a34b864d6d545f4ec3143ff7	toolchain-funcs	24921b57d6561d87cbef4916a296ada4
+_md5_=29bf3b9851871d4fc2d6ee8be5858678

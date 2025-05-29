@@ -1,0 +1,14 @@
+BDEPEND=virtual/pkgconfig >=app-portage/elt-patches-20170815 || ( >=sys-devel/automake-1.16.5:1.16 ) >=sys-devel/autoconf-2.71 >=sys-devel/libtool-2.4
+DEFINED_PHASES=compile configure install prepare pretend unpack
+DEPEND=>=sys-libs/zlib-1.2.8-r1 brotli? ( app-arch/brotli ) bzip2? ( >=app-arch/bzip2-1.0.6-r4 ) harfbuzz? ( >=media-libs/harfbuzz-1.3.0[truetype] ) png? ( >=media-libs/libpng-1.2.51:0 ) utils? ( svg? ( >=gnome-base/librsvg-2.46.0 ) X? ( >=x11-libs/libX11-1.6.2 ) )
+DESCRIPTION=High-quality and portable font engine
+EAPI=7
+HOMEPAGE=https://www.freetype.org/
+IUSE=X +adobe-cff brotli bzip2 +cleartype-hinting debug doc fontforge harfbuzz +png static-libs svg utils
+KEYWORDS=*
+LICENSE=|| ( FTL GPL-2+ )
+RDEPEND=>=sys-libs/zlib-1.2.8-r1 brotli? ( app-arch/brotli ) bzip2? ( >=app-arch/bzip2-1.0.6-r4 ) harfbuzz? ( >=media-libs/harfbuzz-1.3.0[truetype] ) png? ( >=media-libs/libpng-1.2.51:0 ) utils? ( svg? ( >=gnome-base/librsvg-2.46.0 ) X? ( >=x11-libs/libX11-1.6.2 ) )
+SLOT=2
+SRC_URI=https://downloads.sourceforge.net/freetype/freetype-2.13.3.tar.xz mirror://nongnu/freetype/freetype-2.13.3.tar.xz utils? ( https://downloads.sourceforge.net/freetype/ft2demos-2.13.3.tar.xz mirror://nongnu/freetype/ft2demos-2.13.3.tar.xz ) doc? ( https://downloads.sourceforge.net/freetype/freetype-doc-2.13.3.tar.xz mirror://nongnu/freetype/freetype-doc-2.13.3.tar.xz )
+_eclasses_=autotools	e9ade2787b2f54643c7cdffbfa1cca9c	libtool	f143db5a74ccd9ca28c1234deffede96	multilib	d410501a125f99ffb560b0c523cd3d1e	toolchain-funcs	24921b57d6561d87cbef4916a296ada4
+_md5_=67ec33093aae79b32e769f096f403b0c

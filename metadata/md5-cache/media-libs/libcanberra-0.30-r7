@@ -1,0 +1,15 @@
+BDEPEND=app-arch/xz-utils virtual/pkgconfig virtual/pkgconfig
+DEFINED_PHASES=configure install
+DEPEND=dev-libs/libltdl:0 media-libs/libvorbis alsa? ( media-libs/alsa-lib udev? ( virtual/libudev ) ) gstreamer? ( media-libs/gstreamer:1.0 ) gtk2? ( >=dev-libs/glib-2.32:2 >=x11-libs/gtk+-2.20.0:2 x11-libs/libX11 ) gtk3? ( >=dev-libs/glib-2.32:2 x11-libs/gtk+:3[X] x11-libs/libX11 ) pulseaudio? ( >=media-sound/pulseaudio-0.9.11 ) tdb? ( sys-libs/tdb )
+DESCRIPTION=Portable sound event library
+EAPI=7
+HOMEPAGE=http://0pointer.de/lennart/projects/libcanberra/
+IUSE=alsa gnome gstreamer +gtk2 +gtk3 oss pulseaudio +sound tdb udev
+KEYWORDS=*
+LICENSE=LGPL-2.1+
+RDEPEND=dev-libs/libltdl:0 media-libs/libvorbis alsa? ( media-libs/alsa-lib udev? ( virtual/libudev ) ) gstreamer? ( media-libs/gstreamer:1.0 ) gtk2? ( >=dev-libs/glib-2.32:2 >=x11-libs/gtk+-2.20.0:2 x11-libs/libX11 ) gtk3? ( >=dev-libs/glib-2.32:2 x11-libs/gtk+:3[X] x11-libs/libX11 ) pulseaudio? ( >=media-sound/pulseaudio-0.9.11 ) tdb? ( sys-libs/tdb ) gnome? ( gnome-base/dconf gnome-base/gsettings-desktop-schemas ) sound? ( x11-themes/sound-theme-freedesktop )
+REQUIRED_USE=udev? ( alsa )
+SLOT=0
+SRC_URI=http://0pointer.de/lennart/projects/libcanberra/libcanberra-0.30.tar.xz
+_eclasses_=multilib	d410501a125f99ffb560b0c523cd3d1e	systemd	71fd8d2065d102753fb9e4d20eaf3e9f	toolchain-funcs	24921b57d6561d87cbef4916a296ada4
+_md5_=a4b3220fc7cb4ec9d309ac557359cce1

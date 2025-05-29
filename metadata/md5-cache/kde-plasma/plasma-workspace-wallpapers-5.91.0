@@ -1,0 +1,13 @@
+BDEPEND=>=dev-qt/qtbase-6.6.0:6 kde-frameworks/extra-cmake-modules:0 >=dev-util/cmake-3.20.5
+DEFINED_PHASES=compile configure install nofetch prepare test unpack
+DESCRIPTION=Wallpapers for the Plasma workspace
+EAPI=7
+HOMEPAGE=https://kde.org/plasma-desktop
+KEYWORDS=~amd64
+LICENSE=GPL-2
+RDEPEND=!kde-plasma/plasma-workspace-wallpapers:5
+RESTRICT=mirror
+SLOT=6
+SRC_URI=mirror://kde/unstable/plasma/5.91.0/plasma-workspace-wallpapers-5.91.0.tar.xz
+_eclasses_=cmake	0f2e0c197fad0312f3c4765c9cf36271	eutils	6e6c2737b59a4b982de6fb3ecefd87f8	flag-o-matic	d0939f99dd528dd0c5ec25284877bf5c	kde.org	7d9003612310df330b80fdcf04c222f8	multilib	d410501a125f99ffb560b0c523cd3d1e	multiprocessing	cac3169468f893670dac3e7cb940e045	ninja-utils	e7575bc4a90349d76e72777013b2bbc2	plasma.kde.org	c53027340f66d3e8f2d6ed64137ba146	toolchain-funcs	24921b57d6561d87cbef4916a296ada4	xdg-utils	baea6080dd821f5562d715887954c9d3
+_md5_=f0cf034c7a0c52c01156d2612d41f37f

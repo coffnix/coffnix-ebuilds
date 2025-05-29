@@ -1,0 +1,13 @@
+DEFINED_PHASES=configure install prepare
+DEPEND=dev-qt/qtcore:5
+DESCRIPTION=QFile extension with advisory locking functions
+EAPI=7
+HOMEPAGE=https://code.qt.io/cgit/qt-solutions/qt-solutions.git/
+IUSE=doc
+KEYWORDS=amd64 ~arm ~arm64 ~hppa ~ppc ~ppc64 ~riscv x86
+LICENSE=|| ( LGPL-2.1 GPL-3 )
+RDEPEND=dev-qt/qtcore:5
+SLOT=0
+SRC_URI=https://dev.gentoo.org/~pesa/distfiles/qt-solutions-20171024.tar.xz
+_eclasses_=estack	43ddf5aaffa7a8d0482df54d25a66a1f	multilib	d410501a125f99ffb560b0c523cd3d1e	qmake-utils	bdf97e69a34b864d6d545f4ec3143ff7	toolchain-funcs	24921b57d6561d87cbef4916a296ada4
+_md5_=da55cb58ddc4e59dfbb071ef5cf60931

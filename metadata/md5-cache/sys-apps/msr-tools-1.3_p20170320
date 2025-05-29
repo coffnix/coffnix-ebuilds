@@ -1,0 +1,12 @@
+BDEPEND=>=app-portage/elt-patches-20170815 || ( >=sys-devel/automake-1.16.5:1.16 ) >=sys-devel/autoconf-2.71 >=sys-devel/libtool-2.4
+DEFINED_PHASES=postinst prepare setup
+DESCRIPTION=Utilities allowing the read and write of CPU model-specific registers (MSR)
+EAPI=7
+HOMEPAGE=https://github.com/intel/msr-tools
+IUSE=kernel_linux
+KEYWORDS=*
+LICENSE=GPL-2+
+SLOT=0
+SRC_URI=https://github.com/intel/msr-tools/archive/eec71d977a83f8dc76bc3ccc6de5cbd3be378572.tar.gz -> msr-tools-1.3_p20170320.tar.gz
+_eclasses_=autotools	e9ade2787b2f54643c7cdffbfa1cca9c	libtool	f143db5a74ccd9ca28c1234deffede96	linux-info	c90a203b1c14cfa77bd3e37a0e96c955	multilib	d410501a125f99ffb560b0c523cd3d1e	toolchain-funcs	24921b57d6561d87cbef4916a296ada4
+_md5_=7daafe5c944d9e81609ca990b0fa30c8

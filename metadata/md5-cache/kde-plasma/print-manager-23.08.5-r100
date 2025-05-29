@@ -1,0 +1,9 @@
+DEFINED_PHASES=-
+DESCRIPTION=Shim print-manager to ease slot 5 users into slot 6
+EAPI=7
+HOMEPAGE=https://kde.org/plasma-desktop
+KEYWORDS=~amd64
+LICENSE=metapackage
+RDEPEND=kde-plasma/print-manager:6
+SLOT=5
+_md5_=9ab4b19036fa7d12ed7d5f90d954d450

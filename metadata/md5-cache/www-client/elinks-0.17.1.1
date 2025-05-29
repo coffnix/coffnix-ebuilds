@@ -1,0 +1,14 @@
+BDEPEND=virtual/pkgconfig >=app-portage/elt-patches-20170815 || ( >=sys-devel/automake-1.16.5:1.16 ) >=sys-devel/autoconf-2.71 >=sys-devel/libtool-2.4
+DEFINED_PHASES=compile configure install postinst prepare setup
+DEPEND=brotli? ( app-arch/brotli:= ) bzip2? ( >=app-arch/bzip2-1.0.2 ) gpm? ( >=sys-libs/ncurses-5.2:0= >=sys-libs/gpm-1.20.0-r5 ) guile? ( >=dev-scheme/guile-1.6.4-r1[deprecated] ) idn? ( net-dns/libidn:= ) javascript? ( dev-lang/spidermonkey:17= ) lua? ( >=dev-lang/lua-5:0= ) perl? ( dev-lang/perl:= ) ruby? ( dev-lang/ruby:* dev-ruby/rubygems:* ) samba? ( net-fs/samba ) ssl? ( !gnutls? ( !libressl? ( dev-libs/openssl:0= ) libressl? ( dev-libs/libressl:0= ) ) gnutls? ( net-libs/gnutls:= ) ) tre? ( dev-libs/tre ) X? ( x11-libs/libX11 x11-libs/libXt ) xml? ( >=dev-libs/expat-1.95.4 ) zlib? ( >=sys-libs/zlib-1.1.4 ) || ( dev-lang/python:3.8 dev-lang/python:3.9 dev-lang/python:3.7 dev-lang/python:3.10 )
+DESCRIPTION=Advanced and well-established text-mode web browser
+EAPI=7
+HOMEPAGE=http://elinks.or.cz/
+IUSE=bittorrent brotli bzip2 debug finger ftp gopher gnutls gpm guile idn ipv6 javascript libressl lua +mouse nls nntp perl ruby samba ssl tre unicode X xml zlib
+KEYWORDS=*
+LICENSE=GPL-2
+RDEPEND=brotli? ( app-arch/brotli:= ) bzip2? ( >=app-arch/bzip2-1.0.2 ) gpm? ( >=sys-libs/ncurses-5.2:0= >=sys-libs/gpm-1.20.0-r5 ) guile? ( >=dev-scheme/guile-1.6.4-r1[deprecated] ) idn? ( net-dns/libidn:= ) javascript? ( dev-lang/spidermonkey:17= ) lua? ( >=dev-lang/lua-5:0= ) perl? ( dev-lang/perl:= ) ruby? ( dev-lang/ruby:* dev-ruby/rubygems:* ) samba? ( net-fs/samba ) ssl? ( !gnutls? ( !libressl? ( dev-libs/openssl:0= ) libressl? ( dev-libs/libressl:0= ) ) gnutls? ( net-libs/gnutls:= ) ) tre? ( dev-libs/tre ) X? ( x11-libs/libX11 x11-libs/libXt ) xml? ( >=dev-libs/expat-1.95.4 ) zlib? ( >=sys-libs/zlib-1.1.4 )
+SLOT=0
+SRC_URI=https://github.com/rkd77/felinks/archive/v0.17.1.1.tar.gz -> elinks-0.17.1.1.tar.gz
+_eclasses_=autotools	e9ade2787b2f54643c7cdffbfa1cca9c	eapi8-dosym	cd7d420bb5be5ee079f27239ce76b8f5	libtool	f143db5a74ccd9ca28c1234deffede96	multilib	d410501a125f99ffb560b0c523cd3d1e	multiprocessing	cac3169468f893670dac3e7cb940e045	python-any-r1	54a3178500786b0a7ede4a23b7f2a6ad	python-utils-r1	d3f9ec72badd0291b655682d67876adc	toolchain-funcs	24921b57d6561d87cbef4916a296ada4
+_md5_=48678ca3b02697c9ac47a02d2148765e

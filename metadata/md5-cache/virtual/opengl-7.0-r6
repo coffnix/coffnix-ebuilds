@@ -1,0 +1,6 @@
+DEFINED_PHASES=-
+DESCRIPTION=Virtual for OpenGL implementation
+EAPI=7
+KEYWORDS=*
+SLOT=0
+_md5_=81534d77071c2904dfb680d342fef0ea

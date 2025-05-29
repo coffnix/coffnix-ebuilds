@@ -1,0 +1,15 @@
+BDEPEND=>=dev-lang/go-1.12 app-arch/unzip
+DEFINED_PHASES=compile install postinst preinst prepare unpack
+DEPEND=app-crypt/gpgme:= >=app-containers/conmon-2.0.0 cgroup-hybrid? ( >=app-containers/runc-1.0.0_rc6 ) !cgroup-hybrid? ( app-containers/crun ) dev-libs/libassuan:= dev-libs/libgpg-error:= || ( >=app-containers/cni-plugins-0.8.6 ( app-containers/netavark app-containers/aardvark-dns ) ) sys-apps/shadow:= sys-fs/lvm2 sys-libs/libseccomp:= apparmor? ( sys-libs/libapparmor ) btrfs? ( sys-fs/btrfs-progs ) init? ( app-containers/catatonit ) rootless? ( app-containers/slirp4netns ) selinux? ( sys-libs/libselinux:= ) dev-go/go-md2man
+DESCRIPTION=Library and podman tool for running OCI-based containers in Pods
+EAPI=7
+HOMEPAGE=https://github.com/containers/podman/
+IUSE=apparmor btrfs cgroup-hybrid +fuse +init +rootless selinux
+KEYWORDS=*
+LICENSE=Apache-2.0 BSD BSD-2 CC-BY-SA-4.0 ISC MIT MPL-2.0
+RDEPEND=app-crypt/gpgme:= >=app-containers/conmon-2.0.0 cgroup-hybrid? ( >=app-containers/runc-1.0.0_rc6 ) !cgroup-hybrid? ( app-containers/crun ) dev-libs/libassuan:= dev-libs/libgpg-error:= || ( >=app-containers/cni-plugins-0.8.6 ( app-containers/netavark app-containers/aardvark-dns ) ) sys-apps/shadow:= sys-fs/lvm2 sys-libs/libseccomp:= apparmor? ( sys-libs/libapparmor ) btrfs? ( sys-fs/btrfs-progs ) init? ( app-containers/catatonit ) rootless? ( app-containers/slirp4netns ) selinux? ( sys-libs/libselinux:= ) fuse? ( sys-fs/fuse-overlayfs ) selinux? ( sec-policy/selinux-podman ) virtual/tmpfiles
+RESTRICT=test
+SLOT=0
+SRC_URI=https://github.com/containers/podman/tarball/073183fe1723d7bda826b574437891976a958c65 -> podman-4.7.0-073183f.tar.gz
+_eclasses_=bash-completion-r1	47a7402d95930413ce25ba8d857339bb	eutils	6e6c2737b59a4b982de6fb3ecefd87f8	flag-o-matic	d0939f99dd528dd0c5ec25284877bf5c	go-module	cb10a443c46556a15ed035d7a99128e8	multilib	d410501a125f99ffb560b0c523cd3d1e	tmpfiles	6f14f7c8fb6f63585daa89581247c82c	toolchain-funcs	24921b57d6561d87cbef4916a296ada4	xdg-utils	baea6080dd821f5562d715887954c9d3
+_md5_=85f90d8f7825ad1732626ae4e12cf5f7

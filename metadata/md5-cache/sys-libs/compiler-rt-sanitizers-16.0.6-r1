@@ -1,0 +1,14 @@
+BDEPEND=dev-util/cmake clang? ( sys-devel/clang:16 ) || ( dev-lang/python:3.8 dev-lang/python:3.9 dev-lang/python:3.7 dev-lang/python:3.10 ) >=dev-util/cmake-3.20.5
+DEFINED_PHASES=compile configure install prepare setup test
+DEPEND=sys-devel/llvm:16
+DESCRIPTION=Compiler runtime libraries for clang (sanitizers & xray)
+EAPI=7
+HOMEPAGE=https://llvm.org/
+IUSE=clang debug elibc_glibc +libfuzzer +memprof +orc +profile +xray +asan +dfsan +lsan +msan +hwasan +tsan +ubsan +safestack +cfi +scudo +shadowcallstack +gwp-asan
+KEYWORDS=*
+LICENSE=Apache-2.0-with-LLVM-exceptions || ( UoI-NCSA MIT )
+REQUIRED_USE=|| ( asan dfsan lsan msan hwasan tsan ubsan safestack cfi scudo shadowcallstack gwp-asan libfuzzer orc profile xray )
+SLOT=16
+SRC_URI=https://github.com/llvm/llvm-project/releases/download/llvmorg-16.0.6/llvm-project-16.0.6.src.tar.xz -> llvm-project-16.0.6.src.tar.xz
+_eclasses_=cmake	0f2e0c197fad0312f3c4765c9cf36271	eapi8-dosym	cd7d420bb5be5ee079f27239ce76b8f5	eutils	6e6c2737b59a4b982de6fb3ecefd87f8	flag-o-matic	d0939f99dd528dd0c5ec25284877bf5c	multilib	d410501a125f99ffb560b0c523cd3d1e	multiprocessing	cac3169468f893670dac3e7cb940e045	ninja-utils	e7575bc4a90349d76e72777013b2bbc2	python-any-r1	54a3178500786b0a7ede4a23b7f2a6ad	python-utils-r1	d3f9ec72badd0291b655682d67876adc	toolchain-funcs	24921b57d6561d87cbef4916a296ada4	xdg-utils	baea6080dd821f5562d715887954c9d3
+_md5_=6df7bca3a38771f12ffb492c58889e79

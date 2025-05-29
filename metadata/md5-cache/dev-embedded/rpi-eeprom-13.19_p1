@@ -1,0 +1,15 @@
+BDEPEND=sys-apps/help2man virtual/pkgconfig
+DEFINED_PHASES=install postinst prepare
+DEPEND=python_targets_python3_10? ( dev-lang/python:3.10 ) python_targets_python3_7? ( dev-lang/python:3.7 ) python_targets_python3_9? ( dev-lang/python:3.9 ) python_targets_python3_8? ( dev-lang/python:3.8 ) >=dev-lang/python-exec-2:=[python_targets_python3_10(-)?,python_targets_python3_7(-)?,python_targets_python3_9(-)?,python_targets_python3_8(-)?,-python_single_target_python3_10(-),-python_single_target_python3_7(-),-python_single_target_python3_9(-),-python_single_target_python3_8(-)]
+DESCRIPTION=Updater for Raspberry Pi 4 bootloader and the VL805 USB controller
+EAPI=7
+HOMEPAGE=https://github.com/raspberrypi/rpi-eeprom/
+IUSE=python_targets_python3_10 python_targets_python3_7 python_targets_python3_9 python_targets_python3_8
+KEYWORDS=arm arm64
+LICENSE=BSD rpi-eeprom
+RDEPEND=python_targets_python3_10? ( dev-lang/python:3.10 ) python_targets_python3_7? ( dev-lang/python:3.7 ) python_targets_python3_9? ( dev-lang/python:3.9 ) python_targets_python3_8? ( dev-lang/python:3.8 ) >=dev-lang/python-exec-2:=[python_targets_python3_10(-)?,python_targets_python3_7(-)?,python_targets_python3_9(-)?,python_targets_python3_8(-)?,-python_single_target_python3_10(-),-python_single_target_python3_7(-),-python_single_target_python3_9(-),-python_single_target_python3_8(-)] sys-apps/flashrom sys-apps/pciutils || ( >=media-libs/raspberrypi-userland-0_pre20201022 >=media-libs/raspberrypi-userland-bin-1.20201022 )
+REQUIRED_USE=|| ( python_targets_python3_10 python_targets_python3_7 python_targets_python3_9 python_targets_python3_8 )
+SLOT=0
+SRC_URI=https://archive.raspberrypi.org/debian/pool/main/r/rpi-eeprom/rpi-eeprom_13.19-1.debian.tar.xz https://archive.raspberrypi.org/debian/pool/main/r/rpi-eeprom/rpi-eeprom_13.19.orig.tar.gz
+_eclasses_=eapi8-dosym	cd7d420bb5be5ee079f27239ce76b8f5	multibuild	b2c915190b051f55a23b9354b9849847	multilib	d410501a125f99ffb560b0c523cd3d1e	multiprocessing	cac3169468f893670dac3e7cb940e045	python-r1	5bbb250a8d0b8f4496dcef8e8c1c1a8a	python-utils-r1	d3f9ec72badd0291b655682d67876adc	systemd	71fd8d2065d102753fb9e4d20eaf3e9f	toolchain-funcs	24921b57d6561d87cbef4916a296ada4
+_md5_=f3874354c2dd4d108cf7714bd4e982c9
