@@ -8,7 +8,7 @@ PYTHON_REQ_USE="ncurses,readline"
 FIRMWARE_ABI_VERSION="7.1.0"
 
 inherit linux-info toolchain-funcs python-r1 udev fcaps readme.gentoo-r1 \
-		pax-utils xdg-utils flag-o-matic
+		pax-utils xdg-utils
 
 MY_P="${PN}-${PV/_rc/-rc}"
 SRC_URI="https://download.qemu.org/${MY_P}.tar.xz"
@@ -650,16 +650,9 @@ qemu_src_configure() {
 }
 
 src_configure() {
-    # Corrige includes da GLib para evitar erro de GLIB_SIZEOF_SIZE_T
-    append-cppflags "-I/usr/include/glib-2.0 -I/usr/lib64/glib-2.0/include"
-    append-cflags   "${CPPFLAGS}"
-    append-cxxflags "${CPPFLAGS}"
-
-    # Garante que o pkg-config está usando os arquivos nativos certos
-    export PKG_CONFIG_PATH="/usr/lib64/pkgconfig:/usr/share/pkgconfig"
-
-    local target
-    python_setup
+	export CPPFLAGS="${CPPFLAGS} -I/usr/include/glib-2.0 -I/usr/lib64/glib-2.0/include"
+export CFLAGS="${CFLAGS} ${CPPFLAGS}"
+export CXXFLAGS="${CXXFLAGS} ${CPPFLAGS}"
 	local target
 
 	python_setup
