@@ -28,7 +28,3 @@ RDEPEND="
 DEPEND="${RDEPEND}
 	>=dev-util/gtk-doc-am-1.12
 "
-
-PATCHES=(
-	"${FILESDIR}/gst-plugins-libav-1.18.4_ffmpeg-4.4.patch"
-)
