@@ -35,6 +35,7 @@ src_prepare() {
 	sed -i 's:umount --fake:true --fake:' configure || die
 	elibtoolize
 	eautoreconf
+	touch -r configure aclocal.m4
 
 	default
 }
