@@ -14,6 +14,7 @@ DESCRIPTION="Network exploration tool and security / port scanner"
 HOMEPAGE="https://nmap.org/"
 SRC_URI="https://nmap.org/dist/nmap-7.97.tar.bz2 -> nmap-7.97.tar.bz2
 "
+#SRC_URI+=" https://dev.gentoo.org/~sam/distfiles/${CATEGORY}/${PN}/${PN}-7.95-patches-2.tar.xz"
 
 LICENSE="|| ( NPSL GPL-2 )"
 SLOT="0"
@@ -39,7 +40,9 @@ RDEPEND="
 DEPEND="${RDEPEND}"
 PATCHES=(
 	"$FILESDIR"/nmap-liblua-ar.patch
+   # "${WORKDIR}"/${PN}-7.95-patches-2
 )
+
 
 pkg_setup() {
 	use system-lua && lua-single_pkg_setup
@@ -86,6 +89,7 @@ src_configure() {
 }
 
 src_compile() {
+	# Etapa 1: gera os makefile.dep normalmente
 	local directory
 	for directory in . libnetutil nsock/src \
 		$(usex ncat ncat '') \
@@ -94,6 +98,13 @@ src_compile() {
 		emake -C "${directory}" makefile.dep
 	done
 
+	# Etapa 2: força geração do config.h em libdnet-stripped
+	emake -C libdnet-stripped configure
+
+	# Etapa 3: remove a declaração bosta de strlcat do config.h gerado
+	sed -i '/strlcat.*char.*/,/);/d' libdnet-stripped/include/config.h || die "remocao strlcat falhou"
+
+	# Etapa 4: compila normalmente com AR e RANLIB definidos
 	emake \
 		AR=$(tc-getAR) \
 		RANLIB=$(tc-getRANLIB)
