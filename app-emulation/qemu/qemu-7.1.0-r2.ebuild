@@ -8,7 +8,7 @@ PYTHON_REQ_USE="ncurses,readline"
 FIRMWARE_ABI_VERSION="7.1.0"
 
 inherit linux-info toolchain-funcs python-r1 udev fcaps readme.gentoo-r1 \
-		pax-utils xdg-utils
+		pax-utils xdg-utils flag-o-matic
 
 MY_P="${PN}-${PV/_rc/-rc}"
 SRC_URI="https://download.qemu.org/${MY_P}.tar.xz"
