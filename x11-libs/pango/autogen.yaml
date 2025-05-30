@@ -1,0 +1,4 @@
+pango:
+  packages:
+    - pango:
+        version: "1.48"
