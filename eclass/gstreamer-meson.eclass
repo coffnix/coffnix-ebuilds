@@ -329,6 +329,9 @@ gstreamer_multilib_src_configure() {
 
 	if grep -qF "option('package-origin'" "${EMESON_SOURCE}"/meson_options.txt ; then
 		gst_conf+=( -Dpackage-origin="https://www.funtoo.org" )
+	fi
+
+	if grep -qF "option('gpl'" "${EMESON_SOURCE}"/meson_options.txt ; then
 		gst_conf+=( -Dgpl=enabled )
 	fi
 
