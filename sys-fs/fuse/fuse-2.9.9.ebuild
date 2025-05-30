@@ -29,10 +29,15 @@ pkg_setup() {
 }
 
 src_prepare() {
+ # Corrige chamada hardcoded de aclocal-1.15 no script "missing"
+    sed -i 's/aclocal-1\.15/aclocal/g' "${S}/missing" || die
+
+    # Corrige todos os arquivos do tarball com essa merda
+    find "${S}" -type f -exec sed -i 's/aclocal-1\.15/aclocal/g' {} + || die "sed global aclocal-1.15"
+
 	local PATCHES=( "${FILESDIR}"/${PN}-2.9.3-kernel-types.patch "${FILESDIR}"/${PN}-2.9.9-avoid-calling-umount.patch "${FILESDIR}"/${PN}-2.9.9-closefrom-glibc-2-34.patch )
 	# sandbox violation with mtab writability wrt #438250
 	# don't sed configure.in without eautoreconf because of maintainer mode
-	sed -i 's/aclocal-1\.15/aclocal/' "${S}/missing" || die "fix missing aclocal version"
 	sed -i 's:umount --fake:true --fake:' configure || die
 	elibtoolize
 	eautoreconf
