@@ -34,6 +34,7 @@ src_prepare() {
 	# don't sed configure.in without eautoreconf because of maintainer mode
 	sed -i 's:umount --fake:true --fake:' configure || die
 	elibtoolize
+	eautoreconf
 
 	default
 }
