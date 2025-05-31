@@ -12,7 +12,7 @@ if [[ ${QT5_BUILD_TYPE} == release ]]; then
 	KEYWORDS="amd64 arm arm64 ~hppa ~loong ppc ppc64 ~riscv ~sparc x86"
 fi
 
-DEPEND="=dev-qt/qtcore-5.15.11*:5="
+DEPEND="=dev-qt/qtcore-5.15.16*:5="
 RDEPEND="${DEPEND}
 	!<dev-qt/qtwayland-5.15.3:5
 "
