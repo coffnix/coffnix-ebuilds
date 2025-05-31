@@ -1,17 +1,16 @@
+# Copyright 1999-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
+PYTHON_REQ_USE="xml(+)"
 PYTHON_COMPAT=( python3+ )
-USE_RUBY="ruby26 ruby27 ruby30 ruby31"
+USE_RUBY="ruby31 ruby32 ruby33 ruby34"
 
-inherit check-reqs cmake flag-o-matic gnome3 memsaver pax-utils python-any-r1 ruby-single toolchain-funcs virtualx
+inherit check-reqs flag-o-matic gnome2 optfeature python-any-r1 ruby-single toolchain-funcs cmake
 
 MY_P="webkitgtk-${PV}"
-S="${WORKDIR}/${MY_P}"
-
 DESCRIPTION="Open source web browser engine"
 HOMEPAGE="https://www.webkitgtk.org"
-#SRC_URI="https://www.webkitgtk.org/releases/webkitgtk-2.38.6.tar.xz -> webkitgtk-2.38.6.tar.xz"
 SRC_URI="https://www.webkitgtk.org/releases/${MY_P}.tar.xz"
 
 S="${WORKDIR}/${MY_P}"
@@ -20,132 +19,107 @@ LICENSE="LGPL-2+ BSD"
 SLOT="4/37" # soname version of libwebkit2gtk-4.0
 KEYWORDS="*"
 
-IUSE="aqua avif +egl examples gamepad +geolocation gles2-only gnome-keyring +gstreamer gtk-doc +introspection +jpeg2k +jumbo-build lcms libnotify memsaver +opengl seccomp spell systemd wayland +X"
+IUSE="aqua avif examples gamepad keyring +gstreamer +introspection pdf jpegxl +jumbo-build lcms seccomp spell systemd wayland X"
+REQUIRED_USE="|| ( aqua wayland X )"
 
-# gstreamer with opengl/gles2 needs egl
-REQUIRED_USE="
-	gles2-only? ( egl !opengl )
-	gstreamer? ( opengl? ( egl ) )
-	wayland? ( egl )
-	|| ( aqua wayland X )
-"
-
-# Tests fail to link for inexplicable reasons
-# https://bugs.webkit.org/show_bug.cgi?id=148210
+# Tests do not run when built from tarballs
+# https://bugs.webkit.org/show_bug.cgi?id=215986
 RESTRICT="test"
 
-# Aqua support in gtk3 is untested
-# Dependencies found at Source/cmake/OptionsGTK.cmake
-# Various compile-time optionals for gtk+-3.22.0 - ensure it
-# Missing WebRTC support, but ENABLE_MEDIA_STREAM/ENABLE_WEB_RTC is experimental upstream (PRIVATE OFF) and shouldn't be used yet in 2.30
-# >=gst-plugins-opus-1.14.4-r1 for opusparse (required by MSE)
-wpe_depend="
-	>=gui-libs/libwpe-1.5.0:1.0
-	>=gui-libs/wpebackend-fdo-1.7.0:1.0
-"
-# TODO: gst-plugins-base[X] is only needed when build configuration ends up with GLX set, but that's a bit automagic too to fix
+# Dependencies can be found in Source/cmake/OptionsGTK.cmake.
+#
+# * Missing WebRTC support, but ENABLE_WEB_RTC is experimental upstream.
+#
+# * media-libs/mesa dep is for libgbm
+#
+# * >=gst-plugins-opus-1.14.4-r1 for opusparse (required by MSE)
+#
+# * TODO: gst-plugins-base[X] is only needed when build configuration ends up
+#         with GLX set, but that's a bit automagic too to fix
+#
+# * Cairo is only needed on big-endian systems, where Skia is not officially
+#   supported (the build system will choose a backend for you). We could probably
+#   hard-code a list of BE arches here, to avoid the extra dependency? But I am
+#   holding out hope that this might actually get fixed before we need to do that.
+#
+# * dev-util/sysprof-capture is disabled because it was a new dependency in 2.46
+#   and we don't need any more new problems.
+#
 RDEPEND="
-	!net-libs/webkit
-	>=x11-libs/cairo-1.16.0:=[X?]
-	>=media-libs/fontconfig-2.13.0:1.0
-	>=media-libs/freetype-2.9.0:2
-	>=dev-libs/libgcrypt-1.7.0:0=
-	>=x11-libs/gtk+-3.22.0:3[aqua?,introspection?,wayland?,X?]
-	>=media-libs/harfbuzz-1.4.2:=[icu(+)]
-	>=dev-libs/icu-61.2:=
-	virtual/jpeg:0=
-	>=net-libs/libsoup-2.54:2.4[introspection?]
-	>=dev-libs/libxml2-2.8.0:2
-	>=media-libs/libpng-1.4:0=
-	dev-db/sqlite:3=
-	sys-libs/zlib:0
-	>=dev-libs/atk-2.16.0
-	media-libs/libwebp:=
-
-	>=dev-libs/glib-2.67.1:2
-	>=dev-libs/libxslt-1.1.7
-	media-libs/woff2
-	gnome-keyring? ( app-crypt/libsecret )
-	introspection? (
-		>=dev-libs/gobject-introspection-1.59.1:=
-		dev-util/gi-docgen
-	)
-	dev-libs/libtasn1:=
-	spell? ( >=app-text/enchant-0.22 )
-	gstreamer? (
-		>=media-libs/gstreamer-1.16:1.0
-		>=media-libs/gst-plugins-base-1.14:1.0[egl?,opengl?,X?]
-		gles2-only? ( media-libs/gst-plugins-base:1.0[gles2] )
-		>=media-plugins/gst-plugins-opus-1.14.4-r1:1.0
-		>=media-libs/gst-plugins-bad-1.14:1.0 )
-
-	X? (
-		x11-libs/libX11
-		x11-libs/libXcomposite
-		x11-libs/libXdamage
-		x11-libs/libXrender
-		x11-libs/libXt )
-
-	libnotify? ( x11-libs/libnotify )
+	app-accessibility/at-spi2-core:2
+	dev-db/sqlite:3
+	dev-libs/glib:2
 	dev-libs/hyphen
-	jpeg2k? ( >=media-libs/openjpeg-2.2.0:2= )
-	avif? ( >=media-libs/libavif-0.9.0 )
+	dev-libs/icu:=
+	dev-libs/libgcrypt:0=
+	dev-libs/libtasn1:=
+	dev-libs/libxml2:2
+	dev-libs/libxslt
+	media-libs/fontconfig:1.0
+	media-libs/freetype:2
+	media-libs/harfbuzz:=[icu(+)]
+	media-libs/libjpeg-turbo:0=
+	media-libs/libepoxy[egl(+)]
+	media-libs/libglvnd
+	media-libs/libpng:0=
+	media-libs/libwebp:=
+	media-libs/mesa
+	media-libs/woff2
+	net-libs/libsoup:2.4[introspection?]
+	sys-libs/zlib:0
+	x11-libs/cairo[X?]
+	x11-libs/gtk+:3[aqua?,introspection?,wayland?,X?]
+	x11-libs/libdrm
+	avif? ( media-libs/libavif:= )
+	gamepad? ( dev-libs/libmanette )
+	gstreamer? (
+		media-libs/gstreamer:1.0
+		media-libs/gst-plugins-base:1.0[egl,opengl,X?]
+		media-plugins/gst-plugins-opus:1.0
+		media-libs/gst-plugins-bad:1.0
+	)
+	introspection? ( dev-libs/gobject-introspection:= )
+	jpegxl? ( media-libs/libjxl:= )
+	keyring? ( app-crypt/libsecret )
 	lcms? ( media-libs/lcms:2 )
-
-	egl? ( media-libs/mesa[egl(+)] )
-	gles2-only? ( media-libs/mesa[gles2] )
-	opengl? ( virtual/opengl )
+	seccomp? (
+		sys-apps/bubblewrap
+		sys-libs/libseccomp
+		sys-apps/xdg-dbus-proxy
+	)
+	spell? ( app-text/enchant:2 )
+	systemd? ( sys-apps/systemd:= )
+	X? ( x11-libs/libX11 )
 	wayland? (
 		dev-libs/wayland
-		>=dev-libs/wayland-protocols-1.12
-		opengl? ( ${wpe_depend} )
-		gles2-only? ( ${wpe_depend} )
+		dev-libs/wayland-protocols
 	)
-
-	seccomp? (
-		>=sys-apps/bubblewrap-0.3.1
-		sys-libs/libseccomp
-		dev-util/xdg-dbus-proxy
-	)
-
-	systemd? ( sys-apps/systemd:= )
-	gamepad? ( >=dev-libs/libmanette-0.2.4 )
 "
-unset wpe_depend
 DEPEND="${RDEPEND}"
-# paxctl needed for bug #407085
 # Need real bison, not yacc
 BDEPEND="
 	${PYTHON_DEPS}
 	${RUBY_DEPS}
-	>=app-accessibility/at-spi2-core-2.5.3
+	app-accessibility/at-spi2-core
+	dev-lang/perl
+	dev-util/gdbus-codegen
 	dev-util/glib-utils
-	>=dev-util/gperf-3.0.1
-	>=sys-devel/bison-2.4.3
-	|| ( >=sys-devel/gcc-7.3 >=sys-devel/clang-5 )
+	dev-util/gperf
+	dev-util/unifdef
+	sys-devel/bison
 	sys-devel/gettext
-	virtual/pkgconfig
-
-	>=dev-lang/perl-5.10
 	virtual/perl-Data-Dumper
 	virtual/perl-Carp
 	virtual/perl-JSON-PP
-
-	gtk-doc? ( >=dev-util/gtk-doc-1.32 )
-	geolocation? ( dev-util/gdbus-codegen )
-	introspection? ( dev-util/gi-docgen )
-
-	>=dev-util/cmake-3.10
-"
-#	test? (
-#		dev-python/pygobject:3[python_targets_python2_7]
-#		x11-themes/hicolor-icon-theme
-#		jit? ( sys-apps/paxctl ) )
-RDEPEND="${RDEPEND}
-	geolocation? ( >=app-misc/geoclue-2.1.5:2.0 )
+	virtual/pkgconfig
+	wayland? ( dev-util/wayland-scanner )
 "
 
 CHECKREQS_DISK_BUILD="18G" # and even this might not be enough, bug #417307
+
+# We cannot use PATCHES because src_prepare() calls cmake_src_prepare and
+# gnome2_src_prepare, and both apply ${PATCHES[@]}
+PATCHES=()
 
 pkg_pretend() {
 	if [[ ${MERGE_TYPE} != "binary" ]] ; then
@@ -158,16 +132,6 @@ pkg_pretend() {
 			die "You need at least GCC 7.3.x or Clang >= 5 for C++17-specific compiler flags"
 		fi
 	fi
-
-	if ! use opengl && ! use gles2-only; then
-		ewarn
-		ewarn "You are disabling OpenGL usage (USE=opengl or USE=gles2-only) completely."
-		ewarn "This is an unsupported configuration meant for very specific embedded"
-		ewarn "use cases, where there truly is no GL possible (and even that use case"
-		ewarn "is very unlikely to come by). If you have GL (even software-only), you"
-		ewarn "really really should be enabling OpenGL!"
-		ewarn
-	fi
 }
 
 pkg_setup() {
@@ -179,108 +143,114 @@ pkg_setup() {
 }
 
 src_prepare() {
-	eapply "${FILESDIR}"/2.44.4-fix-icu76.1.patch
 	cmake_src_prepare
-	gnome3_src_prepare
+	gnome2_src_prepare
+
+	# https://bugs.gentoo.org/943213
+	eapply "${FILESDIR}"/2.44.4-fix-icu76.1.patch
+
+	# We don't want -Werror for gobject-introspection (bug #947761)
+	sed -i -e "s:--warn-error::" Source/cmake/FindGI.cmake || die
 }
 
 src_configure() {
 	# Respect CC, otherwise fails on prefix #395875
 	tc-export CC
 
-	append-ldflags "-Wl,--no-keep-memory"
+	# ODR violations (bug #915230, https://bugs.webkit.org/show_bug.cgi?id=233007)
+	filter-lto
+
+	# It does not compile on alpha without this in LDFLAGS
+	# https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=648761
+	use alpha && append-ldflags "-Wl,--no-relax"
+
+	# Sigbuses on SPARC with mcpu and co., bug #???
+	use sparc && filter-flags "-mvis"
+
+	# https://bugs.webkit.org/show_bug.cgi?id=42070 , #301634
+	use ppc64 && append-flags "-mminimal-toc"
+
+	# Try to use less memory, bug #469942 (see Fedora .spec for reference)
+	append-ldflags $(test-flags-CCLD "-Wl,--no-keep-memory")
 
 	# Ruby situation is a bit complicated. See bug 513888
 	local rubyimpl
 	local ruby_interpreter=""
+	local RUBY
 	for rubyimpl in ${USE_RUBY}; do
-		if has_version -b "virtual/rubygems[ruby_targets_${rubyimpl}]"; then
-			ruby_interpreter="-DRUBY_EXECUTABLE=$(type -P ${rubyimpl})"
+		if has_version -b "virtual/rubygems[ruby_targets_${rubyimpl}(-)]"; then
+			RUBY="$(type -P ${rubyimpl})"
+			ruby_interpreter="-DRUBY_EXECUTABLE=${RUBY}"
 		fi
 	done
 	# This will rarely occur. Only a couple of corner cases could lead us to
 	# that failure. See bug 513888
-	[[ -z $ruby_interpreter ]] && die "No suitable ruby interpreter found"
+	[[ -z ${ruby_interpreter} ]] && die "No suitable ruby interpreter found"
+	# JavaScriptCore/Scripts/postprocess-asm invokes another Ruby script directly
+	# so it doesn't respect RUBY_EXECUTABLE, bug #771744.
+	sed -i -e "s:#!/usr/bin/env ruby:#!${RUBY}:" $(grep -rl "/usr/bin/env ruby" Source/JavaScriptCore || die) || die
 
 	# TODO: Check Web Audio support
 	# should somehow let user select between them?
-
-	# opengl needs to be explicetly handled, bug #576634
-	local use_wpe_renderer=OFF
-	local opengl_enabled
-	if use opengl || use gles2-only; then
-		opengl_enabled=ON
-		use wayland && use_wpe_renderer=ON
-	else
-		opengl_enabled=OFF
-	fi
-
 	local mycmakeargs=(
+		-DPython_EXECUTABLE="${PYTHON}"
 		${ruby_interpreter}
-		$(cmake_use_find_package gles2-only OpenGLES2)
-		$(cmake_use_find_package egl EGL)
-		$(cmake_use_find_package opengl OpenGL)
-		-DBWRAP_EXECUTABLE:FILEPATH="${EPREFIX}"/usr/bin/bwrap # If bubblewrap[suid] then portage makes it go-r and cmake find_program fails with that
+		# If bubblewrap[suid] then portage makes it go-r and cmake find_program fails with that
+		-DBWRAP_EXECUTABLE:FILEPATH="${EPREFIX}"/usr/bin/bwrap
 		-DDBUS_PROXY_EXECUTABLE:FILEPATH="${EPREFIX}"/usr/bin/xdg-dbus-proxy
 		-DPORT=GTK
 		# Source/cmake/WebKitFeatures.cmake
-		-DENABLE_API_TESTS=$(usex test)
+		-DENABLE_API_TESTS=OFF
 		-DENABLE_BUBBLEWRAP_SANDBOX=$(usex seccomp)
 		-DENABLE_GAMEPAD=$(usex gamepad)
-		-DENABLE_GEOLOCATION=$(usex geolocation) # Runtime optional (talks over dbus service)
+		-DENABLE_GEOLOCATION=ON # Runtime optional (talks over dbus service)
 		-DENABLE_MINIBROWSER=$(usex examples)
+		-DENABLE_PDFJS=$(usex pdf)
 		-DENABLE_SPELLCHECK=$(usex spell)
 		-DENABLE_UNIFIED_BUILDS=$(usex jumbo-build)
 		-DENABLE_VIDEO=$(usex gstreamer)
-		-DENABLE_WEBGL=${opengl_enabled}
-		# Supported only under ANGLE and default off PRIVATE option still@2.34.1, see
-		# https://bugs.webkit.org/show_bug.cgi?id=225563
-		# https://bugs.webkit.org/show_bug.cgi?id=224888
-		-DENABLE_WEBGL2=OFF
 		-DENABLE_WEB_AUDIO=$(usex gstreamer)
+		-DENABLE_WEB_CODECS=$(usex gstreamer) # https://bugs.webkit.org/show_bug.cgi?id=269147
+		-DENABLE_WEBDRIVER=OFF
+		-DENABLE_WEBGL=ON
+		-DUSE_AVIF=$(usex avif)
+		-DUSE_GSTREAMER_WEBRTC=$(usex gstreamer)
+		-DUSE_GSTREAMER_TRANSCODER=$(usex gstreamer)
 		# Source/cmake/OptionsGTK.cmake
-		-DENABLE_GLES2=$(usex gles2-only)
-		-DENABLE_GTKDOC=$(usex gtk-doc)
+		-DENABLE_DOCUMENTATION=OFF
 		-DENABLE_INTROSPECTION=$(usex introspection)
+		-DENABLE_JOURNALD_LOG=$(usex systemd)
 		-DENABLE_QUARTZ_TARGET=$(usex aqua)
 		-DENABLE_WAYLAND_TARGET=$(usex wayland)
 		-DENABLE_X11_TARGET=$(usex X)
-		-DUSE_AVIF=$(usex avif)
+		-DUSE_GBM=ON
 		-DUSE_GTK4=OFF
+		-DUSE_JPEGXL=$(usex jpegxl)
 		-DUSE_LCMS=$(usex lcms)
+		-DUSE_LIBBACKTRACE=OFF
+		-DUSE_LIBDRM=ON
 		-DUSE_LIBHYPHEN=ON
-		-DUSE_LIBNOTIFY=$(usex libnotify)
-		-DUSE_LIBSECRET=$(usex gnome-keyring)
-		-DUSE_OPENGL_OR_ES=${opengl_enabled}
-		-DUSE_OPENJPEG=$(usex jpeg2k)
+		-DUSE_LIBSECRET=$(usex keyring)
 		-DUSE_SOUP2=ON
-		-DENABLE_JOURNALD_LOG=$(usex systemd)
+		-DUSE_SYSPROF_CAPTURE=OFF
 		-DUSE_WOFF2=ON
-		-DUSE_WPE_RENDERER=${use_wpe_renderer} # WPE renderer is used to implement accelerated compositing under wayland
 	)
+
+	# Temporary workaround for bug 938162 (upstream bug 271371).
+	# The idea to disable WebAssembly and the FTL JIT instead
+	# of using ENABLE_JIT=OFF was stolen from OpenBSD.
+	use riscv && mycmakeargs+=( -DENABLE_WEBASSEMBLY=OFF -DENABLE_FTL_JIT=OFF )
 
 	# https://bugs.gentoo.org/761238
 	append-cppflags -DNDEBUG
 
-	memsaver_src_configure
 	WK_USE_CCACHE=NO cmake_src_configure
 }
 
-src_compile() {
-	cmake_src_compile
-}
-
-src_test() {
-	# Prevents test failures on PaX systems
-	pax-mark m $(list-paxables Programs/*[Tt]ests/*) # Programs/unittests/.libs/test*
-
-	cmake_src_test
-}
-
-src_install() {
-	cmake_src_install
-
-	# Prevents crashes on PaX systems, bug #522808
-	pax-mark m "${ED}/usr/libexec/webkit2gtk-4.0/jsc" "${ED}/usr/libexec/webkit2gtk-4.0/WebKitWebProcess"
-	pax-mark m "${ED}/usr/libexec/webkit2gtk-4.0/WebKitPluginProcess"
+pkg_postinst() {
+	optfeature "geolocation service (used at runtime if available)" "app-misc/geoclue"
+	optfeature "Common Multimedia codecs" "media-plugins/gst-plugins-meta"
+	optfeature "VAAPI encoding support" "media-libs/gst-plugins-bad[vaapi]"
+	optfeature "MPEG-DASH support" "media-plugins/gst-plugins-dash"
+	optfeature "HTTP live streaming (HLS) support" "media-plugins/gst-plugins-hls"
 }
