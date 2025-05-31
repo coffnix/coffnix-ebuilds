@@ -5,7 +5,7 @@ EAPI=7
 
 PYTHON_COMPAT=( python3+ )
 
-inherit cmake-multilib python-any-r1
+inherit cmake python-any-r1
 
 DESCRIPTION="Abseil Common Libraries (C++), LTS Branch"
 HOMEPAGE="https://abseil.io/"
