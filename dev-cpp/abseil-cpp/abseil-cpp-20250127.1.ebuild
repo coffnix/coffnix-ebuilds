@@ -22,7 +22,7 @@ IUSE="test test-helpers"
 
 RDEPEND="
 	test-helpers? (
-		dev-cpp/gtest:=[${MULTILIB_USEDEP}]
+		dev-cpp/gtest
 	)
 "
 DEPEND="${RDEPEND}"
@@ -58,7 +58,7 @@ src_prepare() {
 	absl/copts/generate_copts.py || die
 }
 
-multilib_src_configure() {
+src_configure() {
 	local mycmakeargs=(
 		-DABSL_ENABLE_INSTALL="yes"
 		-DABSL_USE_EXTERNAL_GOOGLETEST="yes"
@@ -80,7 +80,7 @@ multilib_src_configure() {
 	cmake_src_configure
 }
 
-multilib_src_test() {
+src_test() {
 	if ! use amd64; then
 		CMAKE_SKIP_TESTS=(
 			absl_symbolize_test
@@ -89,12 +89,6 @@ multilib_src_test() {
 		if use ppc; then
 			CMAKE_SKIP_TESTS+=(
 				absl_failure_signal_handler_test
-			)
-		fi
-	else
-		if ! multilib_is_native_abi; then
-			CMAKE_SKIP_TESTS+=(
-				absl_hash_instantiated_test
 			)
 		fi
 	fi
