@@ -1,0 +1,4 @@
+[Camel]
+camel_file_util_encode_off_t.value_type = "gint64"
+camel_file_util_decode_off_t.dest_type = "gint64"
+off_t = "gint64"

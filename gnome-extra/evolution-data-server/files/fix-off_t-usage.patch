@@ -1,0 +1,11 @@
+--- a/src/camel/CMakeLists.txt
++++ b/src/camel/CMakeLists.txt
+@@ -100,6 +100,8 @@ gir_scanner = custom_target('gir-scanner',
+    '--cflags-begin',
+    '-I${CMAKE_CURRENT_BINARY_DIR}',
+    '-I${CMAKE_SOURCE_DIR}/src',
++   '-I/usr/include',
++   '-include sys/types.h',
+    '--cflags-end',
+    '--verbose',
+    '--namespace=Camel',

@@ -1,0 +1,54 @@
+--- a/src/camel/camel-stream.c
++++ b/src/camel/camel-stream.c
+@@ -17,6 +17,7 @@
+ #include <glib/gi18n-lib.h>
+ 
+ #include <camel/camel-debug.h>
++#include <glib/gstdio.h> /* Para goffset */
+ 
+ #include "camel-stream.h"
+ 
+@@ -682,6 +683,7 @@ camel_stream_read (CamelStream *stream,
+  * @buffer: (array length=n) (type gchar): output buffer
+  * @n: max number of bytes to read.
+  * @cancellable: optional #GCancellable object, or %NULL
++ * @error: (nullable): return location for a #GError, or %NULL
+  * @error: return location for a #GError, or %NULL
+  *
+  * Attempts to read up to @n bytes from @stream into @buffer.
+@@ -715,7 +717,7 @@ camel_stream_read (CamelStream *stream,
+ }
+ 
+ /**
+- * camel_stream_write:
++ * camel_stream_write: (skip)
+  * @stream: a #CamelStream object
+  * @buffer: (array length=n) (type gchar): buffer to write.
+  * @n: number of bytes to write
+@@ -749,7 +751,7 @@ camel_stream_write (CamelStream *stream,
+ }
+ 
+ /**
+- * camel_stream_flush:
++ * camel_stream_flush: (skip)
+  * @stream: a #CamelStream object
+  * @cancellable: optional #GCancellable object, or %NULL
+  * @error: return location for a #GError, or %NULL
+@@ -779,7 +781,7 @@ camel_stream_flush (CamelStream *stream,
+ }
+ 
+ /**
+- * camel_stream_close:
++ * camel_stream_close: (skip)
+  * @stream: a #CamelStream object
+  * @cancellable: optional #GCancellable object, or %NULL
+  * @error: return location for a #GError, or %NULL
+@@ -809,7 +811,7 @@ camel_stream_close (CamelStream *stream,
+ }
+ 
+ /**
+- * camel_stream_eos:
++ * camel_stream_eos: (skip)
+  * @stream: a #CamelStream object
+  *
+  * Tests if there are bytes left to read on the @stream object.

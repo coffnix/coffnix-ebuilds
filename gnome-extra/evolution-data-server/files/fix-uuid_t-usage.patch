@@ -1,0 +1,15 @@
+--- a/tests/libebook/test-ebook-add-contact.c
++++ b/tests/libebook/test-ebook-add-contact.c
+@@ -45,10 +45,11 @@
+ static void
+ generate_uid (gchar *uid)
+ {
+-	uuid_t *uuid;
+-
+-	uuid_generate (uuid);
+-	uuid_unparse_lower (*uuid, uid);
++	uuid_t uuid;
++	/* uuid is a stack-allocated array[16], not a pointer */
++	uuid_generate (uuid);
++	uuid_unparse_lower (uuid, uid);
+ }
