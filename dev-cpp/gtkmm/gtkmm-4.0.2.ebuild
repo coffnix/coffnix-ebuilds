@@ -19,7 +19,7 @@ RDEPEND="
 	>=x11-libs/gdk-pixbuf-2.39.2:2
 	>=dev-cpp/atkmm-2.24.2:0
 	>=dev-cpp/cairomm-1.12.0
-	>=dev-cpp/pangomm-2.48.2:1.4
+	>=dev-cpp/pangomm-2.48.2:2.48
 	>=dev-libs/libsigc++-2.3.2:2
 "
 DEPEND="${RDEPEND}
