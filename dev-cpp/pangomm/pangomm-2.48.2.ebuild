@@ -9,7 +9,7 @@ DESCRIPTION="C++ interface for pango"
 HOMEPAGE="https://www.gtkmm.org https://gitlab.gnome.org/GNOME/pangomm"
 
 LICENSE="LGPL-2.1+"
-SLOT="1.4"
+SLOT="2.48"
 KEYWORDS="*"
 IUSE="+gtk-doc doc"
 
