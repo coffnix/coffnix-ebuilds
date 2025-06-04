@@ -7,7 +7,7 @@ DESCRIPTION="C++ interface for GTK+"
 HOMEPAGE="https://www.gtkmm.org"
 
 LICENSE="LGPL-2.1+"
-SLOT="3.0"
+SLOT="4.0"
 KEYWORDS="*"
 
 IUSE="aqua doc test wayland X"
