@@ -4,7 +4,19 @@
 EAPI=7
 PYTHON_COMPAT=( python3+ )
 CMAKE_BUILD_TYPE=RelWithDebInfo
-SANITIZER_FLAGS=( asan dfsan lsan msan hwasan tsan ubsan safestack cfi scudo shadowcallstack gwp-asan )
+
+SANITIZER_FLAGS_ALL=( asan dfsan lsan msan hwasan tsan ubsan safestack cfi scudo shadowcallstack gwp-asan )
+
+case "${ARCH}" in
+    arm64|aarch64)
+        # Ative apenas os suportados em arm64
+        SANITIZER_FLAGS=( asan lsan ubsan scudo )
+        ;;
+    *)
+        SANITIZER_FLAGS=( "${SANITIZER_FLAGS_ALL[@]}" )
+        ;;
+esac
+
 inherit cmake flag-o-matic python-any-r1 toolchain-funcs
 
 DESCRIPTION="Compiler runtime libraries for clang (sanitizers & xray)"
@@ -13,14 +25,17 @@ SRC_URI="https://github.com/llvm/llvm-project/releases/download/llvmorg-16.0.6/l
 LICENSE="Apache-2.0-with-LLVM-exceptions || ( UoI-NCSA MIT )"
 SLOT="16"
 KEYWORDS="*"
-IUSE="clang debug elibc_glibc +libfuzzer +memprof +orc +profile +xray ${SANITIZER_FLAGS[@]/#/+}"
-REQUIRED_USE="|| ( ${SANITIZER_FLAGS[*]} libfuzzer orc profile xray )"
+
+IUSE="clang debug elibc_glibc +libfuzzer +memprof +orc +profile +xray ${SANITIZER_FLAGS_ALL[@]/#/+}"
+REQUIRED_USE="|| ( ${SANITIZER_FLAGS_ALL[*]} libfuzzer orc profile xray )"
+
 DEPEND="sys-devel/llvm:16"
 BDEPEND="
     dev-util/cmake
     clang? ( sys-devel/clang:16 )
     ${PYTHON_DEPS}
 "
+
 S="${WORKDIR}/llvm-src"
 
 post_src_unpack() {
@@ -34,20 +49,27 @@ pkg_setup() {
 src_prepare() {
     sed -i -e 's:-Werror::' compiler-rt/lib/tsan/go/buildgo.sh || die
 
-    local flag
-    for flag in "${SANITIZER_FLAGS[@]}"; do
+    for flag in "${SANITIZER_FLAGS_ALL[@]}"; do
         if ! use "${flag}"; then
-            local cmake_flag=${flag/-/_}
-            sed -i -e "/COMPILER_RT_HAS_${cmake_flag^^}/s:TRUE:FALSE:" \
-                compiler-rt/cmake/config-ix.cmake || die
+            continue
         fi
+
+        case "${ARCH}" in
+            arm64|aarch64)
+                if [[ "${flag}" =~ ^(cfi|tsan|msan|dfsan|hwasan|shadowcallstack|safestack|gwp-asan)$ ]]; then
+                    continue
+                fi
+                ;;
+        esac
+
+        local cmake_flag=${flag/-/_}
+        sed -i -e "/COMPILER_RT_HAS_${cmake_flag^^}/s:TRUE:FALSE:" \
+            compiler-rt/cmake/config-ix.cmake || die
     done
 
-    # bug #926330
     sed -i -e '/-Wthread-safety/d' compiler-rt/CMakeLists.txt \
         compiler-rt/cmake/config-ix.cmake || die
 
-    # TODO: fix these tests to be skipped upstream
     if use asan && ! use profile; then
         rm compiler-rt/test/asan/TestCases/asan_and_llvm_coverage_test.cpp || die
     fi
@@ -56,8 +78,6 @@ src_prepare() {
     fi
 
     if has_version -b ">=sys-libs/glibc-2.37"; then
-        # known failures with glibc-2.37
-        # https://github.com/llvm/llvm-project/issues/60678
         rm compiler-rt/test/dfsan/custom.cpp || die
         rm compiler-rt/test/dfsan/release_shadow_space.c || die
     fi
@@ -67,30 +87,24 @@ src_prepare() {
 }
 
 src_configure() {
-    # Ensure to use llvm binary with the right version
+    case "${ARCH}" in
+        arm64|aarch64)
+            mycmakeargs+=( -DCOMPILER_RT_SANITIZERS_TO_BUILD="asan;ubsan;lsan" )
+            ;;
+    esac
+
     export PATH=${EROOT}/usr/lib/llvm/16/bin:${PATH}
-
-    # LLVM_ENABLE_ASSERTIONS=NO does not guarantee this for us
     use debug || local -x CPPFLAGS="${CPPFLAGS} -DNDEBUG"
-
-    # pre-set since we need to pass it to cmake
     BUILD_DIR=${WORKDIR}/compiler-rt_build
 
-    local extra_cflags=""
-    local extra_cppflags=""
-    # Force Clang as default compiler
-    extra_cflags="-I/usr/lib/clang/16/include/ -I${BUILD_DIR}/compiler-rt/lib/fuzzer/libcxx_fuzzer_aarch64/include/c++/v1"
-    extra_cppflags="-I/usr/lib/clang/16/include/ -I${BUILD_DIR}/compiler-rt/lib/fuzzer/libcxx_fuzzer_aarch64/include/c++/v1"
-    export CPPFLAGS="${extra_cppflags}"
+    local extra_cflags="-I/usr/lib/clang/16/include/ -I${BUILD_DIR}/compiler-rt/lib/fuzzer/libcxx_fuzzer_aarch64/include/c++/v1"
+    export CPPFLAGS="${extra_cflags}"
     local -x CC=${CHOST}-clang
     local -x CXX=${CHOST}-clang++
     strip-unsupported-flags
 
-    # Use GCC only if clang USE flag is disabled
     if ! use clang; then
-        extra_cflags="-I${BUILD_DIR}/compiler-rt/lib/fuzzer/libcxx_fuzzer_aarch64/include/c++/v1"
-        extra_cppflags="-I${BUILD_DIR}/compiler-rt/lib/fuzzer/libcxx_fuzzer_aarch64/include/c++/v1"
-        export CPPFLAGS="${extra_cppflags}"
+        export CPPFLAGS="${extra_cflags}"
         local -x CC=${CHOST}-gcc
         local -x CXX=${CHOST}-g++
         strip-unsupported-flags
