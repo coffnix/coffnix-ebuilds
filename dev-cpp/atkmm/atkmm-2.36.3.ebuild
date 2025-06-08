@@ -8,7 +8,7 @@ DESCRIPTION="C++ interface for the ATK library"
 HOMEPAGE="https://www.gtkmm.org"
 
 LICENSE="LGPL-2.1+"
-SLOT="0"
+SLOT="2"
 KEYWORDS="*"
 IUSE="doc"
 
