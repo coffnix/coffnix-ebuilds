@@ -9,13 +9,18 @@ inherit db-use flag-o-matic gnome3 python-any-r1 systemd vala virtualx cmake-uti
 DESCRIPTION="Evolution groupware backend"
 HOMEPAGE="https://wiki.gnome.org/Apps/Evolution"
 
+# Note: explicitly "|| ( LGPL-2 LGPL-3 )", not "LGPL-2+".
 LICENSE="|| ( LGPL-2 LGPL-3 ) BSD Sleepycat"
-SLOT="0/62"
+SLOT="0/62" # subslot = libcamel-1.2 soname version
 KEYWORDS="*"
 
 IUSE="api-doc-extras -berkdb +gnome-online-accounts +gtk +google +introspection ipv6 ldap kerberos vala +weather"
 REQUIRED_USE="vala? ( introspection )"
 
+
+# sys-libs/db is only required for migrating from <3.13 versions
+# gdata-0.17.7 soft required for new gdata_feed_get_next_page_token API to handle more than 100 google tasks
+# berkdb needed only for migrating old calendar data, bug #519512
 gdata_depend=">=dev-libs/libgdata-0.17.7:="
 RDEPEND="
 	>=app-crypt/gcr-3.4
@@ -39,7 +44,7 @@ RDEPEND="
 	)
 	google? (
 		>=dev-libs/json-glib-1.0.4
-		>=net-libs/webkit-gtk-2.11.91:4.1
+		>=net-libs/webkit-gtk-2.11.91:4
 		${gdata_depend}
 	)
 	gnome-online-accounts? (
@@ -62,6 +67,9 @@ DEPEND="${RDEPEND}
 	vala? ( $(vala_depend) )
 "
 
+# Some tests fail due to missings locales.
+# Also, dbus tests are flacky, bugs #397975 #501834
+# It looks like a nightmare to disable those for now.
 RESTRICT="test"
 
 pkg_setup() {
@@ -69,39 +77,14 @@ pkg_setup() {
 }
 
 src_prepare() {
-	# Corrige erros de compatibilidade com Vala >=0.52 (campos GtkChild e uso de ref)
-	find . -name '*.vala' -exec sed -i \
-		-e 's/\[GtkChild\] *\(.*\)/[GtkChild] unowned \1/' \
-		-e 's/ref \([a-zA-Z_][a-zA-Z0-9_]*\)/\1/g' {} + || die "Failed to patch Vala code"
-
-	# Corrige erro de off_t no g-ir-scanner adicionando #include <sys/types.h> ao camel.h
-	#sed -i '/#ifndef CAMEL_H/a #include <sys/types.h> /* Para off_t */' src/camel/camel.h || die "Failed to patch camel.h for off_t"
-
-	# Copia metadados personalizados para corrigir tipos no vapigen
-	cp "${FILESDIR}/camel-1.2.metadata" "${S}/src/vala/" || die "Failed to copy camel-1.2.metadata"
-	export VAPIGEN_EXTRA_ARGS="--metadata=${S}/src/vala/camel-1.2.metadata"
-
-	# Verifica se o arquivo de metadados foi copiado
-	if [ ! -f "${S}/src/vala/camel-1.2.metadata" ]; then
-		die "camel-1.2.metadata not found in src/vala/"
-	fi
-
-	# Define variáveis de ambiente para valac e vapigen
-	export VALAC=/usr/bin/vala-0.54
-	export VAPIGEN=/usr/bin/vapigen-0.54
-
-	# Aplica patches necessários
-	eapply "${FILESDIR}"/3.36.5-gtk-doc-1.32-compat.patch
 	eapply "${FILESDIR}"/vala.patch
-	#eapply "${FILESDIR}"/fix-off_t-usage.patch
-	#eapply "${FILESDIR}"/fix-camel-gir.patch
-
 
 	use vala && vala_src_prepare
 	cmake-utils_src_prepare
 }
 
 src_configure() {
+
 	local mycmakeargs=(
 		-DSYSCONF_INSTALL_DIR="/etc"
 		-DENABLE_GOA=$(usex gnome-online-accounts)
@@ -124,7 +107,6 @@ src_configure() {
 		-DENABLE_EXAMPLES=OFF
 		-DENABLE_UOA=OFF
 		-DENABLE_LIBCANBERRA=ON
-		-Denable-installed-tests=false
 	)
 	if use berkdb; then
 		mycmakeargs+=(
@@ -151,16 +133,6 @@ src_test() {
 	virtx emake check
 }
 
-src_compile() {
-	# Corrige off_t em Camel-1.2.gir gerado pelo scanner
-	if use vala && [[ -f "${BUILD_DIR}/src/camel/Camel-1.2.gir" ]]; then
-		einfo "Patching Camel-1.2.gir: substituindo off_t por gint64..."
-		sed -i -E 's/(<type name=")off_t(" c:type=")off_t(\*?")/\1gint64\2gint64\3/' \
-			"${BUILD_DIR}/src/camel/Camel-1.2.gir" || die "Failed to patch off_t in Camel-1.2.gir"
-	fi
-	cmake-utils_src_compile
-
-}
 src_install() {
 	addwrite /usr/share/glib-2.0/schemas/org.gnome.Evolution.DefaultSources.gschema.xml
 	addwrite /usr/share/glib-2.0/schemas/org.gnome.evolution-data-server.gschema.xml
