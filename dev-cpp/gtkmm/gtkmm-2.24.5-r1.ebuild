@@ -16,7 +16,7 @@ RDEPEND="
 	dev-cpp/glibmm:2
 	>=x11-libs/gtk+-2.24.15:2
 	>=x11-libs/gdk-pixbuf-2.39.2:2
-	>=dev-cpp/atkmm-2.22.7:0
+	>=dev-cpp/atkmm-2.22.7:1
 	dev-cpp/cairomm:0
 	dev-cpp/pangomm:1.4
 	>=dev-libs/libsigc++-2.3.2:2
