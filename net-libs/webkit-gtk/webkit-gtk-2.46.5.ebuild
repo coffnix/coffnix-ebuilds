@@ -198,7 +198,7 @@ src_configure() {
 		# If bubblewrap[suid] then portage makes it go-r and cmake find_program fails with that
 		-DBWRAP_EXECUTABLE:FILEPATH="${EPREFIX}"/usr/bin/bwrap
 		-DDBUS_PROXY_EXECUTABLE:FILEPATH="${EPREFIX}"/usr/bin/xdg-dbus-proxy
-		-DPORT=GTK4.1
+		-DPORT=GTK
 		# Source/cmake/WebKitFeatures.cmake
 		-DENABLE_API_TESTS=OFF
 		-DENABLE_BUBBLEWRAP_SANDBOX=$(usex seccomp)
@@ -231,7 +231,7 @@ src_configure() {
 		-DUSE_LIBDRM=ON
 		-DUSE_LIBHYPHEN=ON
 		-DUSE_LIBSECRET=$(usex keyring)
-		-DUSE_SOUP2=ON
+		-DUSE_SOUP2=OFF
 		-DUSE_SYSPROF_CAPTURE=OFF
 		-DUSE_WOFF2=ON
 	)
