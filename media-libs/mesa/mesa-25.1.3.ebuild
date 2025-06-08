@@ -301,6 +301,9 @@ pkg_setup() {
 
 src_prepare() {
 	default
+	sed -i \
+  -e 's|dep_llvmspirvlib = dependency.*|dep_llvmspirvlib = declare_dependency()|' \
+  "${S}/meson.build" || die
 	sed -i -e "/^PLATFORM_SYMBOLS/a '__gentoo_check_ldflags__'," \
 		bin/symbols-check.py || die # bug #830728
 }
