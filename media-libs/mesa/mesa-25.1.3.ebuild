@@ -309,6 +309,7 @@ src_prepare() {
 }
 
 multilib_src_configure() {
+	export LDFLAGS="${LDFLAGS} -lLLVMSPIRVLib"
 	local emesonargs=()
 
 	# bug #932591 and https://gitlab.freedesktop.org/mesa/mesa/-/issues/11140
