@@ -305,6 +305,8 @@ pkg_setup() {
 #	"${S}/meson.build" || die
 src_prepare() {
 	default
+	append-cflags "-I/usr/lib/llvm/16/include/cclang"
+	append-cxxflags "-I/usr/lib/llvm/16/include/cclang"
 	PKG_CONFIG_PATH="/usr/lib/llvm/${LLVM_SLOT}/$(get_libdir)/pkgconfig"
 	#sed -i 's/dependency([\"\x27]llvmspirvlib[\"\x27])/dependency("LLVMSPIRVLib")/' "${S}/meson.build" || die
 
