@@ -305,9 +305,6 @@ pkg_setup() {
 #	"${S}/meson.build" || die
 src_prepare() {
 	default
-	LDFLAGS+=" -L/usr/lib/llvm/16/lib64"
-	CFLAGS+=" -I/usr/lib/llvm/16/include/cclang"
-	CPPFLAGS+=" -I/usr/lib/llvm/16/include/cclang"
 	append-cflags "-I/usr/lib/llvm/16/include/cclang"
 	append-cxxflags "-I/usr/lib/llvm/16/include/cclang"
 	PKG_CONFIG_PATH="/usr/lib/llvm/${LLVM_SLOT}/$(get_libdir)/pkgconfig"
@@ -318,6 +315,9 @@ src_prepare() {
 }
 
 multilib_src_configure() {
+	LDFLAGS+=" -L/usr/lib/llvm/16/lib64"
+	CFLAGS+=" -I/usr/lib/llvm/16/include/cclang"
+	CPPFLAGS+=" -I/usr/lib/llvm/16/include/cclang"
 	local emesonargs=()
 
 	# bug #932591 and https://gitlab.freedesktop.org/mesa/mesa/-/issues/11140
