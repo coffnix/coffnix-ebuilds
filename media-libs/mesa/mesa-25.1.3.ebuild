@@ -309,7 +309,6 @@ src_prepare() {
 	append-cflags "-I/usr/lib/llvm/16/include/cclang"
 	append-cxxflags "-I/usr/lib/llvm/16/include/cclang"
 	PKG_CONFIG_PATH="/usr/lib/llvm/${LLVM_SLOT}/$(get_libdir)/pkgconfig"
-	#sed -i 's/dependency([\"\x27]llvmspirvlib[\"\x27])/dependency("LLVMSPIRVLib")/' "${S}/meson.build" || die
 
 	sed -i -e "/^PLATFORM_SYMBOLS/a '__gentoo_check_ldflags__'," \
 		bin/symbols-check.py || die # bug #830728
@@ -317,8 +316,11 @@ src_prepare() {
 
 multilib_src_configure() {
 	LDFLAGS+=" -L/usr/lib/llvm/16/lib64"
-	CFLAGS+=" -I/usr/lib/llvm/16/include/cclang"
-	CPPFLAGS+=" -I/usr/lib/llvm/16/include/cclang"
+	#CFLAGS+=" -I/usr/lib/llvm/16/include/cclang"
+	#CPPFLAGS+=" -I/usr/lib/llvm/16/include/cclang"
+	append-cflags "-I/usr/lib/llvm/16/include/cclang"
+	append-cxxflags "-I/usr/lib/llvm/16/include/cclang"
+	append-cppflags "-I/usr/lib/llvm/16/include/cclang"
 	local emesonargs=()
 
 	# bug #932591 and https://gitlab.freedesktop.org/mesa/mesa/-/issues/11140
@@ -416,6 +418,7 @@ multilib_src_configure() {
 		emesonargs+=(
 			$(meson_native_true gallium-rusticl)
 			-Drust_std=2021
+			-DLLVM_CONFIG_PATH="/usr/lib/llvm/{{ .Values.slot }}/bin/llvm-config"
 		)
 	fi
 
@@ -451,7 +454,8 @@ multilib_src_configure() {
 	emesonargs+=(-Dvulkan-layers=${vulkan_layers#,})
 
 	if use opengl && use X; then
-		emesonargs+=(-Dglx=dri -Dgallium-opencl=disabled)
+		emesonargs+=(-Dglx=dri -Dgallium-opencl=disabled -DLLVM_CONFIG_PATH="/usr/lib/llvm/{{ .Values.slot }}/bin/llvm-config")
+
 	else
 		emesonargs+=(-Dglx=disabled)
 	fi
