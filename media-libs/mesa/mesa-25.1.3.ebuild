@@ -145,6 +145,7 @@ DEPEND="${RDEPEND}
 	#app-alternatives/lex
 BDEPEND="
 	sys-devel/libclc
+	dev-libs/opencl-clang
 	dev-python/pyyaml
 	dev-util/glslang
 	${PYTHON_DEPS}
@@ -444,7 +445,7 @@ multilib_src_configure() {
 	emesonargs+=(-Dvulkan-layers=${vulkan_layers#,})
 
 	if use opengl && use X; then
-		emesonargs+=(-Dglx=dri)
+		emesonargs+=(-Dglx=dri -Dgallium-opencl=disabled)
 	else
 		emesonargs+=(-Dglx=disabled)
 	fi
