@@ -2,13 +2,13 @@
 
 EAPI=7
 
-LLVM_COMPAT=16
+LLVM_COMPAT=( 16 )
 LLVM_SLOT=16
 LLVM_OPTIONAL=1
 CARGO_OPTIONAL=1
 PYTHON_COMPAT=( python3+ )
 
-inherit flag-o-matic llvm meson python-any-r1 linux-info rust-toolchain
+inherit flag-o-matic llvm-r1 meson python-any-r1 linux-info rust-toolchain
 
 MY_P="${P/_/-}"
 
@@ -305,6 +305,7 @@ pkg_setup() {
 #	"${S}/meson.build" || die
 src_prepare() {
 	default
+	# Corrige includes do mesa_clc para achar opencl-c-base.h
 	append-cflags "-I/usr/lib/llvm/16/include/cclang"
 	append-cxxflags "-I/usr/lib/llvm/16/include/cclang"
 	PKG_CONFIG_PATH="/usr/lib/llvm/${LLVM_SLOT}/$(get_libdir)/pkgconfig"
