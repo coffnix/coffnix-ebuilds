@@ -305,11 +305,7 @@ pkg_setup() {
 #	"${S}/meson.build" || die
 src_prepare() {
 	default
-	# Corrige includes do mesa_clc para achar opencl-c-base.h
-	append-cflags "-I/usr/lib/llvm/16/include/cclang"
-	append-cxxflags "-I/usr/lib/llvm/16/include/cclang"
 	CFLAGS="${CFLAGS} $(llvm-config --cflags)"
-	#export CFLAGS="${CFLAGS} -I/usr/lib/clang/16/include"
 	PKG_CONFIG_PATH="/usr/lib/llvm/${LLVM_SLOT}/$(get_libdir)/pkgconfig"
 
 	sed -i -e "/^PLATFORM_SYMBOLS/a '__gentoo_check_ldflags__'," \
@@ -318,13 +314,7 @@ src_prepare() {
 
 multilib_src_configure() {
 	LDFLAGS+=" -L/usr/lib/llvm/16/lib64"
-	#CFLAGS+=" -I/usr/lib/llvm/16/include/cclang"
-	#CPPFLAGS+=" -I/usr/lib/llvm/16/include/cclang"
 	CFLAGS="${CFLAGS} $(llvm-config --cflags)"
-	#export CFLAGS="${CFLAGS} -I/usr/lib/clang/16/include/"
-	append-cflags "-I/usr/lib/llvm/16/include/cclang"
-	append-cxxflags "-I/usr/lib/llvm/16/include/cclang"
-	append-cppflags "-I/usr/lib/llvm/16/include/cclang"
 	local emesonargs=()
 
 	# bug #932591 and https://gitlab.freedesktop.org/mesa/mesa/-/issues/11140
