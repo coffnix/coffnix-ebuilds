@@ -299,17 +299,19 @@ pkg_setup() {
 	fi
 }
 
+#	sed -i \
+#	-e 's|dep_llvmspirvlib = dependency.*|dep_llvmspirvlib = declare_dependency()|' \
+#	"${S}/meson.build" || die
 src_prepare() {
 	default
-	sed -i \
-  -e 's|dep_llvmspirvlib = dependency.*|dep_llvmspirvlib = declare_dependency()|' \
-  "${S}/meson.build" || die
+	PKG_CONFIG_PATH="/usr/lib/llvm/${LLVM_SLOT}/$(get_libdir)/pkgconfig"
+	#sed -i 's/dependency([\"\x27]llvmspirvlib[\"\x27])/dependency("LLVMSPIRVLib")/' "${S}/meson.build" || die
+
 	sed -i -e "/^PLATFORM_SYMBOLS/a '__gentoo_check_ldflags__'," \
 		bin/symbols-check.py || die # bug #830728
 }
 
 multilib_src_configure() {
-	export LDFLAGS="${LDFLAGS} -lLLVMSPIRVLib"
 	local emesonargs=()
 
 	# bug #932591 and https://gitlab.freedesktop.org/mesa/mesa/-/issues/11140
@@ -399,8 +401,10 @@ multilib_src_configure() {
 		gallium_enable video_cards_radeon r300 r600
 	fi
 
+	#PKG_CONFIG_PATH="$(get_llvm_prefix "${LLVM_MAX_SLOT}")/$(get_libdir)/pkgconfig"
 	if use llvm && use opencl; then
-		PKG_CONFIG_PATH="$(get_llvm_prefix)/$(get_libdir)/pkgconfig"
+		#PKG_CONFIG_PATH="$(get_llvm_prefix)/$(get_libdir)/pkgconfig"
+		#PKG_CONFIG_PATH="/usr/lib/llvm/16/lib64/pkgconfig"
 		# See https://gitlab.freedesktop.org/mesa/mesa/-/blob/main/docs/rusticl.rst
 		emesonargs+=(
 			$(meson_native_true gallium-rusticl)
