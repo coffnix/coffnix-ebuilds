@@ -45,10 +45,6 @@ BDEPEND="
 	virtual/pkgconfig
 "
 
-PATCHES=(
-	"${FILESDIR}"/${P}-gcc15.patch
-)
-
 src_prepare() {
 	use cuda && cuda_src_prepare
 	cmake_src_prepare
