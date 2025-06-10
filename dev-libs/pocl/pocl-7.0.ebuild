@@ -3,9 +3,8 @@
 
 EAPI=7
 
-LLVM_COMPAT=( 16 )
 LLVM_SLOT=16
-inherit cmake cuda llvm-r1
+inherit cmake llvm
 
 DESCRIPTION="Portable Computing Language (an implementation of OpenCL)"
 HOMEPAGE="http://portablecl.org https://github.com/pocl/pocl"
@@ -13,37 +12,23 @@ SRC_URI="https://github.com/pocl/pocl/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="amd64 ppc64"
-# TODO: hsa tce
+KEYWORDS="~arm64"
 IUSE="accel +conformance cuda debug examples float-conversion hardening +hwloc memmanager test"
-# Tests not yet passing, fragile in Portage environment(?)
+
+
 RESTRICT="!test? ( test ) test"
 
-CLANG_DEPS="
-	$(llvm_gen_dep '
-		!cuda? (
-			sys-devel/clang:${LLVM_SLOT}=
-			sys-devel/llvm:${LLVM_SLOT}=
-		)
-		cuda? (
-			sys-devel/clang:${LLVM_SLOT}=[llvm_targets_NVPTX]
-			sys-devel/llvm:${LLVM_SLOT}=[llvm_targets_NVPTX]
-		)
-	')
-"
 RDEPEND="
-	${CLANG_DEPS}
+	sys-devel/clang:${LLVM_SLOT}=
+	sys-devel/llvm:${LLVM_SLOT}=
 	dev-libs/libltdl
 	virtual/opencl
-	debug? ( dev-util/lttng-ust:= )
-	cuda? ( dev-util/nvidia-cuda-toolkit:= )
 	hwloc? ( sys-apps/hwloc )
+	cuda? ( dev-util/nvidia-cuda-toolkit )
+	debug? ( dev-util/lttng-ust )
 "
 DEPEND="${RDEPEND}"
-BDEPEND="
-	${CLANG_DEPS}
-	virtual/pkgconfig
-"
+BDEPEND="virtual/pkgconfig"
 
 src_prepare() {
 	use cuda && cuda_src_prepare
