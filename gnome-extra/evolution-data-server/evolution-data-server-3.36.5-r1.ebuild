@@ -37,7 +37,7 @@ RDEPEND="
 	)
 	google? (
 		>=dev-libs/json-glib-1.0.4
-		>=net-libs/webkit-gtk-2.11.91:4.1
+		>=net-libs/webkit-gtk-2.11.91:4
 		${gdata_depend}
 	)
 	gnome-online-accounts? (
