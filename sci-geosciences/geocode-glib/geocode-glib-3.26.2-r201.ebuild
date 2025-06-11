@@ -15,7 +15,7 @@ RESTRICT="!test? ( test )"
 RDEPEND="
 	>=dev-libs/glib-2.44:2
 	>=dev-libs/json-glib-0.99.2[introspection?]
-	>=net-libs/libsoup-3.0.8:3.0[introspection?]
+	>=net-libs/libsoup-2.74.0:2.4[introspection?]
 	introspection? ( >=dev-libs/gobject-introspection-1.54:= )
 
 	!<=sci-geosciences/geocode-glib-3.26.4:0
