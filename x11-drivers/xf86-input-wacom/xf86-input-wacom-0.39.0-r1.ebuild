@@ -19,8 +19,8 @@ IUSE="debug"
 RDEPEND="dev-libs/libwacom
 	virtual/libudev:=
 	|| (
-	>=x11-base/xorg-server-1.15.1
-	>=x11libre-base/xorg-server-1.15.1
+	>=x11-base/xorg-server-21.1.16
+	>=x11libre-base/xorg-server-21.1.16
 	)
 	x11-libs/libX11
 	x11-libs/libXext

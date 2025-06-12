@@ -13,8 +13,11 @@ IUSE="+fonts"
 
 # Server
 RDEPEND="${RDEPEND}
-	x11-base/xorg-server[-minimal]"
-
+	|| (
+        >=x11-base/xorg-server-1.15.1
+        >=x11libre-base/xorg-server-1.15.1[-minimal]
+    )
+"
 # Applications
 RDEPEND="${RDEPEND}
 	x11-apps/appres
