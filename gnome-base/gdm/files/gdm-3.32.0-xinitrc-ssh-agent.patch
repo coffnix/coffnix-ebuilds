@@ -1,0 +1,17 @@
+--- a/data/Xsession.in	2019-02-21 13:44:14.000000000 -0600
++++ b/data/Xsession.in	2019-02-28 15:04:13.134630536 -0600
+@@ -175,14 +175,6 @@
+   fi
+ fi
+ 
+-# add ssh-agent if found
+-sshagent="`gdmwhich ssh-agent`"
+-if [ -n "$sshagent" ] && [ -x "$sshagent" ] && [ -z "$SSH_AUTH_SOCK" ]; then
+-    command="$sshagent -- $command"
+-elif [ -z "$sshagent" ] ; then
+-    echo "$0: ssh-agent not found!"
+-fi
+-
+ echo "$0: Setup done, will execute: $command"
+ 
+ eval exec $command

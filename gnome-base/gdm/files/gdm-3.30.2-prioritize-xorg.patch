@@ -1,0 +1,12 @@
+diff -Nuar gdm-3.30.2/data/gdm.conf-custom.in gdm-3.30.2-fixed/data/gdm.conf-custom.in
+--- gdm-3.30.2/data/gdm.conf-custom.in	2018-11-06 21:26:11.000000000 +0000
++++ gdm-3.30.2-fixed/data/gdm.conf-custom.in	2018-12-05 16:01:19.118500397 +0000
+@@ -2,7 +2,7 @@
+ 
+ [daemon]
+ # Uncomment the line below to force the login screen to use Xorg
+-#WaylandEnable=false
++WaylandEnable=false
+ 
+ [security]
+ 

@@ -1,0 +1,42 @@
+--- a/configure.ac	2019-02-26 14:11:12.000000000 -0600
++++ b/configure.ac	2019-02-28 15:16:03.216318299 -0600
+@@ -829,15 +829,38 @@
+ CPPFLAGS="$xinerama_save_cppflags"
+ 
+ dnl ---------------------------------------------------------------------------
++dnl - Check for elogind support
++dnl ---------------------------------------------------------------------------
++
++PKG_CHECK_MODULES(ELOGIND,
++                  [libelogind],
++                  [have_elogind=yes], [have_elogind=no])
++
++AC_SUBST(ELOGIND_CFLAGS)
++AC_SUBST(ELOGIND_LIBS)
++
++if test "x$have_elogind" != "xno" ; then
++        AC_DEFINE(WITH_ELOGIND, 1, [Define to enable elogind support])
++fi
++
++dnl ---------------------------------------------------------------------------
+ dnl - Check for systemd support
+ dnl ---------------------------------------------------------------------------
+ 
+ PKG_CHECK_MODULES(SYSTEMD,
+-                  [libsystemd])
++                  [libsystemd],
++                  [have_systemd=yes], [have_systemd=no])
+ 
+ AC_SUBST(SYSTEMD_CFLAGS)
+ AC_SUBST(SYSTEMD_LIBS)
+ 
++SYSTEMD_CFLAGS="$SYSTEMD_CFLAGS $ELOGIND_CFLAGS"
++SYSTEMD_LIBS="$SYSTEMD_LIBS $ELOGIND_LIBS"
++
++if test "x$have_systemd" != "xno" ; then
++        AC_DEFINE(WITH_SYSTEMD, 1, [Define to enable systemd support])
++fi
++
+ PKG_CHECK_MODULES(JOURNALD,
+                   [libsystemd],
+                   [have_journald=yes], [have_journald=no])

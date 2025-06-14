@@ -1,0 +1,15 @@
+--- a/data/pam-exherbo/gdm-fingerprint.pam	2019-02-21 13:44:14.000000000 -0600
++++ b/data/pam-exherbo/gdm-fingerprint.pam	2019-02-28 15:08:57.883647405 -0600
+@@ -1,6 +1,11 @@
+ account  include  system-login
+ 
+-auth     substack fingerprint-auth
++auth     optional pam_env.so
++auth     required pam_tally2.so onerr=succeed
++auth     required pam_shells.so
++auth     required pam_nologin.so
++auth     required pam_fprintd.so
++auth     required pam_permit.so
+ auth     optional pam_gnome_keyring.so
+ 
+ password required pam_deny.so
