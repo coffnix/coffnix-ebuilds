@@ -1,6 +1,6 @@
 EAPI=7
 
-PYTHON_COMPAT=( python3_{9..10} )
+PYTHON_COMPAT=( python3+ )
 inherit autotools python-any-r1 toolchain-funcs
 
 MY_P="${P/mit-}"
