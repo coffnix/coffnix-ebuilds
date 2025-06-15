@@ -25,7 +25,7 @@ RDEPEND="
 pkg_postinst() {
 	elog
 	elog "In order to take advantage of OpenCL you will need a runtime for your hardware."
-	elog "Currently included in Gentoo are:"
+	elog "Currently included are:"
 	elog
 	elog " * open:"
 	elog "    - dev-libs/intel-compute-runtime - integrated Intel GPUs from Gen12 onwards. 64-bit only;"
