@@ -23,7 +23,9 @@ EAPI=7
 # downstream consumers (like distributions).
 
 GN_MIN_VER=0.2217
+RUST_SLOT="1.78"
 LLVM_SLOT=16
+LLVM_COMPAT=( 16 )
 # chromium-tools/get-chromium-toolchain-strings.py
 TEST_FONT=f26f29c9d3bfae588207bbc9762de8d142e58935c62a86f67332819b15203b35
 BUNDLED_CLANG_VER=llvmorg-21-init-9266-g09006611-1
@@ -37,15 +39,9 @@ CHROMIUM_LANGS="af am ar bg bn ca cs da de el en-GB es es-419 et fa fi fil fr gu
 	hi hr hu id it ja kn ko lt lv ml mr ms nb nl pl pt-BR pt-PT ro ru sk sl sr
 	sv sw ta te th tr uk ur vi zh-CN zh-TW"
 
-LLVM_COMPAT=( 16 )
 PYTHON_COMPAT=( python3+ )
 PYTHON_REQ_USE="xml(+)"
-RUST_MIN_VER=1.78.0
-RUST_NEEDS_LLVM="yes please"
-RUST_OPTIONAL="yes" # Not actually optional, but we don't need system Rust (or LLVM) with USE=bundled-toolchain
-
-inherit check-reqs chromium-2 desktop flag-o-matic llvm-r1 multiprocessing ninja-utils pax-utils
-inherit python-any-r1 readme.gentoo-r1 rust systemd toolchain-funcs virtualx xdg-utils
+inherit check-reqs chromium-2 desktop flag-o-matic llvm-r1 multiprocessing ninja-utils pax-utils python-any-r1 readme.gentoo-r1 systemd toolchain-funcs virtualx xdg-utils
 
 DESCRIPTION="Open-source version of Google Chrome web browser"
 HOMEPAGE="https://www.chromium.org/"
@@ -200,14 +196,13 @@ BDEPEND="
 	!headless? (
 		qt6? ( dev-qt/qtbase:6 )
 	)
-	!bundled-toolchain? ( $(llvm_gen_dep '
-		sys-devel/clang:${LLVM_SLOT}
-		sys-devel/llvm:${LLVM_SLOT}
-		sys-devel/lld:${LLVM_SLOT}
+	!bundled-toolchain? (
+		>=sys-devel/clang-16
+		>=sys-devel/llvm-16
+		>=sys-devel/lld-16
 		official? (
-			!ppc64? ( sys-libs/compiler-rt-sanitizers:${LLVM_SLOT}[cfi] )
-		) ')
-		${RUST_DEPEND}
+			!ppc64? ( >=sys-libs/compiler-rt-sanitizers-16[cfi] )
+		)
 	)
 	pgo? (
 		dev-python/selenium
@@ -272,7 +267,7 @@ pre_build_checks() {
 	local extra_disk=1 # Always include a little extra space
 	local memory=4
 	tc-is-cross-compiler && extra_disk=$((extra_disk * 2))
-	if tc-is-lto || use pgo; then
+	if use pgo; then
 		memory=$((memory * 2 + 1))
 		tc-is-cross-compiler && extra_disk=$((extra_disk * 2)) # Double the requirements
 		use pgo && extra_disk=$((extra_disk + 4))
@@ -316,48 +311,29 @@ pkg_setup() {
 		# to a sane value.
 		# This is effectively the 'force-clang' path if GCC support is re-added.
 		# TODO: check if the user has already selected a specific impl via make.conf and respect that.
-		use_lto="false"
-		if tc-is-lto; then
-			use_lto="true"
-			# We can rely on GN to do this for us; anecdotally without this builds
-			# take significantly longer with LTO enabled and it doesn't hurt anything.
-			filter-lto
-		fi
-
-		if [ "$use_lto" = "false" ] && use official; then
+		use_lto="true"
+		if use official; then
 			einfo "USE=official selected and LTO not detected."
 			einfo "It is _highly_ recommended that LTO be enabled for performance reasons"
 			einfo "and to be consistent with the upstream \"official\" build optimisations."
 		fi
 
-		if [ "$use_lto" = "false" ] && use test; then
+		if use test; then
 			die "Tests require CFI which requires LTO"
 		fi
 
 		export use_lto
 
-		# 936858
-		if tc-ld-is-mold; then
-			eerror "Your toolchain is using the mold linker."
-			eerror "This is not supported by Chromium."
-			die "Please switch to a different linker."
-		fi
-
-		if use !bundled-toolchain; then
-			llvm-r1_pkg_setup
-			rust_pkg_setup
-		fi
-
 		# Forcing clang; respect llvm_slot_x to enable selection of impl from LLVM_COMPAT
 		AR=llvm-ar
-		CPP="${CHOST}-clang++-${LLVM_SLOT} -E"
+		CPP="${CHOST}-clang++ -E"
 		NM=llvm-nm
-		CC="${CHOST}-clang-${LLVM_SLOT}"
-		CXX="${CHOST}-clang++-${LLVM_SLOT}"
+		CC="${CHOST}-clang"
+		CXX="${CHOST}-clang++"
 
 		if tc-is-cross-compiler; then
 			use pgo && die "The pgo USE flag cannot be used when cross-compiling"
-			CPP="${CBUILD}-clang++-${LLVM_SLOT} -E"
+			CPP="${CBUILD}-clang++ -E"
 		fi
 
 		# I hate doing this but upstream Rust have yet to come up with a better solution for
@@ -365,7 +341,8 @@ pkg_setup() {
 		export RUSTC_BOOTSTRAP=1
 
 		# Users should never hit this, it's purely a development convenience
-		if ver_test $(gn --version || die) -lt ${GN_MIN_VER}; then
+		gn_ver=$(gn --version | awk '{print $1}' || die)
+		if [[ "${gn_ver}" < "${GN_MIN_VER}" ]]; then
 			die "dev-build/gn >= ${GN_MIN_VER} is required to build this Chromium"
 		fi
 	fi
@@ -506,16 +483,6 @@ src_prepare() {
 
 	default
 
-	if [[ ${LLVM_SLOT} == "19" ]]; then
-		# Upstream now hard depend on a feature that was added in LLVM 20.1, but we don't want to stabilise that yet.
-		# Do the temp file shuffle in case someone is using something other than `gawk`
-		{
-			awk '/config\("clang_warning_suppression"\) \{/	{ print $0 " }"; sub(/clang/, "xclang"); print; next }
-				{ print }' build/config/compiler/BUILD.gn > "${T}/build.gn" && \
-				mv "${T}/build.gn" build/config/compiler/BUILD.gn
-		} || die "Unable to disable warning suppression"
-	fi
-
 	# Not included in -lite tarballs, but we should check for it anyway.
 	if [[ -f third_party/node/linux/node-linux-x64/bin/node ]]; then
 		rm third_party/node/linux/node-linux-x64/bin/node || die
@@ -624,7 +591,6 @@ src_prepare() {
 		third_party/farmhash
 		third_party/fast_float
 		third_party/fdlibm
-		third_party/ffmpeg
 		third_party/fft2d
 		third_party/flatbuffers
 		third_party/fp16
@@ -731,10 +697,7 @@ src_prepare() {
 		third_party/rapidhash
 		third_party/re2
 		third_party/rnnoise
-		third_party/rust
-		third_party/ruy
 		third_party/s2cellid
-		third_party/search_engines_data
 		third_party/securemessage
 		third_party/selenium-atoms
 		third_party/sentencepiece
@@ -757,7 +720,6 @@ src_prepare() {
 		third_party/swiftshader/third_party/marl
 		third_party/swiftshader/third_party/SPIRV-Headers/include/spirv
 		third_party/swiftshader/third_party/SPIRV-Tools
-		third_party/swiftshader/third_party/subzero
 		third_party/tensorflow_models
 		third_party/tensorflow-text
 		third_party/tflite
@@ -811,7 +773,6 @@ src_prepare() {
 	fi
 
 	if use test; then
-		# tar tvf /var/cache/distfiles/${P}-testdata.tar.xz | grep '^d' | grep 'third_party' | awk '{print $NF}'
 		keeplibs+=(
 			third_party/breakpad/breakpad/src/processor
 			third_party/fuzztest
@@ -961,9 +922,9 @@ chromium_configure() {
 	# We don't use the same clang version as upstream, and with -Werror
 	# we need to make sure that we don't get superfluous warnings.
 	append-flags -Wno-unknown-warning-option
-	if tc-is-cross-compiler; then # can you cross-compile with the bundled toolchain?
-			export BUILD_CXXFLAGS+=" -Wno-unknown-warning-option"
-			export BUILD_CFLAGS+=" -Wno-unknown-warning-option"
+	if tc-is-cross-compiler; then
+		export BUILD_CXXFLAGS+=" -Wno-unknown-warning-option"
+		export BUILD_CFLAGS+=" -Wno-unknown-warning-option"
 	fi
 
 	# Start building our GN options
@@ -1072,7 +1033,7 @@ chromium_configure() {
 		# pseudolocales are only used for testing
 		"enable_pseudolocales=false"
 		"enable_widevine=$(usex widevine true false)"
-		# Disable fatal linker warnings, bug 506268.
+		# Disable fatal linker warnings, bug #506268.
 		"fatal_linker_warnings=false"
 		# Set up Google API keys, see http://www.chromium.org/developers/how-tos/api-keys
 		# Note: these are for Gentoo use ONLY. For your own distribution,
