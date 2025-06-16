@@ -341,7 +341,8 @@ pkg_setup() {
 		export RUSTC_BOOTSTRAP=1
 
 		# Users should never hit this, it's purely a development convenience
-		if ver_test $(gn --version || die) -lt ${GN_MIN_VER}; then
+		gn_ver=$(gn --version | awk '{print $1}' || die)
+		if [[ "${gn_ver}" < "${GN_MIN_VER}" ]]; then
 			die "dev-build/gn >= ${GN_MIN_VER} is required to build this Chromium"
 		fi
 	fi
