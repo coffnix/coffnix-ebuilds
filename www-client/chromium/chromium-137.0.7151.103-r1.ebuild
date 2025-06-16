@@ -34,7 +34,7 @@ CHROMIUM_LANGS="af am ar bg bn ca cs da de el en-GB es es-419 et fa fi fil fr gu
 
 PYTHON_COMPAT=( python3+ )
 PYTHON_REQ_USE="xml(+)"
-inherit check-reqs chromium-2 desktop flag-o-matic llvm-r1 multiprocessing ninja-utils pax-utils python-any-r1 readme.gentoo-r1 systemd toolchain-funcs virtualx xdg-utils
+inherit check-reqs chromium-2 desktop flag-o-matic llvm multiprocessing ninja-utils pax-utils python-any-r1 readme.gentoo-r1 systemd toolchain-funcs virtualx xdg-utils
 
 DESCRIPTION="Open-source version of Google Chrome web browser"
 HOMEPAGE="https://www.chromium.org/"
@@ -58,8 +58,6 @@ LICENSE+=" SGI-B-2.0 SSLeay SunSoft Unicode-3.0 Unicode-DFS-2015 Unlicense UoI-N
 LICENSE+=" rar? ( unRAR )"
 
 SLOT="0/stable"
-# Dev exists mostly to give devs some breathing room for beta/stable releases;
-# it shouldn't be keyworded but adventurous users can select it.
 if [[ ${SLOT} != "0/dev" ]]; then
 	KEYWORDS="amd64 ~arm64 ~ppc64"
 fi
@@ -176,6 +174,7 @@ BDEPEND="
 	${PYTHON_DEPS}
 	$(python_gen_any_dep '
 		dev-python/setuptools[${PYTHON_USEDEP}]
+		dev-python/jinja2[${PYTHON_USEDEP}]
 	')
 	>=app-arch/gzip-1.7
 	!headless? (
@@ -237,22 +236,19 @@ in /etc/chromium/default.
 "
 
 python_check_deps() {
-	python_has_version "dev-python/setuptools[${PYTHON_USEDEP}]"
+	python_has_version "dev-python/setuptools[${PYTHON_USEDEP}]" &&
+	python_has_version "dev-python/jinja2[${PYTHON_USEDEP}]"
 }
 
 pre_build_checks() {
-	# Check build requirements: bugs #471810, #541816, #914220
-	# We're going to start doing maths here on the size of an unpacked source tarball,
-	# this should make updates easier as chromium continues to balloon in size.
-	# xz -l /var/cache/distfiles/chromium-${PV}*.tar.xz
-	local base_disk=9 # Round up
+	local base_disk=9
 	use test && base_disk=$((base_disk + 5))
-	local extra_disk=1 # Always include a little extra space
+	local extra_disk=1
 	local memory=4
 	tc-is-cross-compiler && extra_disk=$((extra_disk * 2))
 	if use pgo; then
 		memory=$((memory * 2 + 1))
-		tc-is-cross-compiler && extra_disk=$((extra_disk * 2)) # Double the requirements
+		tc-is-cross-compiler && extra_disk=$((extra_disk * 2))
 		use pgo && extra_disk=$((extra_disk + 4))
 	fi
 	if is-flagq '-g?(gdb)?([1-9])'; then
@@ -268,7 +264,6 @@ pre_build_checks() {
 
 pkg_pretend() {
 	if [[ ${MERGE_TYPE} != binary ]]; then
-		# The pre_build_checks are all about compilation resources, no need to run it for a binpkg
 		pre_build_checks
 	fi
 
@@ -286,14 +281,8 @@ pkg_pretend() {
 
 pkg_setup() {
 	if [[ ${MERGE_TYPE} != binary ]]; then
-		# The pre_build_checks are all about compilation resources, no need to run it for a binpkg
 		pre_build_checks
 
-		# The linux:unbundle toolchain in GN grabs CC, CXX, CPP (etc) from the environment
-		# We'll set these to clang here then use llvm-utils functions to very explicitly set these
-		# to a sane value.
-		# This is effectively the 'force-clang' path if GCC support is re-added.
-		# TODO: check if the user has already selected a specific impl via make.conf and respect that.
 		use_lto="true"
 		append-flags -flto
 		append-ldflags -flto
@@ -303,7 +292,6 @@ pkg_setup() {
 
 		export use_lto
 
-		# Forcing clang; respect llvm_slot_x to enable selection of impl from LLVM_COMPAT
 		AR=llvm-ar
 		CPP="${CHOST}-clang++ -E"
 		NM=llvm-nm
@@ -315,11 +303,8 @@ pkg_setup() {
 			CPP="${CBUILD}-clang++ -E"
 		fi
 
-		# I hate doing this but upstream Rust have yet to come up with a better solution for
-		# us poor packagers. Required for Split LTO units, which are required for CFI.
 		export RUSTC_BOOTSTRAP=1
 
-		# Users should never hit this, it's purely a development convenience
 		gn_ver=$(gn --version | awk '{print $1}' || die)
 		gn_min_ver_num=$(echo "${GN_MIN_VER}" | tr -d '.')
 		if [[ "${gn_ver}" -lt "${gn_min_ver_num}" ]]; then
@@ -337,11 +322,7 @@ src_unpack() {
 	use pgo && unpack chromium-profiler-0.2.tar
 
 	if use test; then
-		# A new testdata tarball is available for each release; but testfonts tend to remain stable
-		# for the duration of a release.
-		# This unpacks directly into/over ${WORKDIR}/${P} so we can just use `unpack`.
 		unpack ${P}-linux-testdata.tar.xz
-		# This just contains a bunch of font files that need to be unpacked (or moved) to the correct location.
 		local testfonts_dir="${WORKDIR}/${P}/third_party/test_fonts"
 		local testfonts_tar="${DISTDIR}/chromium-testfonts-${TEST_FONT:0:10}.tar.gz"
 		tar xf "${testfonts_tar}" -C "${testfonts_dir}" || die "Failed to unpack testfonts"
@@ -353,7 +334,6 @@ src_unpack() {
 }
 
 src_prepare() {
-	# Calling this here supports resumption via FEATURES=keepwork
 	python_setup
 
 	local PATCHES=(
@@ -378,11 +358,8 @@ src_prepare() {
 			PATCHES+=( "${patch}" )
 		fi
 	done
-
 	shopt -u globstar nullglob
 
-	# We can't use the bundled compiler builtins with the system toolchain
-	# `grep` is a development convenience to ensure we fail early when google changes something.
 	local builtins_match="if (is_clang && !is_nacl && !is_cronet_build) {"
 	grep -q "${builtins_match}" build/config/compiler/BUILD.gn || die "Failed to disable bundled compiler builtins"
 	sed -i -e "/${builtins_match}/,+2d" build/config/compiler/BUILD.gn
@@ -404,17 +381,11 @@ src_prepare() {
 		fi
 	fi
 
-	# Oxidised hacks, let's keep 'em all in one place
-	# This is a nightly option that does not exist in older releases
-	# https://github.com/rust-lang/rust/commit/389a399a501a626ebf891ae0bb076c25e325ae64
 	if [[ "${RUST_SLOT}" < "1.83.0" ]]; then
 		sed '/rustflags = \[ "-Zdefault-visibility=hidden" \]/d' -i build/config/gcc/BUILD.gn ||
 			die "Failed to remove default visibility nightly option"
 	fi
 
-	# Upstream Rust replaced adler with adler2, for older versions of Rust we still need
-	# to tell GN that we have the older lib when it tries to copy the Rust sysroot
-	# into the bulid directory.
 	if [[ "${RUST_SLOT}" < "1.86.0" ]]; then
 		sed -i 's/adler2/adler/' build/rust/std/BUILD.gn ||
 			die "Failed to tell GN that we have adler and not adler2"
@@ -422,7 +393,6 @@ src_prepare() {
 
 	default
 
-	# Not included in -lite tarballs, but we should check for it anyway.
 	if [[ -f third_party/node/linux/node-linux-x64/bin/node ]]; then
 		rm third_party/node/linux/node-linux-x64/bin/node || die
 	else
@@ -430,11 +400,8 @@ src_prepare() {
 	fi
 	ln -s "${EPREFIX}"/usr/bin/node third_party/node/linux/node-linux-x64/bin/node || die
 
-	# adjust python interpreter version
 	sed -i -e "s|\(^script_executable = \).*|\1\"${EPYTHON}\"|g" .gn || die
 
-	# remove_bundled_libraries.py walks the source tree and looks for paths containing the substring 'third_party'
-	# whitelist matches use the right-most matching path component, so we need to whitelist from that point down.
 	local keeplibs=(
 		base/third_party/cityhash
 		base/third_party/double_conversion
@@ -636,6 +603,8 @@ src_prepare() {
 		third_party/rapidhash
 		third_party/re2
 		third_party/rnnoise
+		third_party/rust
+		third_party/rust/cxx
 		third_party/s2cellid
 		third_party/securemessage
 		third_party/selenium-atoms
@@ -700,8 +669,6 @@ src_prepare() {
 		v8/third_party/rapidhash-v8
 		v8/third_party/v8
 		v8/third_party/valgrind
-
-		# gyp -> gn leftovers
 		third_party/speech-dispatcher
 		third_party/usb_ids
 		third_party/xdg-utils
@@ -723,7 +690,6 @@ src_prepare() {
 		)
 	fi
 
-	# USE=system-*
 	if ! use system-harfbuzz; then
 		keeplibs+=( third_party/harfbuzz-ng )
 	fi
@@ -740,19 +706,13 @@ src_prepare() {
 		keeplibs+=( third_party/zstd )
 	fi
 
-	# Arch-specific
 	if use arm64 || use ppc64 ; then
 		keeplibs+=( third_party/swiftshader/third_party/llvm-10.0 )
 	fi
-	# we need to generate ppc64 stuff because upstream does not ship it yet
-	# it has to be done before unbundling.
+
 	if use ppc64; then
 		pushd third_party/libvpx >/dev/null || die
 		mkdir -p source/config/linux/ppc64 || die
-		# requires git and clang, bug #832803
-		# Revert https://chromium.googlesource.com/chromium/src/+/b463d0f40b08b4e896e7f458d89ae58ce2a27165%5E%21/third_party/libvpx/generate_gni.sh
-		# and https://chromium.googlesource.com/chromium/src/+/71ebcbce867dd31da5f8b405a28fcb0de0657d91%5E%21/third_party/libvpx/generate_gni.sh
-		# since we're not in a git repo
 		sed -i -e "s|^update_readme||g; s|clang-format|${EPREFIX}/bin/true|g; /^git -C/d; /git cl/d; /cd \$BASE_DIR\/\$LIBVPX_SRC_DIR/ign format --in-place \$BASE_DIR\/BUILD.gn\ngn format --in-place \$BASE_DIR\/libvpx_srcs.gni" \
 			generate_gni.sh || die
 		./generate_gni.sh || die
@@ -764,9 +724,6 @@ src_prepare() {
 		popd >/dev/null || die
 	fi
 
-	# Sanity check keeplibs, on major version bumps it is often necessary to update this list
-	# and this enables us to hit them all at once.
-	# There are some entries that need to be whitelisted (TODO: Why? The file is understandable, the rest seem odd)
 	whitelist_libs=(
 		net/third_party/quic
 		third_party/devtools-frontend/src/front_end/third_party/additional_readme_paths.json
@@ -790,39 +747,25 @@ src_prepare() {
 		die "Please update the ebuild."
 	fi
 
-	# Remove most bundled libraries. Some are still needed.
 	einfo "Unbundling third-party libraries ..."
 	build/linux/unbundle/remove_bundled_libraries.py "${keeplibs[@]}" --do-remove || die
 
-	# bundled eu-strip is for amd64 only and we don't want to pre-stripped binaries
 	mkdir -p buildtools/third_party/eu-strip/bin || die
 	ln -s "${EPREFIX}"/bin/true buildtools/third_party/eu-strip/bin/eu-strip || die
 }
 
 chromium_configure() {
-	# Calling this here supports resumption via FEATURES=keepwork
 	python_setup
 
-	# Bug 491582.
 	export TMPDIR="${WORKDIR}/temp"
 	mkdir -p -m 755 "${TMPDIR}" || die
 
-	# https://bugs.gentoo.org/654216
-	addpredict /dev/dri/ #nowarn
+	addpredict /dev/dri/
 
-	# Use system-provided libraries.
-	# TODO: freetype -- remove sources (https://bugs.chromium.org/p/pdfium/issues/detail?id=733).
-	# TODO: use_system_hunspell (upstream changes needed).
-	# TODO: use_system_protobuf (bug #525560).
-	# TODO: use_system_sqlite (http://crbug.com/22208).
-
-	# libevent: https://bugs.gentoo.org/593458
 	local gn_system_libraries=(
 		flac
 		fontconfig
 		freetype
-		# Need harfbuzz_from_pkgconfig target
-		#harfbuzz-ng
 		libjpeg
 		libwebp
 		libxml
@@ -843,8 +786,6 @@ chromium_configure() {
 	build/linux/unbundle/replace_gn_files.py --system-libraries "${gn_system_libraries[@]}" ||
 		die "Failed to replace GN files for system libraries"
 
-	# TODO 131: The above call clobbers `enable_freetype = true` in the freetype gni file
-	# drop the last line, then append the freetype line and a new curly brace to end the block
 	local freetype_gni="build/config/freetype/freetype.gni"
 	sed -i -e '$d' ${freetype_gni} || die
 	echo "  enable_freetype = true" >> ${freetype_gni} || die
@@ -853,21 +794,16 @@ chromium_configure() {
 	if use !custom-cflags; then
 		replace-flags "-Os" "-O2"
 		strip-flags
-		# Debug info section overflows without component build
-		# Prevent linker from running out of address space, bug #471810 .
 		filter-flags "-g*"
 	fi
 
-	# We don't use the same clang version as upstream, and with -Werror
-	# we need to make sure that we don't get superfluous warnings.
 	append-flags -Wno-unknown-warning-option
 	if tc-is-cross-compiler; then
 		export BUILD_CXXFLAGS+=" -Wno-unknown-warning-option"
 		export BUILD_CFLAGS+=" -Wno-unknown-warning-option"
 	fi
 
-	# Start building our GN options
-	local myconf_gn=() # Tip: strings must be quoted, bools or numbers are fine
+	local myconf_gn=()
 
 	if tc-is-cross-compiler; then
 		CC="${CC} -target ${CHOST} --sysroot ${ESYSROOT}"
@@ -878,11 +814,10 @@ chromium_configure() {
 		BUILD_NM=${NM}
 	fi
 
-	# Make sure the build system will use the right tools, bug #340795.
 	tc-export AR CC CXX NM
 
 	strip-unsupported-flags
-	append-ldflags -Wl,--undefined-version # https://bugs.gentoo.org/918897#c32
+	append-ldflags -Wl,--undefined-version
 
 	myconf_gn+=(
 		"is_clang=true"
@@ -907,14 +842,12 @@ chromium_configure() {
 			"pkg_config=$(tc-getPKG_CONFIG)"
 		)
 
-		# setup cups-config, build system only uses --libs option
 		if use cups; then
 			mkdir "${T}/cups-config" || die
 			cp "${ESYSROOT}/usr/bin/${CHOST}-cups-config" "${T}/cups-config/cups-config" || die
 			export PATH="${PATH}:${T}/cups-config"
 		fi
 
-		# Don't inherit PKG_CONFIG_PATH from environment
 		local -x PKG_CONFIG_PATH=
 	fi
 
@@ -922,7 +855,6 @@ chromium_configure() {
 	myarch="$(tc-arch)"
 	case ${myarch} in
 		amd64)
-			# Bug 530248, 544702, 546984, 853646.
 			use !custom-cflags && filter-flags -mno-mmx -mno-sse2 -mno-ssse3 -mno-sse4.1 \
 										-mno-avx -mno-avx2 -mno-fma -mno-fma4 -mno-xop -mno-sse4a
 			myconf_gn+=( 'target_cpu="x64"' )
@@ -938,71 +870,40 @@ chromium_configure() {
 			;;
 	esac
 
-	# Common options
-
 	myconf_gn+=(
-		# Disable code formating of generated files
 		"blink_enable_generated_code_formatting=false"
-		# enable DCHECK with USE=debug only, increases chrome binary size by 30%, bug #811138.
-		# DCHECK is fatal by default, make it configurable at runtime, #bug 807881.
 		"dcheck_always_on=$(usex debug true false)"
 		"dcheck_is_configurable=$(usex debug true false)"
-		# Chromium builds provided by Linux distros should disable the testing config
 		"disable_fieldtrial_testing_config=true"
-		# 131 began laying the groundwork for replacing freetype with
-		# "Rust-based Fontations set of libraries plus Skia path rendering"
-		# We now need to opt-in
 		"enable_freetype=true"
 		"enable_hangout_services_extension=$(usex hangouts true false)"
-		# Disable nacl; deprecated, we can't build without pnacl (http://crbug.com/269560).
 		"enable_nacl=false"
-		# Don't need nocompile checks and GN crashes with our config (verify with modern GN)
 		"enable_nocompile_tests=false"
-		# pseudolocales are only used for testing
 		"enable_pseudolocales=false"
 		"enable_widevine=$(usex widevine true false)"
-		# Disable fatal linker warnings, bug #506268.
 		"fatal_linker_warnings=false"
-		# Set up Google API keys, see http://www.chromium.org/developers/how-tos/api-keys
-		# Note: these are for Gentoo use ONLY. For your own distribution,
-		# please get your own set of keys. Feel free to contact chromium@gentoo.org for more info.
-		# note: OAuth2 is patched in; check patchset for details.
 		'google_api_key="AIzaSyDEAOvatFo0eTgsV_ZlEzx0ObmepsMzfAc"'
-		# Component build isn't generally intended for use by end users. It's mostly useful
-		# for development and debugging.
 		"is_component_build=false"
-		# GN needs explicit config for Debug/Release as opposed to inferring it from build directory.
 		"is_debug=false"
 		"is_official_build=$(usex official true false)"
-		# Enable ozone wayland and/or headless support
 		"ozone_auto_platforms=false"
 		"ozone_platform_headless=true"
-		# Enables building without non-free unRAR licence
 		"safe_browsing_use_unrar=$(usex rar true false)"
 		"thin_lto_enable_optimizations=${use_lto}"
 		"treat_warnings_as_errors=false"
-		# Use in-tree libc++ (buildtools/third_party/libc++ and buildtools/third_party/libc++abi)
-		# instead of the system C++ library for C++ standard library support.
-		# default: true, but let's be explicit (forced since 120 ; USE removed 127).
 		"use_custom_libcxx=true"
-		# Enable ozone wayland and/or headless support
 		"use_ozone=true"
-		# The sysroot is the oldest debian image that chromium supports, we don't need it
 		"use_sysroot=false"
-		# See dependency logic in third_party/BUILD.gn
 		"use_system_harfbuzz=$(usex system-harfbuzz true false)"
+		"use_system_libdrm=true"
 		"use_thin_lto=${use_lto}"
-		# Only enabled for clang, but gcc has endian macros too
 		"v8_use_libm_trig_functions=true"
 	)
 
 	if use bindist ; then
 		myconf_gn+=(
-			# If this is set to false Chromium won't be able to load any proprietary codecs
-			# even if provided with an ffmpeg capable of h264/aac decoding
 			"proprietary_codecs=true"
 			'ffmpeg_branding="Chrome"'
-			# build ffmpeg as an external component (libffmpeg.so) that we can remove / substitute
 			"is_component_ffmpeg=true"
 		)
 	else
@@ -1036,8 +937,6 @@ chromium_configure() {
 	else
 		myconf_gn+=(
 			"gtk_version=$(usex gtk4 4 3)"
-			# link pulseaudio directly (DT_NEEDED) instead of using dlopen.
-			# helps with automated detection of ABI mismatches and prevents silent errors.
 			"link_pulseaudio=$(usex pulseaudio true false)"
 			"ozone_platform_wayland=$(usex wayland true false)"
 			"ozone_platform_x11=$(usex X true false)"
@@ -1047,7 +946,6 @@ chromium_configure() {
 			"use_kerberos=$(usex kerberos true false)"
 			"use_pulseaudio=$(usex pulseaudio true false)"
 			"use_qt5=false"
-			"use_system_libffi=$(usex wayland true false)"
 			"use_system_minigbm=true"
 			"use_vaapi=$(usex vaapi true false)"
 			"use_xkbcommon=true"
@@ -1056,7 +954,6 @@ chromium_configure() {
 			local cbuild_libdir
 			cbuild_libdir="$(get_libdir)"
 			if tc-is-cross-compiler; then
-			# Hack to workaround get_libdir not being able to handle CBUILD, bug #794181
 				cbuild_libdir="$($(tc-getBUILD_PKG_CONFIG) --keep-system-libs --libs-only-L libxslt)"
 				cbuild_libdir="${cbuild_libdir:2}"
 				cbuild_libdir="${cbuild_libdir/% }"
@@ -1070,13 +967,11 @@ chromium_configure() {
 		fi
 	fi
 
-	# Explicitly disable ICU data file support for system-icu/headless builds.
 	if use system-icu || use headless; then
 		myconf_gn+=( "icu_use_data_file=false" )
 	fi
 
 	if use official; then
-		# Allow building against system libraries in official builds
 		sed -i 's/OFFICIAL_BUILD/GOOGLE_CHROME_BUILD/' \
 			tools/generate_shim_headers/generate_shim_headers.py || die
 		if use !ppc64; then
@@ -1084,7 +979,6 @@ chromium_configure() {
 		else
 			myconf_gn+=( "is_cfi=false" )
 		fi
-		# Don't add symbols to build
 		myconf_gn+=( "symbol_level=0" )
 	fi
 
@@ -1097,15 +991,10 @@ chromium_configure() {
 		myconf_gn+=( "chrome_pgo_phase=0" )
 	fi
 
-	# Odds and ends
-
-	# skipping typecheck is only supported on amd64, bug #876157
 	if ! use amd64; then
 		myconf_gn+=( "devtools_skip_typecheck=false" )
 	fi
 
-	# Disable external code space for V8 for ppc64. It is disabled for ppc64
-	# by default, but cross-compiling on amd64 enables it again.
 	if tc-is-cross-compiler && use ppc64; then
 		myconf_gn+=( "v8_enable_external_code_space=false" )
 	fi
@@ -1121,16 +1010,12 @@ src_configure() {
 }
 
 chromium_compile() {
-	# Final link uses lots of file descriptors.
 	ulimit -n 2048
 
-	# Calling this here supports resumption via FEATURES=keepwork
 	python_setup
 
-	# Don't inherit PYTHONPATH from environment, bug #789021, #812689
 	local -x PYTHONPATH=
 
-	# Build mksnapshot and pax-mark it.
 	if use pax-kernel; then
 		local x
 		for x in mksnapshot v8_context_snapshot_generator; do
@@ -1144,15 +1029,10 @@ chromium_compile() {
 		done
 	fi
 
-	# Even though ninja autodetects number of CPUs, we respect
-	# user's options, for debugging with -j 1 or any other reason.
 	eninja -C out/Release chrome chromedriver chrome_sandbox $(use test && echo "base_unittests")
 
 	pax-mark m out/Release/chrome
 
-	# This codepath does minimal patching, so we're at the mercy of upstream
-	# CFLAGS. This is fine - we're not intending to force this on users
-	# and we do a lot of flag 'management' anyway.
 	QA_FLAGS_IGNORED="
 		usr/lib64/chromium-browser/chrome
 		usr/lib64/chromium-browser/chrome-sandbox
@@ -1168,14 +1048,11 @@ chromium_compile() {
 	"
 }
 
-# This function is called from virtx, and must always return so that Xvfb
-# session isn't left running. If we return 1, virtx will call die().
 chromium_profile() {
 	einfo "Profiling for PGO"
 
 	pushd "${WORKDIR}/chromium-profiler-"* >/dev/null || return 1
 
-	# Remove old profdata in case profiling was interrupted.
 	rm -rf "${1}" || return 1
 
 	if ! "${EPYTHON}" ./chromium_profiler.py \
@@ -1204,7 +1081,6 @@ src_compile() {
 		fi
 
 		if [[ ! -e "${WORKDIR}/.pgo-phase-2-configured" ]]; then
-			# Remove phase 1 output
 			rm -r out/Release || die
 
 			chromium_configure 2 "$profdata"
@@ -1224,13 +1100,11 @@ src_compile() {
 
 	rm -f out/Release/locales/*.pak.info || die
 
-	# Build manpage; bug #684550
 	sed -e 's|@@PACKAGE@@|chromium-browser|g;
 		s|@@MENUNAME@@|Chromium|g;' \
 		chrome/app/resources/manpage.1.in > \
 		out/Release/chromium-browser.1 || die
 
-	# Build desktop file; bug #706786
 	sed -e 's|@@MENUNAME@@|Chromium|g;
 		s|@@USR_BIN_SYMLINK_NAME@@|chromium-browser|g;
 		s|@@PACKAGE@@|chromium-browser|g;
@@ -1238,15 +1112,12 @@ src_compile() {
 		chrome/installer/linux/common/desktop.template > \
 		out/Release/chromium-browser-chromium.desktop || die
 
-	# Build vk_swiftshader_icd.json; bug #827861
 	sed -e 's|${ICD_LIBRARY_PATH}|./libvk_swiftshader.so|g' \
 		third_party/swiftshader/src/Vulkan/vk_swiftshader_icd.json.tmpl > \
 		out/Release/vk_swiftshader_icd.json || die
 }
 
 src_test() {
-	# Initial list of tests to skip pulled from Alpine. Thanks Lauren!
-	# https://issues.chromium.org/issues/40939315
 	local skip_tests=(
 		'MessagePumpLibeventTest.NestedNotification*'
 		ClampTest.Death
@@ -1259,7 +1130,6 @@ src_test() {
 		StringPieceTest.OutOfBoundsDeath
 		ThreadPoolEnvironmentConfig.CanUseBackgroundPriorityForWorker
 		ValuesUtilTest.FilePath
-		# Gentoo-specific
 		AlternateTestParams/PartitionAllocDeathTest.RepeatedAllocReturnNullDirect/0
 		AlternateTestParams/PartitionAllocDeathTest.RepeatedAllocReturnNullDirect/1
 		AlternateTestParams/PartitionAllocDeathTest.RepeatedAllocReturnNullDirect/2
@@ -1288,11 +1158,10 @@ src_test() {
 		TestLauncherTools.TruncateSnippetFocusedMatchesFatalMessagesTest
 		ToolsSanityTest.BadVirtualCallNull
 		ToolsSanityTest.BadVirtualCallWrongType
-		CancelableEventTest.BothCancelFailureAndSucceedOccurUnderContention #new m133: TODO investigate
-		DriveInfoTest.GetFileDriveInfo # new m137: TODO investigate
+		CancelableEventTest.BothCancelFailureAndSucceedOccurUnderContention
+		DriveInfoTest.GetFileDriveInfo
 	)
 	local test_filter="-$(IFS=:; printf '%s' "${skip_tests[*]}")"
-	# test-launcher-bot-mode enables parallelism and plain output
 	./out/Release/base_unittests --test-launcher-bot-mode \
 		--test-launcher-jobs="$(makeopts_jobs)" \
 		--gtest_filter="${test_filter}" || die "Tests failed!"
@@ -1319,15 +1188,10 @@ src_install() {
 	sed "${sedargs[@]}" "${FILESDIR}/chromium-launcher-r7.sh" > chromium-launcher.sh || die
 	doexe chromium-launcher.sh
 
-	# It is important that we name the target "chromium-browser",
-	# xdg-utils expect it; bug #355517.
 	dosym "${CHROMIUM_HOME}/chromium-launcher.sh" /usr/bin/chromium-browser
-	# keep the old symlink around for consistency
 	dosym "${CHROMIUM_HOME}/chromium-launcher.sh" /usr/bin/chromium
-
 	dosym "${CHROMIUM_HOME}/chromedriver" /usr/bin/chromedriver
 
-	# Allow users to override command-line options, bug #357629.
 	insinto /etc/chromium
 	newins "${FILESDIR}/chromium.default" "default"
 
@@ -1340,12 +1204,8 @@ src_install() {
 	doins out/Release/*.pak
 
 	if use bindist; then
-		# We built libffmpeg as a component library, but we can't distribute it
-		# with proprietary codec support. Remove it and make a symlink to the requested
-		# system library.
 		rm -f out/Release/libffmpeg.so \
 			|| die "Failed to remove bundled libffmpeg.so (with proprietary codecs)"
-		# symlink the libffmpeg.so from either ffmpeg-chromium or ffmpeg[chromium].
 		einfo "Creating symlink to libffmpeg.so from $(usex ffmpeg-chromium ffmpeg-chromium ffmpeg[chromium])..."
 		dosym ../chromium/libffmpeg.so$(usex ffmpeg-chromium .${PV%%\.*} "") \
 			/usr/$(get_libdir)/chromium-browser/libffmpeg.so
@@ -1357,7 +1217,6 @@ src_install() {
 		[[ ${#files[@]} -gt 0 ]] && doins "${files[@]}"
 	)
 
-	# Install bundled xdg-utils, avoids installing X11 libraries with USE="-X wayland"
 	doins out/Release/xdg-{settings,mime}
 
 	if ! use system-icu && ! use headless; then
@@ -1367,7 +1226,6 @@ src_install() {
 	doins -r out/Release/locales
 	doins -r out/Release/MEIPreload
 
-	# Install vk_swiftshader_icd.json; bug #827861
 	doins out/Release/vk_swiftshader_icd.json
 
 	if [[ -d out/Release/swiftshader ]]; then
@@ -1375,7 +1233,6 @@ src_install() {
 		doins out/Release/swiftshader/*.so
 	fi
 
-	# Install icons
 	local branding size
 	for size in 16 24 32 48 64 128 256 ; do
 		case ${size} in
@@ -1386,14 +1243,11 @@ src_install() {
 			chromium-browser.png
 	done
 
-	# Install desktop entry
 	domenu out/Release/chromium-browser-chromium.desktop
 
-	# Install GNOME default application entry (bug #303100).
 	insinto /usr/share/gnome-control-center/default-apps
 	newins "${FILESDIR}"/chromium-browser.xml chromium-browser.xml
 
-	# Install manpage; bug #684550
 	doman out/Release/chromium-browser.1
 	dosym chromium-browser.1 /usr/share/man/man1/chromium.1
 
