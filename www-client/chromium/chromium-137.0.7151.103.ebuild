@@ -36,7 +36,7 @@ CHROMIUM_LANGS="af am ar bg bn ca cs da de el en-GB es es-419 et fa fi fil fr gu
 	hi hr hu id it ja kn ko lt lv ml mr ms nb nl pl pt-BR pt-PT ro ru sk sl sr
 	sv sw ta te th tr uk ur vi zh-CN zh-TW"
 
-LLVM_COMPAT=( 19 20 )
+LLVM_COMPAT=( 16 20 )
 PYTHON_COMPAT=( python3+ )
 PYTHON_REQ_USE="xml(+)"
 RUST_MIN_VER=1.78.0
@@ -83,8 +83,8 @@ if [[ ${SLOT} != "0/dev" ]]; then
 fi
 
 IUSE_SYSTEM_LIBS="+system-harfbuzz +system-icu +system-png +system-zstd"
-IUSE="+X ${IUSE_SYSTEM_LIBS} bindist bundled-toolchain cups debug ffmpeg-chromium gtk4 +hangouts headless kerberos +official pax-kernel pgo"
-IUSE+=" +proprietary-codecs pulseaudio qt6 +rar +screencast selinux test +vaapi +wayland +widevine cpu_flags_ppc_vsx3"
+IUSE="+X ${IUSE_SYSTEM_LIBS} bindist bundled-toolchain cups debug ffmpeg-chromium gtk4 +hangouts headless kerberos +official pax-kernel +pgo"
+IUSE+=" +proprietary-codecs pulseaudio qt6 +rar screencast selinux test vaapi wayland +widevine cpu_flags_ppc_vsx3"
 RESTRICT="
 	!bindist? ( bindist )
 	!test? ( test )
@@ -200,25 +200,25 @@ BDEPEND="
 		qt6? ( dev-qt/qtbase:6 )
 	)
 	!bundled-toolchain? ( $(llvm_gen_dep '
-		llvm-core/clang:${LLVM_SLOT}
-		llvm-core/llvm:${LLVM_SLOT}
-		llvm-core/lld:${LLVM_SLOT}
+		sys-devel/clang:${LLVM_SLOT}
+		sys-devel/llvm:${LLVM_SLOT}
+		sys-devel/lld:${LLVM_SLOT}
 		official? (
-			!ppc64? ( llvm-runtimes/compiler-rt-sanitizers:${LLVM_SLOT}[cfi] )
+			!ppc64? ( sys-libs/compiler-rt-sanitizers:${LLVM_SLOT}[cfi] )
 		) ')
 		${RUST_DEPEND}
 	)
 	pgo? (
-		>=dev-python/selenium-3.141.0
+		dev-python/selenium
 		>=dev-util/web_page_replay_go-20220314
 	)
 	>=dev-util/bindgen-0.68.0
-	>=dev-build/gn-${GN_MIN_VER}
-	app-alternatives/ninja
+	>=dev-util/gn-${GN_MIN_VER}
+	dev-util/ninja
 	dev-lang/perl
 	>=dev-util/gperf-3.2
 	dev-vcs/git
-	>=net-libs/nodejs-${NODE_VER}:0/${NODE_VER%%.*}[inspector]
+	net-libs/nodejs
 	>=sys-devel/bison-2.4.3
 	sys-devel/flex
 	virtual/pkgconfig
