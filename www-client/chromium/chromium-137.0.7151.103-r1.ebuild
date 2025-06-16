@@ -237,7 +237,7 @@ in /etc/chromium/default.
 
 python_check_deps() {
 	python_has_version "dev-python/setuptools[${PYTHON_USEDEP}]" &&
-	python_has_version "dev-python/jinja2[${PYTHON_USEDEP}]"
+	python_has_version "dev-python/jinja[${PYTHON_USEDEP}]"
 }
 
 pre_build_checks() {
