@@ -63,7 +63,7 @@ if [[ ${SLOT} != "0/dev" ]]; then
 fi
 
 IUSE_SYSTEM_LIBS="+system-harfbuzz +system-icu +system-png +system-zstd"
-IUSE="+X ${IUSE_SYSTEM_LIBS} bindist cups debug ffmpeg-chromium gtk4 +hangouts headless kerberos +official pax-kernel +pgo"
+IUSE="+X ${IUSE_SYSTEM_LIBS} bindist cups debug ffmpeg-chromium gtk4 +hangouts headless kerberos +official pax-kernel +pgo +custom-cflags"
 IUSE+=" +proprietary-codecs pulseaudio qt6 +rar screencast selinux test vaapi wayland +widevine cpu_flags_ppc_vsx3"
 RESTRICT="
 	!bindist? ( bindist )
@@ -851,24 +851,26 @@ chromium_configure() {
 		local -x PKG_CONFIG_PATH=
 	fi
 
-	local myarch
-	myarch="$(tc-arch)"
-	case ${myarch} in
-		amd64)
-			use !custom-cflags && filter-flags -mno-mmx -mno-sse2 -mno-ssse3 -mno-sse4.1 \
-										-mno-avx -mno-avx2 -mno-fma -mno-fma4 -mno-xop -mno-sse4a
-			myconf_gn+=( 'target_cpu="x64"' )
-			;;
-		arm64)
-			myconf_gn+=( 'target_cpu="arm64"' )
-			;;
-		ppc64)
-			myconf_gn+=( 'target_cpu="ppc64"' )
-			;;
-		*)
-			die "Failed to determine target arch, got '${myarch}'."
-			;;
-	esac
+
+local myarch
+myarch="$(tc-arch)"
+case ${myarch} in
+    amd64)
+        use !custom-cflags && filter-flags -mno-mmx -mno-sse2 -mno-ssse3 -mno-sse4.1 \
+                                    -mno-avx -mno-avx2 -mno-fma -mno-fma4 -mno-xop -mno-sse4a
+        myconf_gn+=( 'target_cpu="x64"' )
+        ;;
+    arm64)
+        myconf_gn+=( 'target_cpu="arm64"' )
+        use !custom-cflags && filter-flags -mno-neon
+        ;;
+    ppc64)
+        myconf_gn+=( 'target_cpu="ppc64"' )
+        ;;
+    *)
+        die "Failed to determine target arch, got '${myarch}'."
+        ;;
+esac
 
 	myconf_gn+=(
 		"blink_enable_generated_code_formatting=false"
@@ -895,7 +897,7 @@ chromium_configure() {
 		"use_ozone=true"
 		"use_sysroot=false"
 		"use_system_harfbuzz=$(usex system-harfbuzz true false)"
-		"use_system_libdrm=true"
+		"use_system_libdrm=false"
 		"use_thin_lto=${use_lto}"
 		"v8_use_libm_trig_functions=true"
 	)
