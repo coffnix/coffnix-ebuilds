@@ -174,7 +174,7 @@ BDEPEND="
 	${PYTHON_DEPS}
 	$(python_gen_any_dep '
 		dev-python/setuptools[${PYTHON_USEDEP}]
-		dev-python/jinja2[${PYTHON_USEDEP}]
+		dev-python/jinja[${PYTHON_USEDEP}]
 	')
 	>=app-arch/gzip-1.7
 	!headless? (
