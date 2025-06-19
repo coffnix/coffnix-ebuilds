@@ -19,6 +19,7 @@ RESTRICT="!test? ( test )"
 BDEPEND="
 	dev-python/evdev
 	dev-python/libevdev
+	dev-python/pytest
 	"
 RDEPEND="
 	x11-libs/libX11
