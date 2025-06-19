@@ -7,7 +7,8 @@ inherit linux-info udev xorg-3 meson git-r3
 DESCRIPTION="Driver for Wacom tablets and drawing devices"
 HOMEPAGE="https://linuxwacom.github.io/"
 #SRC_URI="https://github.com/linuxwacom/${PN}/releases/download/${P}/${P}.tar.bz2"
-EGIT_REPO_URI="https://github.com/X11Libre/xf86-input-libinput.git"
+EGIT_REPO_URI="https://github.com/X11Libre/xf86-input-wacom.git"
+SRC_URI=""
 EGIT_BRANCH="master"
 
 LICENSE="GPL-2+"
