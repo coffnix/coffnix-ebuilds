@@ -12,7 +12,7 @@ SRC_URI="https://github.com/pocl/pocl/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="~arm64"
+KEYWORDS="*"
 IUSE="accel +conformance cuda debug examples float-conversion hardening +hwloc memmanager test"
 
 
