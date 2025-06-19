@@ -12,8 +12,8 @@ SRC_URI="https://github.com/pocl/pocl/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64"
-IUSE="accel +conformance cuda debug examples float-conversion hardening +hwloc memmanager test"
+KEYWORDS="*"
+IUSE="accel +conformance cuda debug examples float-conversion hardening +hwloc memmanager spirv test"
 
 RESTRICT="!test? ( test ) test"
 
@@ -25,8 +25,8 @@ RDEPEND="
 	hwloc? ( sys-apps/hwloc )
 	cuda? ( dev-util/nvidia-cuda-toolkit )
 	debug? ( dev-util/lttng-ust )
+	spirv? ( >=sys-devel/llvm-${LLVM_SLOT}:${LLVM_SLOT} )
 "
-
 DEPEND="${RDEPEND}"
 BDEPEND="virtual/pkgconfig"
 
@@ -38,27 +38,24 @@ src_prepare() {
 src_configure() {
 	local host_cpu_variants="generic"
 
-	if use amd64; then
+	if use amd64 ; then
 		host_cpu_variants="distro"
-	elif use ppc64; then
+	elif use ppc64 ; then
 		host_cpu_variants="pwr10;pwr9;pwr8;pwr7;pwr6;g5;a2;generic"
-	elif use riscv; then
+	elif use riscv ; then
 		host_cpu_variants="generic-rv64"
-	elif use arm64; then
-		host_cpu_variants="cortex-a55"
 	fi
 
 	local mycmakeargs=(
 		-DENABLE_HSA=OFF
 		-DENABLE_ICD=ON
-		-DPOCL_ICD_ABSOLUTE_PATH=OFF
-
+		-DPOCL_ICD_ABSOLUTE_PATH=ON
+		-DPOCL_INSTALL_PUBLIC_LIBDIR="${EPREFIX}/usr/$(get_libdir)/OpenCL/vendors/pocl"
+		-DENABLE_IPO=OFF
 		-DENABLE_POCL_BUILDING=ON
 		-DKERNELLIB_HOST_CPU_VARIANTS="${host_cpu_variants}"
-
 		-DSTATIC_LLVM=OFF
 		-DWITH_LLVM_CONFIG="$(get_llvm_prefix -d)/bin/llvm-config"
-
 		-DENABLE_ALMAIF_DEVICE=$(usex accel)
 		-DENABLE_CONFORMANCE=$(usex conformance)
 		-DENABLE_CUDA=$(usex cuda)
@@ -69,6 +66,7 @@ src_configure() {
 		-DUSE_POCL_MEMMANAGER=$(usex memmanager)
 		-DENABLE_EXAMPLES=$(usex examples)
 		-DENABLE_TESTS=$(usex test)
+		-DENABLE_SPIRV=$(usex spirv)
 	)
 
 	cmake_src_configure
@@ -79,19 +77,14 @@ src_test() {
 	export POCL_DEVICES=basic
 	export CTEST_OUTPUT_ON_FAILURE=1
 	export TEST_VERBOSE=1
-
 	cmake_src_test
 }
 
 src_install() {
 	cmake_src_install
 
-	# Remove headers que causam colisão com dev-util/opencl-headers
-	rm -rf "${ED}/usr/include/CL" || die
-
-	# Documentação dos exemplos se ativado
-	if use examples; then
+	if use examples ; then
 		dodoc -r examples
-		docompress -x /usr/share/doc/${PF}/examples
+		docompress -x /usr/share/doc/${P}/examples
 	fi
 }
