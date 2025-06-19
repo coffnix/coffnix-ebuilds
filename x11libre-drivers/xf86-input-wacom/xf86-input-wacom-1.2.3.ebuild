@@ -16,7 +16,10 @@ KEYWORDS="*"
 IUSE="test"
 RESTRICT="!test? ( test )"
 
-BDEPEND="dev-python/evdev"
+BDEPEND="
+	dev-python/evdev
+	dev-python/libevdev
+	"
 RDEPEND="
 	x11-libs/libX11
 	x11-libs/libXext
