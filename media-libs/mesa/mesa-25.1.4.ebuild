@@ -94,60 +94,69 @@ REQUIRED_USE="
 "
 
 LIBDRM_DEPSTRING=">=x11-libs/libdrm-2.4.121"
+
+llvm_check_targets() {
+	local targets="AArch64 BPF"
+	if use video_cards_radeonsi || use video_cards_r600 || use video_cards_radeon; then
+		targets+=" AMDGPU"
+	fi
+	echo "${targets}"
+}
+
+
+llvm_check_targets() {
+	local targets="AArch64 BPF"
+	if use video_cards_radeonsi || use video_cards_r600 || use video_cards_radeon; then
+		targets+=" AMDGPU"
+	fi
+	echo "${targets}"
+}
+
+LIBDRM_DEPSTRING=">=x11-libs/libdrm-2.4.121"
+
+LIBDRM_DEPSTRING=">=x11-libs/libdrm-2.4.121"
+
 RDEPEND="
-	>=dev-libs/expat-2.1.0-r3[${MULTILIB_USEDEP}]
-	>=dev-util/spirv-tools-1.3.231.0[${MULTILIB_USEDEP}]
-	>=media-libs/libglvnd-1.3.2[X?,${MULTILIB_USEDEP}]
-	>=sys-libs/zlib-1.2.9[${MULTILIB_USEDEP}]
-	unwind? ( sys-libs/libunwind[${MULTILIB_USEDEP}] )
-	llvm? (
-		$(llvm_gen_dep "
-			sys-devel/llvm:\${LLVM_SLOT}[llvm_targets_AMDGPU(+),${MULTILIB_USEDEP}]
-			opencl? (
-				dev-util/spirv-llvm-translator:\${LLVM_SLOT}
-				sys-devel/clang:\${LLVM_SLOT}[llvm_targets_AMDGPU(+),${MULTILIB_USEDEP}]
-				=sys-devel/libclc-\${LLVM_SLOT}*[spirv(-)]
-			)
-		")
-		video_cards_r600? (
-			virtual/libelf:0=[${MULTILIB_USEDEP}]
-		)
-		video_cards_radeon? (
-			virtual/libelf:0=[${MULTILIB_USEDEP}]
-		)
-	)
-	lm-sensors? ( sys-apps/lm-sensors:=[${MULTILIB_USEDEP}] )
+	>=dev-libs/expat-2.1.0-r3
+	>=dev-util/spirv-tools-1.3.231.0
+	>=media-libs/libglvnd-1.3.2[X?]
+	>=sys-libs/zlib-1.2.9
+	sys-devel/llvm:${LLVM_SLOT}
+	virtual/libelf:0=
+	lm-sensors? ( sys-apps/lm-sensors )
 	opencl? (
 		virtual/opencl
 		sys-devel/libclc[spirv(-)]
 		virtual/libelf:0=
+		dev-util/spirv-llvm-translator:${LLVM_SLOT}
+		sys-devel/clang:${LLVM_SLOT}
 	)
-	vaapi? (
-		>=media-libs/libva-1.7.3:=[${MULTILIB_USEDEP}]
-	)
-	vdpau? ( >=x11-libs/libvdpau-1.5:=[${MULTILIB_USEDEP}] )
-	video_cards_radeonsi? ( virtual/libelf:0=[${MULTILIB_USEDEP}] )
-	video_cards_zink? ( media-libs/vulkan-loader:=[${MULTILIB_USEDEP}] )
-	vulkan? ( virtual/libudev:= )
-	wayland? ( >=dev-libs/wayland-1.18.0[${MULTILIB_USEDEP}] )
-	${LIBDRM_DEPSTRING}[video_cards_freedreno?,video_cards_intel?,video_cards_nouveau?,video_cards_vc4?,video_cards_vivante?,video_cards_vmware?,${MULTILIB_USEDEP}]
+	vaapi? ( >=media-libs/libva-1.7.3 )
+	vdpau? ( >=x11-libs/libvdpau-1.5 )
+	video_cards_radeonsi? ( virtual/libelf:0= )
+	video_cards_zink? ( media-libs/vulkan-loader )
+	vulkan? ( virtual/libudev )
+	wayland? ( >=dev-libs/wayland-1.18.0 )
+	${LIBDRM_DEPSTRING}[video_cards_freedreno?,video_cards_intel?,video_cards_nouveau?,video_cards_vc4?,video_cards_vivante?,video_cards_vmware?]
 	X? (
-		>=x11-libs/libX11-1.6.2[${MULTILIB_USEDEP}]
-		>=x11-libs/libxshmfence-1.1[${MULTILIB_USEDEP}]
-		>=x11-libs/libXext-1.3.2[${MULTILIB_USEDEP}]
-		>=x11-libs/libXxf86vm-1.1.3[${MULTILIB_USEDEP}]
-		>=x11-libs/libxcb-1.17:=[${MULTILIB_USEDEP}]
-		x11-libs/libXfixes[${MULTILIB_USEDEP}]
-		x11-libs/xcb-util-keysyms[${MULTILIB_USEDEP}]
+		>=x11-libs/libX11-1.6.2
+		>=x11-libs/libxshmfence-1.1
+		>=x11-libs/libXext-1.3.2
+		>=x11-libs/libXxf86vm-1.1.3
+		>=x11-libs/libxcb-1.17
+		x11-libs/libXfixes
+		x11-libs/xcb-util-keysyms
 	)
-	zstd? ( app-arch/zstd:=[${MULTILIB_USEDEP}] )
+	zstd? ( app-arch/zstd )
 "
-for card in ${RADEON_CARDS}; do
-	RDEPEND="${RDEPEND}
+
+for card in r300 r600 radeon; do
+	RDEPEND+="
 		video_cards_${card}? ( ${LIBDRM_DEPSTRING}[video_cards_radeon] )
 	"
 done
-RDEPEND="${RDEPEND}
+
+RDEPEND+="
 	video_cards_radeonsi? ( ${LIBDRM_DEPSTRING}[video_cards_amdgpu] )
 "
 
