@@ -9,7 +9,7 @@ LLVM_OPTIONAL=1
 CARGO_OPTIONAL=1
 PYTHON_COMPAT=( python3+ )
 
-inherit flag-o-matic llvm-r1 meson python-any-r1 linux-info rust-toolchain git-r3
+inherit flag-o-matic llvm-r1 meson python-any-r1 linux-info rust-toolchain
 
 MY_P="${P/_/-}"
 
@@ -30,14 +30,10 @@ inherit cargo
 DESCRIPTION="OpenGL-like graphic library for Linux"
 HOMEPAGE="https://www.mesa3d.org/ https://mesa.freedesktop.org/"
 
-#SRC_URI="
-#	https://archive.mesa3d.org/${MY_P}.tar.xz
-#"
+SRC_URI="
+	https://archive.mesa3d.org/${MY_P}.tar.xz
+"
 
-EGIT_REPO_URI="https://github.com/X11Libre/xf86-input-libinput.git"
-EGIT_BRANCH="master"
-SRC_URI=""
-KEYWORDS="*"
 
 # This should be {CARGO_CRATE_URIS//.crate/.tar.gz} to correspond to the wrap files,
 # but there are "stale" distfiles on the mirrors with the wrong names.
@@ -46,8 +42,8 @@ SRC_URI+="
 	${CARGO_CRATE_URIS}
 "
 
-#S="${WORKDIR}/${MY_P}"
-EGIT_CHECKOUT_DIR=${S}
+S="${WORKDIR}/${MY_P}"
+#EGIT_CHECKOUT_DIR=${S}
 
 LICENSE="MIT SGI-B-2.0"
 SLOT="0"
