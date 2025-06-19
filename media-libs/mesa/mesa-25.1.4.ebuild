@@ -59,11 +59,18 @@ for card in ${VIDEO_CARDS}; do
 	IUSE_VIDEO_CARDS+=" video_cards_${card}"
 done
 
+
 IUSE="${IUSE_VIDEO_CARDS}
-	cpu_flags_x86_sse2 d3d9 debug +llvm
-	lm-sensors opencl +opengl +proprietary-codecs
-	test unwind vaapi valgrind vdpau vulkan
-	wayland +X xa +zstd"
+    cpu_flags_x86_sse2 d3d9 debug +egl +gbm gles1 +gles2 +glvnd +llvm
+    lm_sensors opencl osmesa selinux test unwind vaapi valgrind vdpau vulkan
+    vulkan-overlay wayland +X xa zink +zstd
+	"
+
+#IUSE="${IUSE_VIDEO_CARDS}
+#	cpu_flags_x86_sse2 d3d9 debug +llvm
+#	lm-sensors opencl +opengl +proprietary-codecs
+#	test unwind vaapi valgrind vdpau vulkan
+#	wayland +X xa +zstd"
 RESTRICT="!test? ( test )"
 REQUIRED_USE="
 	d3d9? (
