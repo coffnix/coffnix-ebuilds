@@ -321,6 +321,7 @@ src_prepare() {
 }
 
 multilib_src_configure() {
+	PKG_CONFIG_PATH="$(get_llvm_prefix)/$(get_libdir)/pkgconfig"
 	local emesonargs=()
 
 	# bug #932591 and https://gitlab.freedesktop.org/mesa/mesa/-/issues/11140
@@ -404,7 +405,6 @@ multilib_src_configure() {
 	fi
 
 	if use llvm && use opencl; then
-		#PKG_CONFIG_PATH="$(get_llvm_prefix)/$(get_libdir)/pkgconfig"
 		# See https://gitlab.freedesktop.org/mesa/mesa/-/blob/main/docs/rusticl.rst
 		emesonargs+=(
 			$(meson_native_true gallium-rusticl)
