@@ -204,10 +204,10 @@ fi
 : ${XORG_DRI:="no"}
 
 DRI_COMMON_DEPEND="
-    || (
-    >=x11-base/xorg-server-21.1.16
-    >=x11libre-base/xorg-server-21.1.16
-    )
+	|| (
+		>=x11-base/xorg-server-21.1.16
+		>=x11libre-base/xorg-server-21.1.16
+	)
 	x11-libs/libdrm
 "
 case ${XORG_DRI} in
