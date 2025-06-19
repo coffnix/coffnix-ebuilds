@@ -62,9 +62,8 @@ done
 
 IUSE="${IUSE_VIDEO_CARDS}
     cpu_flags_x86_sse2 d3d9 debug +egl +gbm gles1 +gles2 +glvnd +llvm
-    lm_sensors opencl osmesa selinux test unwind vaapi valgrind vdpau vulkan
-    vulkan-overlay wayland +X xa zink +zstd
-	"
+    lm-sensors opencl osmesa selinux test unwind vaapi valgrind vdpau vulkan
+    vulkan-overlay wayland +X xa zink +zstd +opengl +proprietary-codecs"
 
 #IUSE="${IUSE_VIDEO_CARDS}
 #	cpu_flags_x86_sse2 d3d9 debug +llvm
