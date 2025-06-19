@@ -305,6 +305,7 @@ pkg_setup() {
 }
 
 src_configure() {
+	PKG_CONFIG_PATH="$(get_llvm_prefix)/$(get_libdir)/pkgconfig"
 	local emesonargs=()
 
 	local platforms
