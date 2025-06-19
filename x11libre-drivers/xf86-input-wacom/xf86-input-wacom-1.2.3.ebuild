@@ -21,6 +21,7 @@ BDEPEND="
 	dev-python/libevdev
 	dev-python/pytest
 	dev-python/exceptiongroup
+	dev-python/attrs
 	"
 RDEPEND="
 	x11-libs/libX11
