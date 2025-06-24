@@ -2,14 +2,15 @@
 
 EAPI=7
 
-inherit meson git-r3
+inherit meson
 
 DESCRIPTION="x.org X server"
 HOMEPAGE="https://www.x.org/wiki"
 # SRC_URI="https://www.x.org/releases/individual/xserver/${P}.tar.xz"
 #SRC_URI="https://www.x.org/releases/individual/xserver/xorg-server-21.1.16.tar.xz -> xorg-server-21.1.16.tar.xz"
-EGIT_REPO_URI="https://github.com/X11Libre/xserver.git"
-EGIT_BRANCH="master"  # ou outro branch específico, se necessário
+SRC_URI="https://github.com/X11Libre/xserver/archive/refs/tags/xlibre-xserver-${PV}.tar.gz -> ${P}.tar.gz"
+#EGIT_REPO_URI="https://github.com/X11Libre/xserver.git"
+#EGIT_BRANCH="master"  # ou outro branch específico, se necessário
 #S="${WORKDIR}/xserver"
 
 LICENSE="MIT"
