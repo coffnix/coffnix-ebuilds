@@ -20,7 +20,7 @@ RDEPEND="dev-libs/libwacom
 	virtual/libudev:=
 	|| (
 	x11-base/xorg-server
-	x11libre-base/xorg-server
+	xlibre-base/xorg-server
 	)
 	x11-libs/libX11
 	x11-libs/libXext

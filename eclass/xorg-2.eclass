@@ -206,7 +206,7 @@ fi
 DRI_COMMON_DEPEND="
 	|| (
 		>=x11-base/xorg-server-21.1.16
-		>=x11libre-base/xorg-server-21.1.16
+		>=xlibre-base/xorg-server-21.1.16
 	)
 	x11-libs/libdrm
 "
@@ -227,7 +227,7 @@ if [[ -n "${DRIVER}" ]]; then
 	COMMON_DEPEND+="
     || (
     x11-base/xorg-server[xorg]
-    x11libre-base/xorg-server[xorg]
+    xlibre-base/xorg-server[xorg]
     )
 	"
 fi
@@ -281,7 +281,7 @@ if [[ ${DRIVER} == yes ]]; then
 	RDEPEND+="
     || (
     x11-base/xorg-server:=
-    x11libre-base/xorg-server:=
+    xlibre-base/xorg-server:=
     )
 	"
 			;;

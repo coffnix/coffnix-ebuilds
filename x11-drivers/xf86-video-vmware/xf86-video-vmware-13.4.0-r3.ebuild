@@ -13,7 +13,7 @@ DEPEND="
 	x11-base/xorg-proto
 	|| (
         >=x11-base/xorg-server-1.15.1
-        >=x11libre-base/xorg-server-1.15.1
+        >=xlibre-base/xorg-server-1.15.1
     )
 	>=sys-devel/libtool-2.2.6a
 	sys-devel/m4
@@ -21,7 +21,7 @@ DEPEND="
 
 	|| (
         x11-base/xorg-server[-minimal]
-        x11libre-base/xorg-server[-minimal]
+        xlibre-base/xorg-server[-minimal]
     )
 	x11-libs/libdrm
 "

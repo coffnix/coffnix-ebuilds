@@ -50,7 +50,7 @@ COMMON_DEPEND="
 	>=x11-misc/colord-1.0.2:=
 	cups? ( >=net-print/cups-1.4[dbus] )
 	wacom? ( >=dev-libs/libwacom-0.7 )
-	wacom? ( x11libre-drivers/xf86-input-wacom )
+	wacom? ( xlibre-drivers/xf86-input-wacom )
 	>=x11-libs/pango-1.44.7
 	virtual/libgudev:=
 	networkmanager? ( >=net-misc/networkmanager-1.0 )

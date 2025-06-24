@@ -41,7 +41,7 @@ COMMON_DEPEND="
 	x11-apps/sessreg
 	|| (
     >=x11-base/xorg-server-21.1.16
-    >=x11libre-base/xorg-server-21.1.16
+    >=xlibre-base/xorg-server-21.1.16
     )
 	x11-libs/libXi
 	x11-libs/libXau

@@ -180,7 +180,7 @@ BDEPEND+=" virtual/pkgconfig"
 DRI_COMMON_DEPEND="
 	    || (
     x11-base/xorg-server[-minimal]
-    x11libre-base/xorg-server[-minimal]
+    xlibre-base/xorg-server[-minimal]
     )
 	x11-libs/libdrm
 "
@@ -201,12 +201,12 @@ if [[ ${PN} == xf86-video-* || ${PN} == xf86-input-* ]]; then
 	DEPEND+="  x11-base/xorg-proto"
 	RDEPEND+=" || (
 	>=x11-base/xorg-server-21.1.16
-	>=x11libre-base/xorg-server-21.1.16
+	>=xlibre-base/xorg-server-21.1.16
 )"
 
 COMMON_DEPEND+=" || (
 	>=x11-base/xorg-server-21.1.16[xorg]
-	>=x11libre-base/xorg-server-21.1.16[xorg]
+	>=xlibre-base/xorg-server-21.1.16[xorg]
 )"
 	[[ ${PN} == xf86-video-* ]] && COMMON_DEPEND+=" >=x11-libs/libpciaccess-0.14"
 fi

@@ -39,7 +39,7 @@ DEPEND="
 	monitor? ( kde-plasma/libkscreen:5= )
 	touchpad? (
 		virtual/libudev:=
-		x11libre-drivers/xf86-input-libinput
+		xlibre-drivers/xf86-input-libinput
 		x11-libs/libXi
 	)
 "

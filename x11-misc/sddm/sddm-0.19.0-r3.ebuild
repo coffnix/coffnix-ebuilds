@@ -25,7 +25,7 @@ COMMON_DEPEND="
 	>=dev-qt/qtnetwork-5.9.4:5
 	|| (
 		>=x11-base/xorg-server-1.15.1
-		>=x11libre-base/xorg-server-1.15.1
+		>=xlibre-base/xorg-server-1.15.1
 	)
 	x11-libs/libxcb[xkb]
 	consolekit? ( >=sys-auth/consolekit-0.9.4 )

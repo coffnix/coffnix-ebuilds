@@ -29,7 +29,7 @@ RDEPEND="
 	>=x11-libs/pixman-0.27.1
 	|| (
         >=x11-base/xorg-server-1.15.1
-        >=x11libre-base/xorg-server-1.15.1
+        >=xlibre-base/xorg-server-1.15.1
     )
 	!<=media-libs/mesa-12.0.4
 	tools? (

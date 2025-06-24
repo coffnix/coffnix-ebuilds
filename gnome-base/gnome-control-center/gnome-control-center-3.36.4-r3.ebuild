@@ -84,8 +84,8 @@ RDEPEND="${COMMON_DEPEND}
 	ibus? ( >=gnome-base/libgnomekbd-3 )
 	wayland? ( libinput? ( dev-libs/libinput ) )
 	!wayland? (
-		libinput? ( >=x11libre-drivers/xf86-input-libinput-0.19.0 )
-		>=x11libre-drivers/xf86-input-wacom-0.33.0 )
+		libinput? ( >=xlibre-drivers/xf86-input-libinput-0.19.0 )
+		>=xlibre-drivers/xf86-input-wacom-0.33.0 )
 
 	!<gnome-base/gdm-2.91.94
 	!<gnome-extra/gnome-color-manager-3.1.2
