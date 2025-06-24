@@ -2,14 +2,16 @@
 
 EAPI=7
 
-inherit linux-info udev xorg-3 meson git-r3
+inherit linux-info udev xorg-3 meson
 
 DESCRIPTION="Driver for Wacom tablets and drawing devices"
 HOMEPAGE="https://linuxwacom.github.io/"
 #SRC_URI="https://github.com/linuxwacom/${PN}/releases/download/${P}/${P}.tar.bz2"
-EGIT_REPO_URI="https://github.com/X11Libre/xf86-input-wacom.git"
-SRC_URI=""
-EGIT_BRANCH="master"
+SRC_URI="https://github.com/X11Libre/xf86-input-wacom/archive/refs/tags/xlibre-xf86-input-wacom-${PV}.tar.gz -> ${P}.tar.gz"
+S="${WORKDIR}/xf86-input-wacom-xlibre-xf86-input-wacom-${PV}"
+#EGIT_REPO_URI="https://github.com/X11Libre/xf86-input-wacom.git"
+#SRC_URI=""
+#EGIT_BRANCH="master"
 
 LICENSE="GPL-2+"
 KEYWORDS="*"
