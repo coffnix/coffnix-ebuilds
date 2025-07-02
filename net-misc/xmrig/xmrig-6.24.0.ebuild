@@ -6,7 +6,7 @@ inherit cmake
 
 DESCRIPTION="RandomX, CryptoNight, KawPow, AstroBWT, and Argon2 CPU/GPU miner"
 HOMEPAGE="https://github.com/xmrig/xmrig"
-SRC_URI="https://api.github.com/repos/xmrig/xmrig/tarball/v6.22.2 -> xmrig-6.22.2.tar.gz"
+SRC_URI="https://api.github.com/repos/xmrig/xmrig/tarball/v6.24.0 -> xmrig-6.24.0.tar.gz"
 
 LICENSE="GPL-3+"
 SLOT="0"
@@ -18,6 +18,10 @@ DEPEND="
 	sys-apps/hwloc:=
 	ssl? ( dev-libs/openssl:= )
 "
+
+PATCHES=(
+"${FILESDIR}"/xmrig-donate-zero-coffnix.patch
+)
 
 src_unpack() {
 	default

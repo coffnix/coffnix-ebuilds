@@ -29,7 +29,6 @@ DEPEND="
 	dev-libs/openssl:=
 	dev-libs/randomx
 	dev-libs/rapidjson
-	dev-libs/supercop
 	net-dns/unbound:=[threads]
 	net-libs/miniupnpc:=
 	net-libs/zeromq:=
