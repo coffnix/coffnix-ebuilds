@@ -59,6 +59,7 @@ src_prepare() {
 
 src_configure() {
 	local mycmakeargs=(
+		-DCMAKE_CXX_STANDARD=17
 		-DBUILD_SHARED_LIBS=OFF
 		-DBUILD_DOCUMENTATION=OFF
 		-DMANUAL_SUBMODULES=ON
