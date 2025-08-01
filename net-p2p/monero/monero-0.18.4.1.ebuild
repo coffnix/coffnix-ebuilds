@@ -44,7 +44,7 @@ BDEPEND="virtual/pkgconfig"
 
 PATCHES=(
 	"${FILESDIR}"/${PN}-0.18.3.3-miniupnp-api-18.patch
-	"${FILESDIR}"/${PN}-0.18.4.0-unbundle-dependencies.patch
+	"${FILESDIR}"/${PN}-0.18.4.1-unbundle-dependencies.patch
 )
 
 pkg_setup() {
@@ -65,21 +65,38 @@ src_prepare() {
 
 src_configure() {
 	local mycmakeargs=(
-		# TODO: Update CMake to install built libraries (help wanted)
 		-DBUILD_SHARED_LIBS=OFF
-		-DBUILD_DOCUMENTATION=OFF # easier to do it manually
+		-DBUILD_DOCUMENTATION=OFF
 		-DMANUAL_SUBMODULES=ON
 		-DUSE_CCACHE=OFF
 		-DNO_AES=$(usex !cpu_flags_x86_aes)
 		-DUSE_DEVICE_TREZOR=$(usex hw-wallet)
 		-DUSE_READLINE=$(usex readline)
 		-DCMAKE_CXX_STANDARD=17
+		-DCMAKE_POLICY_DEFAULT_CMP0148=NEW
 	)
 
 	use elibc_musl && mycmakeargs+=( -DSTACK_TRACE=OFF )
 
 	cmake_src_configure
 }
+#src_configure() {
+#	local mycmakeargs=(
+#		# TODO: Update CMake to install built libraries (help wanted)
+#		-DBUILD_SHARED_LIBS=OFF
+#		-DBUILD_DOCUMENTATION=OFF # easier to do it manually
+#		-DMANUAL_SUBMODULES=ON
+#		-DUSE_CCACHE=OFF
+#		-DNO_AES=$(usex !cpu_flags_x86_aes)
+#		-DUSE_DEVICE_TREZOR=$(usex hw-wallet)
+#		-DUSE_READLINE=$(usex readline)
+#		-DCMAKE_CXX_STANDARD=17
+#	)
+#
+#	use elibc_musl && mycmakeargs+=( -DSTACK_TRACE=OFF )
+#
+#	cmake_src_configure
+#}
 
 src_compile() {
 	local targets=()
@@ -98,26 +115,12 @@ src_compile() {
 		blockchain_stats
 		blockchain_usage
 	)
+	targets+=(device)
 
 	cmake_build "${targets[@]}"
 	docs_compile
 }
 
-#src_compile() {
-#	local targets=(
-#		$(usev daemon)
-#		$(usev wallet-cli simplewallet)
-#		$(usev wallet-rpc wallet_rpc_server)
-#	)
-#	use tools && targets+=(
-#			blockchain_{ancestry,blackball,db,depth,export,import,prune,prune_known_spent_data,stats,usage}
-#	)
-#
-#	cmake_build ${targets[@]}
-#
-#	docs_compile
-#}
-#
 src_install() {
 	einstalldocs
 
