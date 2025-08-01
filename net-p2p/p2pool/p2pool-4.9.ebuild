@@ -48,6 +48,7 @@ src_configure() {
 	local mycmakeargs=(
 		-DSTATIC_BINARY=OFF
 		-DSTATIC_LIBS=OFF
+		-DNO_RANDOMX=ON
 		-DWITH_GRPC=OFF #$(usex grpc)
 		-DWITH_TLS=OFF #$(usex tls)
 	)
