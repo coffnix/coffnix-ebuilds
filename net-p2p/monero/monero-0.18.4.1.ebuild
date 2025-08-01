@@ -28,7 +28,7 @@ DEPEND="
 	dev-libs/openssl:=
 	dev-libs/randomx
 	dev-libs/rapidjson
-	dev-libs/supercop
+	dev-libs/supercop-monero
 	net-dns/unbound:=[threads]
 	net-libs/miniupnpc:=
 	net-libs/zeromq:=
@@ -81,20 +81,42 @@ src_configure() {
 }
 
 src_compile() {
-	local targets=(
-		$(usev daemon)
-		$(usev wallet-cli simplewallet)
-		$(usev wallet-rpc wallet_rpc_server)
-	)
+	local targets=()
+	use daemon && targets+=(monerod)
+	use wallet-cli && targets+=(monero-wallet-cli)
+	use wallet-rpc && targets+=(monero-wallet-rpc)
 	use tools && targets+=(
-			blockchain_{ancestry,blackball,db,depth,export,import,prune,prune_known_spent_data,stats,usage}
+		blockchain_ancestry
+		blockchain_blackball
+		blockchain_db
+		blockchain_depth
+		blockchain_export
+		blockchain_import
+		blockchain_prune
+		blockchain_prune_known_spent_data
+		blockchain_stats
+		blockchain_usage
 	)
 
-	cmake_build ${targets[@]}
-
+	cmake_build "${targets[@]}"
 	docs_compile
 }
 
+#src_compile() {
+#	local targets=(
+#		$(usev daemon)
+#		$(usev wallet-cli simplewallet)
+#		$(usev wallet-rpc wallet_rpc_server)
+#	)
+#	use tools && targets+=(
+#			blockchain_{ancestry,blackball,db,depth,export,import,prune,prune_known_spent_data,stats,usage}
+#	)
+#
+#	cmake_build ${targets[@]}
+#
+#	docs_compile
+#}
+#
 src_install() {
 	einstalldocs
 
