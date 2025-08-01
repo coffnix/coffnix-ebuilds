@@ -1,4 +1,3 @@
-# Copyright 1999-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -15,7 +14,6 @@ KEYWORDS="*"
 
 LICENSE="BSD MIT"
 SLOT="0"
-#IUSE="+daemon hw-wallet readline +tools wallet-cli +wallet-rpc cpu_flags_x86_aes"
 IUSE="+daemon hw-wallet readline +tools +wallet-cli +wallet-rpc cpu_flags_x86_aes"
 REQUIRED_USE="|| ( daemon tools wallet-cli wallet-rpc )"
 RESTRICT="test"
@@ -30,6 +28,7 @@ DEPEND="
 	dev-libs/openssl:=
 	dev-libs/randomx
 	dev-libs/rapidjson
+	dev-libs/supercop
 	net-dns/unbound:=[threads]
 	net-libs/miniupnpc:=
 	net-libs/zeromq:=
@@ -49,12 +48,13 @@ PATCHES=(
 )
 
 pkg_setup() {
-    if use daemon; then
-        # Criar grupo e usuário monero manualmente (estilo Funtoo oldschool)
-        enewgroup monero
-        enewuser monero -1 -1 /var/lib/monero monero
-    fi
+	if use daemon; then
+		# Criar grupo e usuário monero manualmente (estilo Funtoo oldschool)
+		enewgroup monero
+		enewuser monero -1 -1 /var/lib/monero monero
+	fi
 }
+
 src_prepare() {
 	# The build system does not recognize the release tarball (bug?)
 	# so we patch the GitVersion file.
@@ -83,6 +83,7 @@ src_configure() {
 src_compile() {
 	local targets=(
 		$(usev daemon)
+		$(usev wallet-cli simplewallet)
 		$(usev wallet-rpc wallet_rpc_server)
 	)
 	use tools && targets+=(

@@ -1,4 +1,3 @@
-# Copyright 1999-2025 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -7,13 +6,13 @@ inherit toolchain-funcs
 
 DESCRIPTION="Fast cryptographic operations for Monero wallets"
 HOMEPAGE="https://bench.cr.yp.to/supercop.html"
-SRC_URI="https://bench.cr.yp.to/supercop/supercop-20200826.tar.xz"
+SRC_URI="https://bench.cr.yp.to/supercop/supercop-20250415.tar.xz"
 
-S="${WORKDIR}/supercop-20200826"
+S="${WORKDIR}/supercop-20250415"
 
 LICENSE="public-domain BSD"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64 ~x86"
+KEYWORDS="*"
 
 DEPEND="dev-lang/nasm"
 RDEPEND="${DEPEND}"
