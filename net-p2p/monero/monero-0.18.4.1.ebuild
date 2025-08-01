@@ -73,6 +73,7 @@ src_configure() {
 		-DNO_AES=$(usex !cpu_flags_x86_aes)
 		-DUSE_DEVICE_TREZOR=$(usex hw-wallet)
 		-DUSE_READLINE=$(usex readline)
+		-DCMAKE_CXX_STANDARD=17
 	)
 
 	use elibc_musl && mycmakeargs+=( -DSTACK_TRACE=OFF )
