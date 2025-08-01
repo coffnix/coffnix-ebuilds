@@ -77,6 +77,7 @@ src_configure() {
 		-DUSE_READLINE=$(usex readline)
 		-DCMAKE_CXX_STANDARD=17
 		-DCMAKE_POLICY_DEFAULT_CMP0148=NEW
+		-DSTACK_TRACE=OFF
 	)
 
 	use elibc_musl && mycmakeargs+=( -DSTACK_TRACE=OFF )
