@@ -12,6 +12,7 @@ HOMEPAGE="https://www.getmonero.org"
 #SRC_URI="https://github.com/monero-project/monero/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 SRC_URI="https://downloads.getmonero.org/cli/monero-source-v${PV}.tar.bz2 -> ${P}.tar.bz2"
 
+S="${WORKDIR}/monero-source-v${PV}"
 KEYWORDS="*"
 
 LICENSE="BSD MIT"
