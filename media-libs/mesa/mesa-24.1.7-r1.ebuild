@@ -45,6 +45,7 @@ REQUIRED_USE="
 
 LIBDRM_DEPSTRING=">=x11-libs/libdrm-2.4.109"
 RDEPEND="
+	sys-devel/libclc
 	>=dev-libs/expat-2.1.0-r3:=
 	>=media-libs/libglvnd-1.3.2[X?]
 	>=sys-libs/zlib-1.2.8
