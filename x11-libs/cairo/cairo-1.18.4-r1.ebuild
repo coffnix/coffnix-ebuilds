@@ -19,7 +19,7 @@ IUSE="X aqua debug +glib gtk-doc lzo test +svg +harfbuzz"
 RESTRICT="test !test? ( test )"
 
 RDEPEND="
-	>=media-libs/fontconfig-2.13.92
+	>=media-libs/fontconfig-2.13.0
 	>=media-libs/freetype-2.13:2[png]
 	>=media-libs/libpng-1.6.10:0
 	>=sys-libs/zlib-1.2.8-r1
