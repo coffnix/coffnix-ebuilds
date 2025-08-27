@@ -107,7 +107,7 @@ fi
 # This variable can be used for proper directory specification
 : "${XLIBRE_PACKAGE_NAME:=${PN}}"
 case "${CATEGORY}/${P}" in
-	xlibre-base/xlibre-server-*) 	XLIBRE_PACKAGE_NAME=xserver ;;
+	xlibre-base/xorg-server-*) 	XLIBRE_PACKAGE_NAME=xserver ;;
 esac
 
 HOMEPAGE="https://github.com/X11Libre/${XLIBRE_MODULE}${XLIBRE_PACKAGE_NAME}"
@@ -137,7 +137,7 @@ fi
 EAUTORECONF_DEPEND+=" ${AUTOTOOLS_DEPEND}"
 if [[ ${PN} != util-macros ]] ; then
 	EAUTORECONF_DEPEND+=" >=x11-misc/util-macros-1.18"
-	# Required even by xlibre-server
+	# Required even by xorg-server
 	[[ ${PN} == "font-util" ]] || EAUTORECONF_DEPEND+=" >=media-fonts/font-util-1.2.0"
 fi
 if [[ ${XLIBRE_EAUTORECONF} == no ]] ; then
@@ -204,8 +204,8 @@ unset DRI_COMMON_DEPEND
 
 if [[ ${PN} == xf86-video-* || ${PN} == xf86-input-* ]]; then
 	DEPEND+="  xlibre-base/xorg-proto"
-	RDEPEND+=" xlibre-base/xlibre-server:="
-	COMMON_DEPEND+=" >=xlibre-base/xlibre-server-1.20[xorg]"
+	RDEPEND+=" xlibre-base/xorg-server:="
+	COMMON_DEPEND+=" >=xlibre-base/xorg-server-1.20[xorg]"
 	[[ ${PN} == xf86-video-* ]] && COMMON_DEPEND+=" >=x11-libs/libpciaccess-0.14"
 fi
 
@@ -324,7 +324,7 @@ xlibre_flags_setup() {
 	debug-print-function ${FUNCNAME} "$@"
 
 	# Hardened flags break module autoloading et al (also fixes #778494)
-	if [[ ${PN} == xlibre-server || ${PN} == xf86-video-* || ${PN} == xf86-input-* ]]; then
+	if [[ ${PN} == xorg-server || ${PN} == xf86-video-* || ${PN} == xf86-input-* ]]; then
 		filter-flags -fno-plt
 		append-ldflags -Wl,-z,lazy
 	fi
