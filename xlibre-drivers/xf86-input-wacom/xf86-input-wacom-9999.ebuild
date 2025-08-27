@@ -1,15 +1,18 @@
+# Copyright 1999-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=7
+EAPI=8
 
-inherit linux-info udev xorg-3 meson
+
+inherit linux-info systemd udev xlibre meson
 
 DESCRIPTION="Driver for Wacom tablets and drawing devices"
-HOMEPAGE="https://linuxwacom.github.io/"
-SRC_URI="https://github.com/linuxwacom/${PN}/releases/download/${P}/${P}.tar.bz2"
+HOMEPAGE="https://linuxwacom.github.io/ https://github.com/X11Libre/xf86-input-wacom"
 
 LICENSE="GPL-2+"
-KEYWORDS="*"
+if [[ ${PV} != 9999* ]]; then
+	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~loong ~ppc ~ppc64 ~riscv ~sparc ~x86"
+fi
 IUSE="test"
 RESTRICT="!test? ( test )"
 
@@ -42,7 +45,7 @@ pkg_setup() {
 }
 
 src_configure() {
-	xorg-3_flags_setup
+	xlibre_flags_setup
 
 	local emesonargs=(
 		-Dsystemd-unit-dir="$(systemd_get_systemunitdir)"
