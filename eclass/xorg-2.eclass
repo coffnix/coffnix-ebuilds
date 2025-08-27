@@ -232,13 +232,13 @@ if [[ -n "${DRIVER}" ]]; then
 	"
 fi
 if [[ -n "${DRIVER}" && ${PN} == xf86-input-* ]]; then
-	DEPEND+=" x11-base/xorg-proto"
+	DEPEND+=" xlibre-base/xorg-proto"
 fi
 if [[ -n "${DRIVER}" && ${PN} == xf86-video-* ]]; then
 	COMMON_DEPEND+="
 		x11-libs/libpciaccess
 	"
-	DEPEND+=" x11-base/xorg-proto"
+	DEPEND+=" xlibre-base/xorg-proto"
 fi
 
 # @ECLASS-VARIABLE: XORG_DOC
