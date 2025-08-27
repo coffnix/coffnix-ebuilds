@@ -19,7 +19,7 @@ DEPEND="test? (
 		dev-qt/qttest:5
 	)"
 RDEPEND="
-	!<dev-qt/qtcore-5.5.11-r10:5
+	!<dev-qt/qtcore-5.15.2-r10:5
 "
 
 qtchooser_make() {
