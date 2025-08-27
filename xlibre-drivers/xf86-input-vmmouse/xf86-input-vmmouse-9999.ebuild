@@ -11,7 +11,7 @@ if [[ ${PV} != 9999* ]]; then
 	KEYWORDS="~amd64 ~x86"
 fi
 
-DEPEND="x11-base/xorg-proto"
+DEPEND="xlibre-base/xorg-proto"
 
 src_configure() {
 	local XLIBRE_CONFIGURE_OPTIONS=(

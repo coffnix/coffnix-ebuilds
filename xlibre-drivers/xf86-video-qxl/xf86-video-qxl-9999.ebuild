@@ -25,7 +25,7 @@ RDEPEND="
 DEPEND="
 	${RDEPEND}
 	>=app-emulation/spice-protocol-0.12.0
-	x11-base/xorg-proto"
+	xlibre-base/xorg-proto"
 BDEPEND="virtual/pkgconfig"
 
 pkg_setup() {

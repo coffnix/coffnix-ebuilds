@@ -20,7 +20,7 @@ RDEPEND="
 DEPEND="
 	${RDEPEND}
 	>=sys-kernel/linux-headers-2.6.37
-	x11-base/xorg-proto"
+	xlibre-base/xorg-proto"
 
 check_reqs() {
 	linux-info_pkg_setup

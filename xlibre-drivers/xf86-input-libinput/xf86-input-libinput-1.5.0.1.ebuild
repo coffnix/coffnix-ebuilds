@@ -15,9 +15,9 @@ SLOT="0"
 #S="$WORKDIR/${PN}-${P}"
 S="${WORKDIR}/xf86-input-libinput-xlibre-xf86-input-libinput-${PV}"
 DEPEND="
-	x11-base/xorg-proto
+	xlibre-base/xorg-proto
 	|| (
-        >=x11-base/xorg-server-1.15.1
+        >=xlibre-base/xorg-server-1.15.1
         >=xlibre-base/xorg-server-1.15.1
     )
 	>=sys-devel/libtool-2.2.6a

@@ -28,7 +28,7 @@ RDEPEND="
 	x11-libs/libXScrnSaver
 	>=x11-libs/pixman-0.27.1
 	|| (
-        >=x11-base/xorg-server-1.15.1
+        >=xlibre-base/xorg-server-1.15.1
         >=xlibre-base/xorg-server-1.15.1
     )
 	!<=media-libs/mesa-12.0.4
@@ -53,7 +53,7 @@ RDEPEND="
 	)
 "
 DEPEND="${RDEPEND}
-	x11-base/xorg-proto"
+	xlibre-base/xorg-proto"
 
 PATCHES=(
 	"${FILESDIR}"/${PN}-gcc-pr65873.patch

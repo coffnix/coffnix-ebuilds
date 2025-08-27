@@ -13,9 +13,9 @@ EGIT_REPO_URI="https://github.com/X11Libre/xf86-video-vmware.git"
 EGIT_BRANCH="master"
 SRC_URI=""
 DEPEND="
-	x11-base/xorg-proto
+	xlibre-base/xorg-proto
 	|| (
-        >=x11-base/xorg-server-1.15.1
+        >=xlibre-base/xorg-server-1.15.1
         >=xlibre-base/xorg-server-1.15.1
     )
 	>=sys-devel/libtool-2.2.6a
@@ -23,7 +23,7 @@ DEPEND="
 	>=x11-misc/util-macros-1.18
 
 	|| (
-        x11-base/xorg-server[-minimal]
+        xlibre-base/xorg-server[-minimal]
         xlibre-base/xorg-server[-minimal]
     )
 	x11-libs/libdrm
