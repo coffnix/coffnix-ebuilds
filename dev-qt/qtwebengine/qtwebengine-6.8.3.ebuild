@@ -68,7 +68,7 @@ RDEPEND="app-arch/snappy:=
 "
 DEPEND="${RDEPEND}
 	media-libs/libglvnd
-	x11-base/xorg-proto
+	xlibre-base/xorg-proto
 	x11-libs/libXcursor
 	x11-libs/libXi
 	x11-libs/libxshmfence

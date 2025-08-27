@@ -39,7 +39,7 @@ RDEPEND="dev-qt/qtbase:6[gui,vulkan]
 	
 "
 DEPEND="${RDEPEND}
-	x11-base/xorg-proto
+	xlibre-base/xorg-proto
 	sys-kernel/linux-headers
 	dev-util/vulkan-headers
 	
