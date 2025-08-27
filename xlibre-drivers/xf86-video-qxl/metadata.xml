@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+  <maintainer type="project">
+    <email>maintainer-needed@example.com</email>
+    <name>XLibre</name>
+  </maintainer>
+  <use>
+    <flag name="xspice">Include Xspice, a standard X server that is also a Spice server</flag>
+  </use>
+  <upstream>
+    <remote-id type="github">X11Libre/xf86-video-qxl</remote-id>
+  </upstream>
+</pkgmetadata>
