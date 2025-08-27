@@ -47,7 +47,7 @@ RDEPEND="dev-libs/glib:2
 DEPEND="${RDEPEND}
 	sys-devel/gettext
 	virtual/pkgconfig
-	x11-base/xorg-proto"
+	xlibre-base/xorg-proto"
 
 src_prepare() {
 	use xdg && python_export_best

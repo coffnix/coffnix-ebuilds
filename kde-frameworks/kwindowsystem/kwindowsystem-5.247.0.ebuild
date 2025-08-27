@@ -26,7 +26,7 @@ RDEPEND="
 	)
 "
 DEPEND="${RDEPEND}
-	X? ( x11-base/xorg-proto )
+	X? ( xlibre-base/xorg-proto )
 	test? ( >=dev-qt/qtbase-${QTMIN}:6[widgets] )
 	wayland? (
 		dev-libs/plasma-wayland-protocols

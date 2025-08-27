@@ -13,7 +13,7 @@ IUSE=""
 
 SRC_URI="https://www.x.org/releases/individual/lib/${P}.tar.xz"
 
-RDEPEND="x11-base/xorg-proto
+RDEPEND="xlibre-base/xorg-proto
 	>=x11-libs/libX11-1.6.2[${MULTILIB_USEDEP}]
 	>=x11-libs/libXext-1.3.2[${MULTILIB_USEDEP}]
 	>=x11-libs/libXfixes-5.0.1[${MULTILIB_USEDEP}]"

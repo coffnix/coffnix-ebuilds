@@ -101,7 +101,7 @@ COMMON_DEPEND="
 DEPEND="${COMMON_DEPEND}
 	>=dev-libs/wayland-protocols-1.25
 	dev-libs/boost
-	x11-base/xorg-proto
+	xlibre-base/xorg-proto
 "
 RDEPEND="${COMMON_DEPEND}
 	!<kde-plasma/kdeplasma-addons-5.25.50

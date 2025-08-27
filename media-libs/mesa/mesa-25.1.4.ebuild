@@ -166,7 +166,7 @@ DEPEND="${RDEPEND}
 	wayland? ( >=dev-libs/wayland-protocols-1.41 )
 	X? (
 		x11-libs/libXrandr[${MULTILIB_USEDEP}]
-		x11-base/xorg-proto
+		xlibre-base/xorg-proto
 	)
 "
 

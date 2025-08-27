@@ -56,7 +56,7 @@ COMMON_DEPEND="
 	)
 "
 DEPEND="${COMMON_DEPEND}
-	x11-base/xorg-proto
+	xlibre-base/xorg-proto
 "
 RDEPEND="${COMMON_DEPEND}
 	kf6compat? ( kde-plasma/libplasma:6 )

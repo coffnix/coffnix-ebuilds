@@ -33,7 +33,7 @@ RDEPEND="
 	)
 "
 DEPEND="${RDEPEND}
-	X? ( x11-base/xorg-proto )
+	X? ( xlibre-base/xorg-proto )
 "
 BDEPEND=">=dev-qt/linguist-tools-${QTMIN}:5"
 

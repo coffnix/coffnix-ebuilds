@@ -102,7 +102,7 @@ RDEPEND="${COMMON_DEPEND}
 PDEPEND=">=gnome-base/gnome-session-2.91.6-r1"
 
 DEPEND="${COMMON_DEPEND}
-	x11-base/xorg-proto
+	xlibre-base/xorg-proto
 
 	dev-libs/libxml2:2
 	dev-libs/libxslt

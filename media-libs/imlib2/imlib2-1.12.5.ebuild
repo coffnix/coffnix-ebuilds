@@ -39,7 +39,7 @@ RDEPEND="
 	!<media-plugins/imlib2_loaders-1.7.0
 "
 DEPEND="${RDEPEND}
-	X? ( x11-base/xorg-proto )"
+	X? ( xlibre-base/xorg-proto )"
 BDEPEND="virtual/pkgconfig"
 
 multilib_src_configure() {

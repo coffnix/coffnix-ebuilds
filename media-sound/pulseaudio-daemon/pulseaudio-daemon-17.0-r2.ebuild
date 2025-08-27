@@ -111,7 +111,7 @@ COMMON_DEPEND="
 DEPEND="
 	${COMMON_DEPEND}
 	test? ( >=dev-libs/check-0.9.10 )
-	X? ( x11-base/xorg-proto )
+	X? ( xlibre-base/xorg-proto )
 "
 
 # alsa-utils dep is for the alsasound init.d script (see bug 155707); TODO: read it

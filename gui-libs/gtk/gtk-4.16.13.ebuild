@@ -73,7 +73,7 @@ DEPEND="${COMMON_DEPEND}
 		sys-kernel/linux-headers
 	)
 	sysprof? ( >=dev-util/sysprof-capture-3.40.1:4 )
-	X? ( x11-base/xorg-proto )
+	X? ( xlibre-base/xorg-proto )
 "
 RDEPEND="${COMMON_DEPEND}
 	>=dev-util/gtk-update-icon-cache-3

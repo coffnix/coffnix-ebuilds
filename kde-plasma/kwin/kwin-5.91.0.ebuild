@@ -94,7 +94,7 @@ DEPEND="${COMMON_DEPEND}
 	>=dev-qt/qttools-${QTMIN}:6[designer]
 	>=dev-qt/qtbase-${QTMIN}:6[concurrent]
 	>=dev-qt/qtwayland-${QTMIN}:6
-	x11-base/xorg-proto
+	xlibre-base/xorg-proto
 	x11-libs/xcb-util-image
 	caps? ( sys-libs/libcap )
 	test? ( screencast? ( >=kde-plasma/kpipewire-${PVCUT}:6 ) )

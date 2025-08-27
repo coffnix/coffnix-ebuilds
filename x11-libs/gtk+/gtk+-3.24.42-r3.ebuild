@@ -71,7 +71,7 @@ DEPEND="${COMMON_DEPEND}
 	)
 	>=sys-devel/gettext-0.19.7
 	virtual/pkgconfig
-	X? ( x11-base/xorg-proto )
+	X? ( xlibre-base/xorg-proto )
 	test? (
 		media-fonts/font-misc-misc
 		media-fonts/font-cursor-misc

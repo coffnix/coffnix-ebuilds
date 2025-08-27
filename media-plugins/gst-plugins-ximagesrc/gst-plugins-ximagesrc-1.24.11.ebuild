@@ -18,7 +18,7 @@ RDEPEND="
 	>=x11-libs/libXfixes-5.0.1[${MULTILIB_USEDEP}]
 "
 DEPEND="${RDEPEND}
-	x11-base/xorg-proto
+	xlibre-base/xorg-proto
 "
 
 GST_PLUGINS_BUILD_DIR="ximage"

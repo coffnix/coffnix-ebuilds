@@ -89,7 +89,7 @@ DEPEND="${COMMON_DEPEND}
 	dev-util/itstool
 	>=sys-devel/gettext-0.19.8
 	virtual/pkgconfig
-	x11-base/xorg-proto
+	xlibre-base/xorg-proto
 	test? ( >=dev-libs/check-0.9.4 )
 	app-text/yelp-tools
 " # yelp-tools needed for eautoreconf to not lose help docs (m4_ifdeffed YELP_HELP_INIT call and setup)

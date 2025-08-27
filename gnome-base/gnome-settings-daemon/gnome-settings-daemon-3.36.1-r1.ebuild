@@ -63,7 +63,7 @@ RDEPEND="${COMMON_DEPEND}
 "
 
 DEPEND="${COMMON_DEPEND}
-	!wayland? ( x11-base/xorg-proto )
+	!wayland? ( xlibre-base/xorg-proto )
 	app-text/docbook-xsl-stylesheets
 	dev-libs/libxml2:2
 	dev-libs/libxslt

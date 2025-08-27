@@ -34,7 +34,7 @@ RDEPEND="
 "
 DEPEND="
 	${RDEPEND}
-	x11-base/xorg-proto
+	xlibre-base/xorg-proto
 "
 BDEPEND="
 	doc? ( app-text/doxygen )

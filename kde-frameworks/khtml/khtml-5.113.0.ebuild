@@ -54,7 +54,7 @@ RDEPEND="
 "
 DEPEND="${RDEPEND}
 	test? ( >=dev-qt/qtx11extras-${QTMIN}:5 )
-	X? ( x11-base/xorg-proto )
+	X? ( xlibre-base/xorg-proto )
 "
 BDEPEND="
 	dev-lang/perl

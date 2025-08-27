@@ -288,7 +288,7 @@ RDEPEND="
 "
 DEPEND="
 	${COMMON_DEPEND}
-	X? ( x11-base/xorg-proto )
+	X? ( xlibre-base/xorg-proto )
 	amf? ( media-libs/amf-headers )
 	kernel_linux? ( >=sys-kernel/linux-headers-6 )
 	ladspa? ( media-libs/ladspa-sdk )

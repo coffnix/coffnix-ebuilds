@@ -91,7 +91,7 @@ COMMON_DEPEND="
 DEPEND="${COMMON_DEPEND}
 	>=dev-libs/wayland-protocols-1.25
 	dev-libs/boost
-	x11-base/xorg-proto
+	xlibre-base/xorg-proto
 	test? (
 		>=kde-frameworks/qqc2-desktop-style-${KFMIN}:6
 		>=kde-plasma/kactivitymanagerd-${PVCUT}:6

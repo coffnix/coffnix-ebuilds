@@ -38,7 +38,7 @@ RDEPEND="
 "
 DEPEND="${RDEPEND}
 	wayland? ( >=dev-libs/wayland-protocols-1.12 )
-	X? ( x11-base/xorg-proto )
+	X? ( xlibre-base/xorg-proto )
 "
 BDEPEND="
 	gui-libs/libdecor

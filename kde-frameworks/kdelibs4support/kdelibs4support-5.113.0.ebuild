@@ -67,7 +67,7 @@ COMMON_DEPEND="
 "
 DEPEND="${COMMON_DEPEND}
 	test? ( >=dev-qt/qtconcurrent-${QTMIN}:5 )
-	X? ( x11-base/xorg-proto )
+	X? ( xlibre-base/xorg-proto )
 "
 RDEPEND="${COMMON_DEPEND}
 	>=dev-qt/qtxml-${QTMIN}:5

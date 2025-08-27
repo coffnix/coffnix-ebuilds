@@ -62,7 +62,7 @@ RDEPEND="
 	)"
 DEPEND="${RDEPEND}
 	opengl? ( virtual/glu[${MULTILIB_USEDEP}] )
-	X? ( x11-base/xorg-proto )"
+	X? ( xlibre-base/xorg-proto )"
 BDEPEND="
 	test? ( >=dev-util/cppunit-1.8.0 )
 	>=app-eselect/eselect-wxwidgets-20131230

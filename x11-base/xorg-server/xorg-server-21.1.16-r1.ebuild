@@ -22,7 +22,7 @@ DEPEND="
 	media-libs/libglvnd[X]
 	sys-devel/flex
 	x11-apps/xkbcomp
-	>=x11-base/xorg-proto-2021.4.99.2
+	>=xlibre-base/xorg-proto-2021.4.99.2
 	>=x11-libs/libXau-1.0.4
 	>=x11-libs/libXdmcp-1.0.2
 	>=x11-libs/libXfont2-2.0.1

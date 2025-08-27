@@ -27,5 +27,5 @@ RDEPEND="
 	x11-libs/libXxf86vm
 "
 DEPEND="${RDEPEND}
-	x11-base/xorg-proto
+	xlibre-base/xorg-proto
 "

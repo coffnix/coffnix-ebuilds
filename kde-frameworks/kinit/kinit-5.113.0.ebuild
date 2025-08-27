@@ -33,7 +33,7 @@ RDEPEND="
 	)
 "
 DEPEND="${RDEPEND}
-	X? ( x11-base/xorg-proto )
+	X? ( xlibre-base/xorg-proto )
 "
 BDEPEND="man? ( >=kde-frameworks/kdoctools-${PVCUT}:5 )"
 

@@ -55,7 +55,7 @@ DEPEND="${COMMON_DEPEND}
 	>=dev-util/intltool-0.50
 	dev-util/itstool
 	virtual/pkgconfig
-	x11-base/xorg-proto
+	xlibre-base/xorg-proto
 	test? ( >=dev-libs/glib-2.62.2:2[utils] )
 "
 #CFLAGS+=" -Wno-error=deprecated-declarations -Wno-error=misleading-indentation"
