@@ -13,7 +13,7 @@ PDEPEND="|| (
 	=x11-base/xorg-proto-2018.4_p20180627-r2
 	=x11-base/xorg-proto-2019.2
 	=x11-base/xorg-proto-2023.2
-	=x11-base/xorg-proto-2024.1 )"
+	=xlibre-base/xorg-proto-2024.1 )"
 DEPEND="${RDEPEND}"
 
 S="${WORKDIR}"
