@@ -67,6 +67,7 @@ src_configure() {
 
 	local XLIBRE_CONFIGURE_OPTIONS=(
 		--disable-dri1
+		--disable-dri2
 		$(use_enable debug)
 		$(use_enable dri)
 		$(use_enable dri dri3)
