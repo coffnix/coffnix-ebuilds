@@ -77,7 +77,7 @@ fi
 # This variable can be used for proper directory specification
 : "${XLIBRE_PACKAGE_NAME:=${PN}}"
 case "${CATEGORY}/${P}" in
-	x11-base/xlibre-server-*) 	XLIBRE_PACKAGE_NAME=xserver ;;
+	xlibre-base/xorg-server-*) 	XLIBRE_PACKAGE_NAME=xserver ;;
 esac
 
 HOMEPAGE="https://github.com/X11Libre/${XLIBRE_MODULE}${XLIBRE_PACKAGE_NAME}"
@@ -104,8 +104,8 @@ fi
 
 if [[ ${PN} == xf86-video-* || ${PN} == xf86-input-* ]]; then
 	DEPEND+="  x11-base/xorg-proto"
-	DEPEND+="  >=x11-base/xlibre-server-1.20:=[xorg]"
-	RDEPEND+=" >=x11-base/xlibre-server-1.20:=[xorg]"
+	DEPEND+="  >=xlibre-base/xorg-server-1.20:=[xorg]"
+	RDEPEND+=" >=xlibre-base/xorg-server-1.20:=[xorg]"
 	if [[ ${PN} == xf86-video-* ]]; then
 		DEPEND+="  >=x11-libs/libpciaccess-0.14"
 		RDEPEND+=" >=x11-libs/libpciaccess-0.14"
@@ -154,7 +154,7 @@ xlibre-meson_flags_setup() {
 	debug-print-function ${FUNCNAME} "$@"
 
 	# Hardened flags break module autoloading et al (also fixes #778494)
-	if [[ ${PN} == xlibre-server || ${PN} == xf86-video-* || ${PN} == xf86-input-* ]]; then
+	if [[ ${PN} == xorg-server || ${PN} == xf86-video-* || ${PN} == xf86-input-* ]]; then
 		filter-flags -fno-plt
 		append-ldflags -Wl,-z,lazy
 	fi

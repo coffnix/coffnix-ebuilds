@@ -183,7 +183,10 @@ BDEPEND+=" virtual/pkgconfig"
 : "${XLIBRE_DRI:="no"}"
 
 DRI_COMMON_DEPEND="
-	x11-base/xlibre-server[-minimal]
+    || (
+        >=x11-base/xorg-server-21.1.16
+        >=xlibre-base/xorg-server-21.1.16
+    )
 	x11-libs/libdrm
 "
 case ${XLIBRE_DRI} in
