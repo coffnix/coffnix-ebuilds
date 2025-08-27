@@ -21,7 +21,7 @@
 # everything else should be automatic.
 
 case ${EAPI} in
-	8) ;;
+	7) ;;
 	*) die "${ECLASS}: EAPI ${EAPI:-0} not supported" ;;
 esac
 
