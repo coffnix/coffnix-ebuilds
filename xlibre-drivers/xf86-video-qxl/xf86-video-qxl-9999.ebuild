@@ -3,7 +3,7 @@
 
 EAPI=7
 
-PYTHON_COMPAT=( python3_{10..13} )
+PYTHON_COMPAT=( python3+ )
 inherit python-single-r1 xlibre
 
 DESCRIPTION="QEMU QXL paravirt video driver"
