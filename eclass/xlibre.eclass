@@ -93,7 +93,7 @@ if [[ ${XLIBRE_MODULE} == auto ]]; then
 		media-fonts/*)           XLIBRE_MODULE=font/    ;;
 		x11-apps/*|x11-wm/*)     XLIBRE_MODULE=app/     ;;
 		x11-misc/*|x11-themes/*) XLIBRE_MODULE=util/    ;;
-		x11-base/*)              XLIBRE_MODULE=         ;;
+		xlibre-base/*)              XLIBRE_MODULE=         ;;
 		x11-drivers/*)           XLIBRE_MODULE=         ;;
 		x11-libs/*)              XLIBRE_MODULE=lib/     ;;
 		*)                       XLIBRE_MODULE=         ;;
@@ -107,7 +107,7 @@ fi
 # This variable can be used for proper directory specification
 : "${XLIBRE_PACKAGE_NAME:=${PN}}"
 case "${CATEGORY}/${P}" in
-	x11-base/xlibre-server-*) 	XLIBRE_PACKAGE_NAME=xserver ;;
+	xlibre-base/xlibre-server-*) 	XLIBRE_PACKAGE_NAME=xserver ;;
 esac
 
 HOMEPAGE="https://github.com/X11Libre/${XLIBRE_MODULE}${XLIBRE_PACKAGE_NAME}"
@@ -184,7 +184,7 @@ BDEPEND+=" virtual/pkgconfig"
 
 DRI_COMMON_DEPEND="
     || (
-        >=x11-base/xorg-server-21.1.16
+        >=xlibre-base/xorg-server-21.1.16
         >=xlibre-base/xorg-server-21.1.16
     )
 	x11-libs/libdrm
@@ -203,9 +203,9 @@ esac
 unset DRI_COMMON_DEPEND
 
 if [[ ${PN} == xf86-video-* || ${PN} == xf86-input-* ]]; then
-	DEPEND+="  x11-base/xorg-proto"
-	RDEPEND+=" x11-base/xlibre-server:="
-	COMMON_DEPEND+=" >=x11-base/xlibre-server-1.20[xorg]"
+	DEPEND+="  xlibre-base/xorg-proto"
+	RDEPEND+=" xlibre-base/xlibre-server:="
+	COMMON_DEPEND+=" >=xlibre-base/xlibre-server-1.20[xorg]"
 	[[ ${PN} == xf86-video-* ]] && COMMON_DEPEND+=" >=x11-libs/libpciaccess-0.14"
 fi
 

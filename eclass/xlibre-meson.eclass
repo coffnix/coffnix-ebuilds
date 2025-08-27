@@ -63,7 +63,7 @@ if [[ ${XLIBRE_MODULE} == auto ]]; then
 		media-fonts/*)           XLIBRE_MODULE=font/    ;;
 		x11-apps/*|x11-wm/*)     XLIBRE_MODULE=app/     ;;
 		x11-misc/*|x11-themes/*) XLIBRE_MODULE=util/    ;;
-		x11-base/*)              XLIBRE_MODULE=         ;;
+		xlibre-base/*)              XLIBRE_MODULE=         ;;
 		x11-drivers/*)           XLIBRE_MODULE=         ;;
 		x11-libs/*)              XLIBRE_MODULE=lib/     ;;
 		*)                       XLIBRE_MODULE=         ;;
@@ -103,7 +103,7 @@ fi
 : "${LICENSE:=MIT}"
 
 if [[ ${PN} == xf86-video-* || ${PN} == xf86-input-* ]]; then
-	DEPEND+="  x11-base/xorg-proto"
+	DEPEND+="  xlibre-base/xorg-proto"
 	DEPEND+="  >=xlibre-base/xorg-server-1.20:=[xorg]"
 	RDEPEND+=" >=xlibre-base/xorg-server-1.20:=[xorg]"
 	if [[ ${PN} == xf86-video-* ]]; then
