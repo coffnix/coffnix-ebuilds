@@ -198,7 +198,7 @@ esac
 unset DRI_COMMON_DEPEND
 
 if [[ ${PN} == xf86-video-* || ${PN} == xf86-input-* ]]; then
-	DEPEND+="  x11-base/xorg-proto"
+	DEPEND+="  xlibre-base/xorg-proto"
 	RDEPEND+=" || (
 	>=x11-base/xorg-server-21.1.16
 	>=xlibre-base/xorg-server-21.1.16
