@@ -40,7 +40,7 @@ COMMON_DEPEND="
 	x11-libs/libXtst
 "
 DEPEND="${COMMON_DEPEND}
-	xlibre-base/xorg-proto
+	x11-base/xorg-proto
 	x11-libs/libxcb
 	x11-libs/libXtst
 "

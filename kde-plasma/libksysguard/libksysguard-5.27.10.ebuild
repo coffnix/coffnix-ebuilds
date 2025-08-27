@@ -51,7 +51,7 @@ RDEPEND="
 "
 DEPEND="${RDEPEND}
 	>=kde-frameworks/kiconthemes-${KFMIN}:5
-	xlibre-base/xorg-proto
+	x11-base/xorg-proto
 "
 BDEPEND="sys-libs/libcap"
 

@@ -58,7 +58,7 @@ LIBS_RDEPEND="
 
 LIBS_DEPEND="${LIBS_RDEPEND}
 	test? ( >=dev-libs/check-0.9.10 )
-	X? ( xlibre-base/xorg-proto )
+	X? ( x11-base/xorg-proto )
 "
 
 
@@ -128,7 +128,7 @@ DEPEND="
 	${COMMON_DEPEND}
 	${LIBS_DEPEND}
 	test? ( >=dev-libs/check-0.9.10 )
-	X? ( xlibre-base/xorg-proto )
+	X? ( x11-base/xorg-proto )
 "
 
 RDEPEND="

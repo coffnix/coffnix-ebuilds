@@ -23,7 +23,7 @@ RDEPEND="
 "
 DEPEND="${RDEPEND}
 	X? (
-		xlibre-base/xorg-proto
+		x11-base/xorg-proto
 		x11-libs/libX11
 	)
 "

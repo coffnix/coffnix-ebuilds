@@ -14,7 +14,7 @@ KEYWORDS="*"
 IUSE="+openpty sixel toolbar truetype unicode Xaw3d xinerama"
 
 BDEPEND="virtual/pkgconfig
-	xlibre-base/xorg-proto"
+	x11-base/xorg-proto"
 DEPEND="kernel_linux? ( sys-libs/libutempter )
 	kernel_FreeBSD? ( || ( >=sys-freebsd/freebsd-lib-9.0 sys-libs/libutempter ) )
 	media-libs/fontconfig:1.0

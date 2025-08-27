@@ -24,7 +24,7 @@ RDEPEND="
 	introspection? ( >=dev-libs/gobject-introspection-1.54:= )
 "
 DEPEND="${RDEPEND}
-	xlibre-base/xorg-proto"
+	x11-base/xorg-proto"
 BDEPEND="
 	${PYTHON_DEPS}
 	vala? ( $(vala_depend) )

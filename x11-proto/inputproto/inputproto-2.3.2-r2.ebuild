@@ -10,8 +10,8 @@ KEYWORDS="*"
 SLOT="0/stub"
 
 PDEPEND="|| (
-	=xlibre-base/xorg-proto-2018.4_p20180627-r2
-	=xlibre-base/xorg-proto-2019.2 )"
+	=x11-base/xorg-proto-2018.4_p20180627-r2
+	=x11-base/xorg-proto-2019.2 )"
 DEPEND="${RDEPEND}"
 
 S="${WORKDIR}"

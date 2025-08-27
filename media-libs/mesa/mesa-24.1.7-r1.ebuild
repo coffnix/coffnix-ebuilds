@@ -179,7 +179,7 @@ DEPEND="${RDEPEND}
 	wayland? ( >=dev-libs/wayland-protocols-1.24 )
 	X? (
 		x11-libs/libXrandr
-		xlibre-base/xorg-proto
+		x11-base/xorg-proto
 	)
 "
 BDEPEND="

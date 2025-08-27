@@ -46,7 +46,7 @@ COMMON_DEPEND="
 	x11-libs/xcb-util-keysyms
 "
 DEPEND="${COMMON_DEPEND}
-	xlibre-base/xorg-proto
+	x11-base/xorg-proto
 "
 RDEPEND="${COMMON_DEPEND}
 	>=kde-frameworks/kirigami-${KFMIN}:6

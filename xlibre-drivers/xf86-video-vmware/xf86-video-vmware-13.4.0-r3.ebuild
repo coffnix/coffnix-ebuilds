@@ -13,7 +13,7 @@ EGIT_REPO_URI="https://github.com/X11Libre/xf86-video-vmware.git"
 EGIT_BRANCH="master"
 SRC_URI=""
 DEPEND="
-	xlibre-base/xorg-proto
+	x11-base/xorg-proto
 	|| (
         >=xlibre-base/xorg-server-1.15.1
         >=xlibre-base/xorg-server-1.15.1

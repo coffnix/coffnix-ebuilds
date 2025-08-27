@@ -13,7 +13,7 @@ fi
 
 RDEPEND=">=dev-libs/libinput-1.23.0:0="
 DEPEND="${RDEPEND}
-	>=xlibre-base/xorg-proto-2021.5"
+	>=x11-base/xorg-proto-2021.5"
 
 DOCS=( "README.md" )
 

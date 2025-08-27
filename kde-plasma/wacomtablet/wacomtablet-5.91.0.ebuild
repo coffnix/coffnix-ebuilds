@@ -40,7 +40,7 @@ RDEPEND="
 	x11-libs/libxcb
 "
 DEPEND="${RDEPEND}
-	xlibre-base/xorg-proto
+	x11-base/xorg-proto
 	x11-libs/libX11
 "
 BDEPEND="sys-devel/gettext"

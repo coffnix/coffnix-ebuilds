@@ -21,7 +21,7 @@ RDEPEND="
 	X? ( x11-libs/libX11 )
 "
 DEPEND="${RDEPEND}
-	X? ( xlibre-base/xorg-proto )
+	X? ( x11-base/xorg-proto )
 "
 
 src_configure() {

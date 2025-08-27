@@ -61,7 +61,7 @@ RDEPEND="
 "
 DEPEND="
 	${RDEPEND}
-	xlibre-base/xorg-proto
+	x11-base/xorg-proto
 "
 BDEPEND="
 	virtual/pkgconfig

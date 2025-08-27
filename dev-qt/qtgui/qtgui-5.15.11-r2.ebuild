@@ -65,7 +65,7 @@ DEPEND="${RDEPEND}
 	evdev? ( sys-kernel/linux-headers )
 	linuxfb? ( sys-kernel/linux-headers )
 	udev? ( sys-kernel/linux-headers )
-	X? ( xlibre-base/xorg-proto )
+	X? ( x11-base/xorg-proto )
 "
 PDEPEND="
 	ibus? ( app-i18n/ibus )

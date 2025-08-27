@@ -40,7 +40,7 @@ DEPEND="${RDEPEND}
 		app-text/poppler[cairo]
 		gnome-base/librsvg
 	)
-	X? ( xlibre-base/xorg-proto )
+	X? ( x11-base/xorg-proto )
 "
 
 BDEPEND="

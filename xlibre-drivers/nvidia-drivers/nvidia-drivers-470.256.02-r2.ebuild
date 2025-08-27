@@ -57,14 +57,14 @@ RDEPEND="
 DEPEND="
 	${COMMON_DEPEND}
 	static-libs? (
-		xlibre-base/xorg-proto
+		x11-base/xorg-proto
 		x11-libs/libX11
 		x11-libs/libXext
 	)
 	tools? (
 		media-libs/libglvnd
 		sys-apps/dbus
-		xlibre-base/xorg-proto
+		x11-base/xorg-proto
 		x11-libs/libXrandr
 		x11-libs/libXv
 		x11-libs/libvdpau

@@ -32,7 +32,7 @@ RDEPEND="dev-qt/qtcore:5
 	
 "
 DEPEND="${RDEPEND}
-	gstreamer? ( xlibre-base/xorg-proto )
+	gstreamer? ( x11-base/xorg-proto )
 	
 "
 src_prepare() {

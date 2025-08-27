@@ -50,7 +50,7 @@ RDEPEND="
 "
 DEPEND="
 	${RDEPEND}
-	xlibre-base/xorg-proto
+	x11-base/xorg-proto
 	valgrind? ( dev-debug/valgrind )
 "
 

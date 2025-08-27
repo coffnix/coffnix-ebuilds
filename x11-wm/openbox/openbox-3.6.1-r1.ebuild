@@ -47,7 +47,7 @@ RDEPEND="dev-libs/glib:2
 DEPEND="${RDEPEND}
 	sys-devel/gettext
 	virtual/pkgconfig
-	xlibre-base/xorg-proto"
+	x11-base/xorg-proto"
 
 PATCHES=( "${FILESDIR}/${PN}-3.5.2-gnome-session.patch" )
 

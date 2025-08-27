@@ -19,7 +19,7 @@ RDEPEND="
 DEPEND="
 	${RDEPEND}
 	>=sys-kernel/linux-headers-2.6
-	xlibre-base/xorg-proto"
+	x11-base/xorg-proto"
 
 pkg_pretend() {
 	if use kernel_linux ; then

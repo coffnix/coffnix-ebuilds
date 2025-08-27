@@ -23,7 +23,7 @@ RDEPEND="
 	xlibre-base/xorg-server[-minimal]
 	udev? ( virtual/libudev:= )"
 DEPEND="${RDEPEND}
-	xlibre-base/xorg-proto"
+	x11-base/xorg-proto"
 
 pkg_pretend() {
 	if use kernel_linux; then

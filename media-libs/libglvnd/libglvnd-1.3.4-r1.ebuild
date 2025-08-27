@@ -28,7 +28,7 @@ RDEPEND="
 		x11-proto/glproto
 	)"
 DEPEND="${RDEPEND}
-	X? ( xlibre-base/xorg-proto )"
+	X? ( x11-base/xorg-proto )"
 
 src_prepare() {
 	default

@@ -113,7 +113,7 @@ COMMON_SNAPSHOT_DEPEND="
 		kerberos? ( virtual/krb5 )
 		vaapi? ( >=media-libs/libva-2.7:=[X?,wayland?] )
 		X? (
-			xlibre-base/xorg-proto:=
+			x11-base/xorg-proto:=
 			x11-libs/libX11:=
 			x11-libs/libxcb:=
 			x11-libs/libXext:=

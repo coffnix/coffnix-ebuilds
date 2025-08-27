@@ -53,7 +53,7 @@ RDEPEND="
 	)
 "
 DEPEND="${RDEPEND}
-	xlibre-base/xorg-proto"
+	x11-base/xorg-proto"
 
 PATCHES=(
 	"${FILESDIR}"/${PN}-gcc-pr65873.patch

@@ -49,7 +49,7 @@ RDEPEND="
 "
 DEPEND="${RDEPEND}
 	>=kde-frameworks/kiconthemes-${KFMIN}:6
-	X? ( xlibre-base/xorg-proto )
+	X? ( x11-base/xorg-proto )
 "
 BDEPEND="sys-libs/libcap"
 

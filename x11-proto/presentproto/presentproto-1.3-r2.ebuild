@@ -9,7 +9,7 @@ KEYWORDS="*"
 
 SLOT="0/stub"
 
-PDEPEND="=xlibre-base/xorg-proto-2023.2"
+PDEPEND="=x11-base/xorg-proto-2023.2"
 DEPEND="${RDEPEND}"
 
 S="${WORKDIR}"

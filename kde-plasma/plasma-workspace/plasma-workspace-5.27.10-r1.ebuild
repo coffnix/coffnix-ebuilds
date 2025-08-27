@@ -127,7 +127,7 @@ DEPEND="${COMMON_DEPEND}
 	>=dev-libs/plasma-wayland-protocols-1.6.0
 	>=dev-libs/wayland-protocols-1.31
 	>=dev-qt/qtconcurrent-${QTMIN}:5
-	xlibre-base/xorg-proto
+	x11-base/xorg-proto
 	fontconfig? ( x11-libs/libXrender )
 "
 RDEPEND="${COMMON_DEPEND}

@@ -92,7 +92,7 @@ DEPEND="${COMMON_DEPEND}
 	>=dev-qt/designer-${QTMIN}:5
 	>=dev-qt/qtconcurrent-${QTMIN}:5
 	>=dev-qt/qtwayland-${QTMIN}:5
-	xlibre-base/xorg-proto
+	x11-base/xorg-proto
 	x11-libs/xcb-util-image
 	caps? ( sys-libs/libcap )
 "

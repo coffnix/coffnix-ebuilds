@@ -50,7 +50,7 @@ COMMON_DEPEND="
 "
 DEPEND="${COMMON_DEPEND}
 	>=dev-libs/plasma-wayland-protocols-1.11.1
-	xlibre-base/xorg-proto
+	x11-base/xorg-proto
 "
 RDEPEND="${COMMON_DEPEND}
 	!${CATEGORY}/${PN}:5[-kf6compat(-)]

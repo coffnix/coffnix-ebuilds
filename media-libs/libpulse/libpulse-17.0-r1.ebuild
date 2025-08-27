@@ -34,7 +34,7 @@ RDEPEND="
 "
 DEPEND="${RDEPEND}
 	test? ( >=dev-libs/check-0.9.10 )
-	X? ( xlibre-base/xorg-proto )
+	X? ( x11-base/xorg-proto )
 "
 BDEPEND="
 	dev-lang/perl
