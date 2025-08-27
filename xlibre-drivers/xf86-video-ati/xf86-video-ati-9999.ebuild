@@ -20,7 +20,7 @@ RDEPEND="
 	media-libs/mesa
 	>=x11-libs/libdrm-2.4.89[video_cards_radeon]
 	>=x11-libs/libpciaccess-0.8.0
-	x11-base/xlibre-server[-minimal]
+	xlibre-base/xorg-server[-minimal]
 	udev? ( virtual/libudev:= )"
 DEPEND="${RDEPEND}
 	x11-base/xorg-proto"

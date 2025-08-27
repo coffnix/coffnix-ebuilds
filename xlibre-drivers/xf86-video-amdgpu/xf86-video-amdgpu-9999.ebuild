@@ -16,7 +16,7 @@ HOMEPAGE="https://github.com/X11Libre/xf86-video-amdgpu"
 IUSE="udev"
 
 RDEPEND=">=x11-libs/libdrm-2.4.89[video_cards_amdgpu]
-	x11-base/xlibre-server[-minimal]
+	xlibre-base/xorg-server[-minimal]
 	udev? ( virtual/libudev:= )"
 DEPEND="${RDEPEND}"
 

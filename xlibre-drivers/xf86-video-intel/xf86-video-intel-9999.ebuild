@@ -27,7 +27,7 @@ RDEPEND="
 	x11-libs/libXScrnSaver
 	>=x11-libs/pixman-0.27.1
 	>=x11-libs/libdrm-2.4.52[video_cards_intel]
-	x11-base/xlibre-server:=
+	xlibre-base/xorg-server:=
 	tools? (
 		x11-libs/libX11
 		x11-libs/libxcb

@@ -11,5 +11,5 @@ if [[ ${PV} != 9999* ]]; then
 	KEYWORDS="~alpha amd64 arm arm64 ~hppa ~mips ppc ppc64 sparc x86 ~amd64-linux ~x86-linux"
 fi
 
-RDEPEND="x11-base/xlibre-server"
+RDEPEND="xlibre-base/xorg-server"
 DEPEND="${RDEPEND}"

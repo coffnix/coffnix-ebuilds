@@ -20,7 +20,7 @@ RDEPEND="
 		app-emulation/spice
 		${PYTHON_DEPS}
 	)
-	x11-base/xlibre-server[-minimal]
+	xlibre-base/xorg-server[-minimal]
 	>=x11-libs/libdrm-2.4.46"
 DEPEND="
 	${RDEPEND}

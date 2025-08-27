@@ -12,7 +12,7 @@ if [[ ${PV} != 9999* ]]; then
 fi
 
 RDEPEND="
-	x11-base/xlibre-server[udev]
+	xlibre-base/xorg-server[udev]
 	dev-libs/libevdev
 	sys-libs/mtdev
 	virtual/libudev:="
