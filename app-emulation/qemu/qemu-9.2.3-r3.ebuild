@@ -260,7 +260,7 @@ BDEPEND="
 	$(python_gen_impl_dep)
 	dev-python/distlib[${PYTHON_USEDEP}]
 	dev-lang/perl
-	>=dev-build/meson-0.63.0
+	>=dev-util/meson-0.63.0
 	app-alternatives/ninja
 	virtual/pkgconfig
 	doc? (
