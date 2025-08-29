@@ -7,17 +7,17 @@ EAPI=7
 # (the construct below is to allow overriding from env for script)
 QEMU_DOCS_PREBUILT=${QEMU_DOCS_PREBUILT:-1}
 QEMU_DOCS_PREBUILT_DEV=sam
-QEMU_DOCS_VERSION=$(ver_cut 1-2).0
+QEMU_DOCS_VERSION="7.2.0"
 # Default to generating docs (inc. man pages) if no prebuilt; overridden later
 # bug #830088
 QEMU_DOC_USEFLAG="+doc"
 
-PYTHON_COMPAT=( python3_{11..13} )
-PYTHON_REQ_USE="ensurepip(-),ncurses,readline"
+PYTHON_COMPAT=( python3+ )
+PYTHON_REQ_USE="ncurses,readline"
 
 FIRMWARE_ABI_VERSION="7.2.0"
 
-inherit eapi9-ver flag-o-matic linux-info toolchain-funcs python-r1 udev fcaps \
+inherit linux-info toolchain-funcs python-r1 udev fcaps readme.gentoo-r1 \
 		readme.gentoo-r1 pax-utils xdg-utils
 
 MY_P="${PN}-${PV/_rc/-rc}"
