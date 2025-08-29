@@ -82,6 +82,8 @@ IUSE_SOFTMMU_TARGETS="
 	avr
 	rx
 	tricore
+	aarch64
+	arm
 "
 IUSE_USER_TARGETS="
 	${COMMON_TARGETS}
