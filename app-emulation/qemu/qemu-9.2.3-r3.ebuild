@@ -67,7 +67,6 @@ COMMON_TARGETS="
 	aarch64
 	alpha
 	arm
-	cris
 	hppa
 	i386
 	loongarch64
@@ -78,7 +77,6 @@ COMMON_TARGETS="
 	mips64
 	mips64el
 	mipsel
-	nios2
 	or1k
 	ppc
 	ppc64
