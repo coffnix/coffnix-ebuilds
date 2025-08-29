@@ -289,7 +289,6 @@ DEPEND="
 "
 RDEPEND="
 	${CDEPEND}
-	acct-group/kvm
 	selinux? (
 		sec-policy/selinux-qemu
 		sys-libs/libselinux
