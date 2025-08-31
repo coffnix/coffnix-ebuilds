@@ -47,7 +47,7 @@ RDEPEND="
 	acpi? ( sys-power/acpid )
 	wayland? ( dev-libs/wayland )
 	X? (
-		>=xlibre-base/xorg-server-1.20.8
+		>=x11-base/xorg-server-1.20.8
 		>=x11-libs/libX11-1.6.2
 		>=x11-libs/libXext-1.3.2
 		>=x11-libs/libvdpau-1.0
@@ -368,7 +368,7 @@ src_install() {
 	if use X; then
 
 		# Xorg nvidia.conf
-		if has_version '>=xlibre-base/xorg-server-1.16'; then
+		if has_version '>=x11-base/xorg-server-1.16'; then
 			dosym "${NV_ROOT}/share/X11/xorg.conf.d/nvidia-drm-outputclass.conf" "/usr/share/X11/xorg.conf.d/50-nvidia-drm-outputclass.conf"
 		fi
 
