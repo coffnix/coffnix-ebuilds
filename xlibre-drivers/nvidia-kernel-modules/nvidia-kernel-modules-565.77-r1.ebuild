@@ -1,7 +1,7 @@
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
-inherit eutils flag-o-matic linux-info linux-mod multilib-minimal nvidia-driver \
+EAPI=7
+inherit eutils flag-o-matic linux-info linux-mod multilib-minimal \
 	portability toolchain-funcs unpacker user udev
 
 DESCRIPTION="NVIDIA GPU Kernel Modules"
@@ -9,33 +9,27 @@ HOMEPAGE="http://www.nvidia.com/ http://www.nvidia.com/Download/Find.aspx"
 SRC_URI=""
 
 LICENSE="GPL-2 NVIDIA-r2"
-SLOT="0/${PV%.*}"
+SLOT="565"
 KEYWORDS="-* ~amd64 ~arm64"
 RESTRICT="bindist"
 
-IUSE="+kms +uvm videogroup"
+IUSE="+kms +uvm videogroup open-kernel"
 
 DEPEND="
 	~x11-drivers/nvidia-drivers-${PV}
 	virtual/linux-sources
 "
 NVDRIVERS_DIR="${EPREFIX}/opt/nvidia/nvidia-drivers-${PV}"
-S="${WORKDIR}/kernel-modules"
+S="${WORKDIR}/kernel"
 
 # Maximum supported kernel version in form major.minor
-: "${NV_MAX_KERNEL_VERSION:=6.3}"
+: "${NV_MAX_KERNEL_VERSION:=6.14}"
 
 
 nvidia_drivers_versions_check() {
 	if kernel_is ge ${NV_MAX_KERNEL_VERSION%%.*} ${NV_MAX_KERNEL_VERSION#*.}; then
 		ewarn "These NVIDIA kernel modules are designed to work with Linux ${NV_MAX_KERNEL_VERSION} or earlier."
 	fi
-
-	# Since Nvidia ships many different series of drivers, we need to give the user
-	# some kind of guidance as to what version they should install. This tries
-	# to point the user in the right direction but can't be perfect. check
-	# nvidia-driver.eclass
-	nvidia-driver-check-warning
 
 	# Kernel features/options to check for
 	CONFIG_CHECK="~ZONE_DMA ~MTRR ~SYSVIPC ~!LOCKDEP"
@@ -78,12 +72,15 @@ pkg_setup() {
 }
 
 src_unpack() {
-	cp -r "${NVDRIVERS_DIR}/src/kernel-modules" "${S}" || die
+	if use open-kernel ; then
+		cp -r "${NVDRIVERS_DIR}/src/kernel-open" "${S}" || die
+	else
+		cp -r "${NVDRIVERS_DIR}/src/kernel" "${S}" || die
+	fi
 }
 
 
 src_prepare() {
-
 	# Apply patches for our exact package and version
 	local mypatch
 	for mypatch in "${FILESDIR}"/${P}*.patch ; do
@@ -92,7 +89,6 @@ src_prepare() {
 	done
 
 	default
-
 }
 
 src_compile() {
@@ -104,39 +100,43 @@ src_compile() {
 	MAKEOPTS=-j1 linux-mod_src_compile
 }
 
+_nvidia_mod_src_install() {
+	local modulename libdir srcdir objdir i n
+	[[ -n ${KERNEL_DIR} ]] && addpredict "${KERNEL_DIR}/null.dwo"
+
+	strip_modulenames;
+	for i in ${MODULE_NAMES}
+	do
+		unset libdir srcdir objdir
+		for n in $(find_module_params ${i})
+		do
+			eval ${n/:*}=${n/*:/}
+		done
+		libdir=${libdir:-misc}
+		srcdir=${srcdir:-${S}}
+		objdir=${objdir:-${srcdir}}
+
+		einfo "Installing ${modulename} module"
+		cd "${objdir}" || die "${objdir} does not exist"
+		if use open-kernel ; then
+			insinto /lib/modules/nvidia-open/${PV}/${KV_FULL}/${libdir}
+		else
+			insinto /lib/modules/nvidia/${PV}/${KV_FULL}/${libdir}
+		fi
+		doins ${modulename}.${KV_OBJ} || die "doins ${modulename}.${KV_OBJ} failed"
+		cd "${OLDPWD}"
+
+		generate_modulesd "${objdir}/${modulename}"
+	done
+}
+
 
 src_install() {
-	linux-mod_src_install
-	insinto /etc/modprobe.d
-	if use videogroup; then
-		newins "${FILESDIR}"/nvidia.conf.modprobe-r1.video nvidia.conf
-	else
-		newins "${FILESDIR}"/nvidia.conf.modprobe-r1 nvidia.conf
-	fi
-	newins "${FILESDIR}"/nvidia-rmmod.conf.modprobe nvidia-rmmod.conf
-	doins "${FILESDIR}"/nouveau-blacklist.conf
-	# Ensures that our device nodes are created when not using X
-	sed -e 's:/opt/bin:'"${NVDRIVERS_DIR}"'/bin:g' "${FILESDIR}/nvidia-udev.sh" > "${T}/nvidia-udev.sh"
-	exeinto "$(get_udevdir)"
-	doexe "${T}"/nvidia-udev.sh
-	udev_newrules "${FILESDIR}"/nvidia.udev-rule 99-nvidia.rules
-	readme.gentoo_create_doc
+	_nvidia_mod_src_install
 }
 
 pkg_preinst() {
 	linux-mod_pkg_preinst
-	if use videogroup; then
-		local videogroup="$(egetent group video | cut -d ':' -f 3)"
-		if [ -z "${videogroup}" ]; then
-			eerror "Failed to determine the video group gid"
-			die "Failed to determine the video group gid"
-		else
-			sed -i \
-				-e "s:PACKAGE:${PF}:g" \
-				-e "s:VIDEOGID:${videogroup}:" \
-				"${D}"/etc/modprobe.d/nvidia.conf || die
-		fi
-	fi
 }
 
 pkg_postinst() {
@@ -147,4 +147,15 @@ pkg_postinst() {
 		einfo "any user accounts that need to access NVIDIA devices to this"
 		einfo "group."
 	fi
+
+	einfo "Try to run gpu-configurator nvidia kernel ${PV} ${KV_FULL} ..."
+	gpu-configurator nvidia kernel ${PV} ${KV_FULL}
+
+
+	einfo "The NVIDIA kernel driver is installed on path for"
+	einfo "app-admin/gpu-configurator tool."
+	einfo "Uses: gpu-configurator nvidia kernel ${PV} [kernel-version]"
+	einfo "to add hardlink to kernel path and/or to change configuration."
 }
+
+# vim: filetype=ebuild
