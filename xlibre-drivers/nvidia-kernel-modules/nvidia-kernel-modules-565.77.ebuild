@@ -16,7 +16,7 @@ RESTRICT="bindist"
 IUSE="+kms +uvm videogroup"
 
 DEPEND="
-	~x11-drivers/nvidia-drivers-${PV}
+	~xlibre-drivers/nvidia-drivers-${PV}
 	virtual/linux-sources
 "
 NVDRIVERS_DIR="${EPREFIX}/opt/nvidia/nvidia-drivers-${PV}"
