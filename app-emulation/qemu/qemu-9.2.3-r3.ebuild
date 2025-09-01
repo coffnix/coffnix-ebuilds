@@ -291,6 +291,7 @@ DEPEND="
 "
 RDEPEND="
 	${CDEPEND}
+	dev-python/pycotap
 	selinux? (
 		sec-policy/selinux-qemu
 		sys-libs/libselinux
