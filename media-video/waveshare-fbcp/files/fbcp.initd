@@ -1,0 +1,29 @@
+#!/sbin/openrc-run
+# Copyright 2025 MacaroniOS Authors
+# Distributed under the terms of the GNU General Public License v2
+
+description="Waveshare fbcp userspace framebuffer copier"
+
+pidfile="/run/fbcp.pid"
+command="/usr/sbin/fbcp"
+command_args="${FBCP_OPTS}"
+start_stop_daemon_args="--pidfile ${pidfile} --make-pidfile --background --stdout /var/log/fbcp.log --stderr /var/log/fbcp.log"
+
+depend() {
+    need localmount
+    after bootmisc
+    use logger
+}
+
+start_pre() {
+    checkpath -d -m 0755 /run || return 1
+    checkpath -d -m 0755 /var/log || return 1
+    if [ ! -x "${command}" ]; then
+        eerror "binary not found at ${command}"
+        return 1
+    fi
+    if [ ! -e /dev/fb0 ]; then
+        ewarn "default framebuffer device not found at /dev/fb0"
+    fi
+    return 0
+}
