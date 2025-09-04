@@ -14,3 +14,7 @@ LICENSE="BSD"
 SLOT="0"
 KEYWORDS="*"
 S="${WORKDIR}/av-15.1.0"
+
+RDEPEND="media-video/ffmpeg"
+DEPEND="${RDEPEND}
+	virtual/pkgconfig"
