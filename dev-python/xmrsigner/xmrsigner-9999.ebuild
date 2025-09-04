@@ -35,6 +35,7 @@ RDEPEND="
 	dev-python/qrcode[${PYTHON_USEDEP}]
 	dev-python/rpi-gpio[${PYTHON_USEDEP}]
 	dev-python/pyyaml[${PYTHON_USEDEP}]
+	dev-python/pynacl[${PYTHON_USEDEP}]
 	media-libs/libcamera
 "
 DEPEND="${RDEPEND}"
