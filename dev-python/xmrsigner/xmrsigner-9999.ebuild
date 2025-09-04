@@ -24,7 +24,7 @@ DOCS=( README.md LICENSE.md )
 RDEPEND="
 	dev-python/monero[${PYTHON_USEDEP}]
 	dev-python/polyseed[${PYTHON_USEDEP}]
-	dev-python/picamera[${PYTHON_USEDEP}]
+	dev-python/picamera2[${PYTHON_USEDEP}]
 	dev-python/pyzbar[${PYTHON_USEDEP}]
 	dev-python/six[${PYTHON_USEDEP}]
 	dev-python/spidev[${PYTHON_USEDEP}]
