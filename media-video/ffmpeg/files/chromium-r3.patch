@@ -9,7 +9,7 @@ to need rebasing across ffmpeg versions.
 @@ -43,2 +43,3 @@
  include $(SRC_PATH)/ffbuild/common.mak
 +include $(SRC_PATH)/ffbuild/libffmpeg.mak
-
+ 
 --- a/chromium.c
 +++ b/chromium.c
 @@ -0,0 +1,8 @@
