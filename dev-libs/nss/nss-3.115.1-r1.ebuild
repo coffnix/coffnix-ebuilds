@@ -324,16 +324,8 @@ src_install() {
 }
 
 pkg_postinst() {
-	# We must re-sign the libraries AFTER they are stripped.
-	local shlibsign="${EROOT}/usr/bin/shlibsign"
-	# See if we can execute it (cross-compiling & such). #436216
-	"${shlibsign}" -h >&/dev/null
-	if [[ $? -gt 1 ]] ; then
-		shlibsign="shlibsign"
-	fi
-	generate_chk "${shlibsign}" "${EROOT}"/usr/$(get_libdir)
+	whip h nss.postinst
 }
-
 pkg_postrm() {
-	cleanup_chk "${EROOT}"/usr/$(get_libdir)
+	whip h nss.postrm
 }
