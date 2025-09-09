@@ -6,12 +6,21 @@
 
 EAPI=7
 
-inherit cmake user
+inherit cmake user git-r3
 
 DESCRIPTION="Decentralized pool for Monero mining"
 HOMEPAGE="https://p2pool.io"
-SRC_URI="
-	https://github.com/SChernykh/p2pool/releases/download/v${PV}/p2pool_source-v${PV}.tar.xz -> ${P}.tar.xz"
+EGIT_REPO_URI="https://github.com/SChernykh/p2pool.git"
+EGIT_SUBMODULES=(
+	external/src/RandomX
+	external/src/miniupnp
+	external/src/rapidjson
+	external/src/robin-hood-hashing
+	external/src/cppzmq
+)
+EGIT_CLONE_TYPE="shallow"
+EGIT_CLONE_DEPTH="1"
+EGIT_SUBMODULES_DEPTH="1"
 
 LICENSE="BSD GPL-3+ ISC LGPL-3+ MIT"
 SLOT="0"
@@ -32,23 +41,17 @@ BDEPEND="
 "
 
 pkg_setup() {
-    if use daemon; then
-        # Criar grupo e usuário monero manualmente (estilo Funtoo oldschool)
-        enewgroup monero
-        enewuser monero -1 -1 /var/lib/monero monero
-    fi
-}
-
-src_unpack() {
-	unpack ${P}.tar.xz
-	mv -T "${WORKDIR}"/{${PN},${P}} || die
+	if use daemon; then
+		# Criar grupo e usuário monero manualmente (estilo Funtoo oldschool)
+		enewgroup monero
+		enewuser monero -1 -1 /var/lib/monero monero
+	fi
 }
 
 src_configure() {
 	local mycmakeargs=(
 		-DSTATIC_BINARY=OFF
 		-DSTATIC_LIBS=OFF
-		-DNO_RANDOMX=ON
 		-DWITH_GRPC=OFF #$(usex grpc)
 		-DWITH_TLS=OFF #$(usex tls)
 	)
