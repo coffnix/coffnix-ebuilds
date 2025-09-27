@@ -12,7 +12,7 @@ HOMEPAGE="
 	https://github.com/miniupnp/miniupnp/
 "
 SRC_URI="
-	https://miniupnp.tuxfamily.org/files/${P}.tar.gz
+	https://miniupnp.tuxfamily.org/files/${P}.tar.gz http://miniupnp.free.fr/files/${P}.tar.gz
 "
 
 LICENSE="BSD"
