@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
-inherit libtool linux-info udev toolchain-funcs
+inherit libtool linux-info udev toolchain-funcs autotools
 
 DESCRIPTION="An interface for filesystems implemented in userspace"
 HOMEPAGE="https://github.com/libfuse/libfuse"
@@ -13,6 +13,7 @@ SLOT="0"
 KEYWORDS="*"
 IUSE="examples kernel_linux kernel_FreeBSD static-libs"
 
+BDEPEND=">=sys-devel/gettext-0.26"
 PDEPEND="kernel_FreeBSD? ( sys-fs/fuse4bsd )"
 DEPEND="virtual/pkgconfig"
 RDEPEND=">=sys-fs/fuse-common-3.3.0-r1"
@@ -28,20 +29,30 @@ pkg_setup() {
 	fi
 }
 
+PATCHES=(
+"${FILESDIR}"/${PN}-2.9.3-kernel-types.patch
+"${FILESDIR}"/${PN}-2.9.9-avoid-calling-umount.patch
+"${FILESDIR}"/${PN}-2.9.9-closefrom-glibc-2-34.patch
+)
+
 src_prepare() {
- # Corrige chamada hardcoded de aclocal-1.15 no script "missing"
-    sed -i 's/aclocal-1\.15/aclocal/g' "${S}/missing" || die
-
-
-	local PATCHES=( "${FILESDIR}"/${PN}-2.9.3-kernel-types.patch "${FILESDIR}"/${PN}-2.9.9-avoid-calling-umount.patch "${FILESDIR}"/${PN}-2.9.9-closefrom-glibc-2-34.patch )
-	# sandbox violation with mtab writability wrt #438250
-	# don't sed configure.in without eautoreconf because of maintainer mode
-	sed -i 's:umount --fake:true --fake:' configure || die
-	elibtoolize
-	eautoreconf
-	touch -r configure aclocal.m4
-
 	default
+	# evitar regeneração no meio do make por causa do script 'missing'
+	sed -i -e 's/automake-1\.15/automake/g' -e 's/aclocal-1\.15/aclocal/g' "${S}/missing" || die
+
+	# patch já aplicado no configure pronto, não em configure.ac
+	sed -i 's:umount --fake:true --fake:' configure || die
+
+	# gettext 0.26
+	export WANT_AUTOCONF=2.72
+	AT_M4DIR="/usr/share/gettext/m4 ." eautoreconf
+
+	elibtoolize
+
+	# garante timestamps consistentes para o maintainer-mode não reinvocar autotools
+	touch -r configure aclocal.m4 config.h.in || true
+	find . -name Makefile.in -exec touch -r configure {} + || true
+
 }
 
 src_configure() {
@@ -51,9 +62,6 @@ src_configure() {
 		UDEV_RULES_PATH="${EPREFIX}/$(get_udevdir)/rules.d" \
 		$(use_enable static-libs static) \
 		--disable-example
-        # Corrige todos os arquivos do tarball com essa merda
-        find "${S}" -type f -exec sed -i 's/aclocal-1\.15/aclocal-1.16/g' {} + || die "sed aclocal version fix"
-        find "${S}" -type f -exec sed -i 's/automake-1\.15/automake-1.16/g' {} + || die "sed aclocal version fix"
 }
 
 src_install() {
