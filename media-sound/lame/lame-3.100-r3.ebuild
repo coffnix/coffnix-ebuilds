@@ -1,7 +1,7 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
-inherit autotools multilib-minimal
+inherit autotools
 
 DESCRIPTION="LAME Ain't an MP3 Encoder"
 HOMEPAGE="https://lame.sourceforge.net/"
@@ -12,8 +12,6 @@ SLOT="0"
 KEYWORDS="*"
 IUSE="debug cpu_flags_x86_mmx +frontend mp3rtp sndfile static-libs"
 
-# These deps are without MULTILIB_USEDEP and are correct since we only build
-# libmp3lame for multilib and these deps apply to the lame frontend executable.
 RDEPEND="
 	frontend? (
 		>=sys-libs/ncurses-5.7-r7:0=
@@ -32,47 +30,41 @@ PATCHES=(
 	"${FILESDIR}"/${PN}-3.98-gtk-path.patch
 	"${FILESDIR}"/${PN}-3.99.5-tinfo.patch
 	"${FILESDIR}"/${PN}-3.99.5-msse.patch
-	"${FILESDIR}"/${PN}-3.100-symbols.patch #662752
-	"${FILESDIR}"/${PN}-3.100-pkgconfig.patch #735168
+	"${FILESDIR}"/${PN}-3.100-symbols.patch
+	"${FILESDIR}"/${PN}-3.100-pkgconfig.patch
 )
 
 src_prepare() {
 	default
 
-	mkdir libmp3lame/i386/.libs || die #workaround parallel build with nasm
-
+	mkdir -p libmp3lame/i386/.libs || die
 	sed -i -e '/define sp/s/+/ + /g' libmp3lame/i386/nasm.h || die
-
-	use cpu_flags_x86_mmx || sed -i -e '/AC_PATH_PROG/s:nasm:dIsAbLe&:' configure.in #361879
+	use cpu_flags_x86_mmx || sed -i -e '/AC_PATH_PROG/s:nasm:dIsAbLe&:' configure.in || die
 
 	mv configure.{in,ac} || die
-	AT_M4DIR=. eautoreconf
+
+	# gettext 0.26
+	export WANT_AUTOCONF=2.72
+	AT_M4DIR="/usr/share/gettext/m4 ." eautoreconf
 }
 
-multilib_src_configure() {
-	# Only build the frontend for the default ABI.
+src_configure() {
 	local myconf=(
 		--disable-mp3x
 		--enable-dynamic-frontends
-		$(multilib_native_use_enable frontend)
-		$(multilib_native_use_enable mp3rtp)
-		$(multilib_native_usex sndfile '--with-fileio=sndfile' '')
+		$(use_enable frontend)
+		$(use_enable mp3rtp)
+		$(usex sndfile '--with-fileio=sndfile' '')
 		$(use_enable debug debug norm)
 		$(use_enable static-libs static)
-		$(usex cpu_flags_x86_mmx '--enable-nasm' '') #361879
+		$(usex cpu_flags_x86_mmx '--enable-nasm' '')
 	)
-
-	ECONF_SOURCE="${S}" econf "${myconf[@]}"
+	econf "${myconf[@]}"
 }
 
-multilib_src_install() {
-	emake \
-		DESTDIR="${D}" \
-		pkghtmldir="${EPREFIX}/usr/share/doc/${PF}/html" \
-		install
-}
+src_install() {
+	emake DESTDIR="${D}" pkghtmldir="${EPREFIX}/usr/share/doc/${PF}/html" install
 
-multilib_src_install_all() {
 	dodoc API ChangeLog HACKING README STYLEGUIDE TODO USAGE
 	docinto html
 	dodoc misc/lameGUI.html Dll/LameDLLInterface.htm
