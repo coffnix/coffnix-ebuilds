@@ -15,6 +15,7 @@ RESTRICT="!test? ( test )"
 
 RDEPEND="
 	>=dev-libs/libsigc++-2.9.1:2
+	>=dev-libs/libsigc++-3.0.3:3
 	>=dev-libs/glib-2.62.2:2
 "
 DEPEND="${RDEPEND}"
