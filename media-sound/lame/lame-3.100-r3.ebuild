@@ -21,6 +21,7 @@ RDEPEND="
 DEPEND="${RDEPEND}"
 BDEPEND="
 	sys-devel/gettext
+	>=sys-devel/gettext-0.26
 	virtual/pkgconfig
 	cpu_flags_x86_mmx? ( dev-lang/nasm )
 "
