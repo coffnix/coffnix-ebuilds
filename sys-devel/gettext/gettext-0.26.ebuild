@@ -49,12 +49,6 @@ MULTILIB_WRAPPED_HEADERS=(
 	/usr/include/textstyle/woe32dll.h
 )
 
-PATCHES=(
-	"${FILESDIR}"/${PN}-0.19.7-disable-libintl.patch #564168
-	"${FILESDIR}"/${PN}-0.20-parallel_install.patch #685530
-	"${FILESDIR}"/${PN}-0.20-avoid_eautomake.patch
-)
-
 pkg_setup() {
 	mono-env_pkg_setup
 	java-pkg-opt-2_pkg_setup
