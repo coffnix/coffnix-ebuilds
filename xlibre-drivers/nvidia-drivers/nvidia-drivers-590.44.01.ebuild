@@ -7,11 +7,11 @@ inherit desktop eutils flag-o-matic linux-info linux-mod \
 DESCRIPTION="NVIDIA Accelerated Graphics Driver"
 HOMEPAGE="http://www.nvidia.com/ http://www.nvidia.com/Download/Find.aspx"
 SRC_URI="
-amd64? ( http://download.nvidia.com/XFree86/Linux-x86_64/570.172.08/NVIDIA-Linux-x86_64-570.172.08-no-compat32.run -> NVIDIA-Linux-x86_64-570.172.08-no-compat32.run )
-arm64? ( http://download.nvidia.com/XFree86/Linux-aarch64/570.172.08/NVIDIA-Linux-aarch64-570.172.08.run -> NVIDIA-Linux-aarch64-570.172.08.run )"
+amd64? ( https://download.nvidia.com/XFree86/Linux-x86_64/590.44.01/NVIDIA-Linux-x86_64-590.44.01-no-compat32.run -> NVIDIA-Linux-x86_64-590.44.01-no-compat32.run )"
 
+#arm64? ( https://download.nvidia.com/XFree86/Linux-aarch64/590.44.01/NVIDIA-Linux-aarch64-590.44.01.run -> NVIDIA-Linux-aarch64-590.44.01.run )
 LICENSE="GPL-2 NVIDIA-r2"
-SLOT="570"
+SLOT="580"
 KEYWORDS="*"
 RESTRICT="bindist strip"
 EMULTILIB_PKG="true"
