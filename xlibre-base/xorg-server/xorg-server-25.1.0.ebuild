@@ -110,7 +110,7 @@ src_configure() {
 		-Dsha1=libcrypto
 		-Dxkb_output_dir="${EPREFIX}"/var/lib/xkb
 		-Dxkb_dir="${EPREFIX}"/usr/share/X11/xkb
-		-Dsystemd_logind=true
+		$(usex systemd -Dsystemd_logind=true -Dsystemd_logind=false)
 		$(usex nvidia -Dlegacy_nvidia_padding=true -Dlegacy_nvidia_padding=false)
 		$(meson_use suid suid_wrapper)
 		)
