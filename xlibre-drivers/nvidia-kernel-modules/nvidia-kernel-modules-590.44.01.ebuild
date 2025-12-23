@@ -9,7 +9,7 @@ HOMEPAGE="http://www.nvidia.com/ http://www.nvidia.com/Download/Find.aspx"
 SRC_URI=""
 
 LICENSE="GPL-2 NVIDIA-r2"
-SLOT="580"
+SLOT="590"
 KEYWORDS="*"
 
 IUSE="+kms +uvm videogroup open-kernel"
