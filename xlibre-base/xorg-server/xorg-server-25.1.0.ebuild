@@ -12,7 +12,7 @@ LICENSE="MIT"
 SLOT="0/${PV}"
 KEYWORDS="*"
 IUSE_SERVERS="+kdrive xephyr xnest +xorg xvfb"
-IUSE="${IUSE_SERVERS} debug +elogind minimal selinux +suid test +udev unwind xcsecurity systemd"
+IUSE="${IUSE_SERVERS} debug +elogind +nvidia minimal selinux +suid test +udev unwind xcsecurity systemd"
 
 DEPEND="
 	dev-libs/libbsd
@@ -111,6 +111,7 @@ src_configure() {
 		-Dxkb_output_dir="${EPREFIX}"/var/lib/xkb
 		-Dxkb_dir="${EPREFIX}"/usr/share/X11/xkb
 		-Dsystemd_logind=true
+		$(usex nvidia -Dlegacy_nvidia_padding=true -Dlegacy_nvidia_padding=false)
 		$(meson_use suid suid_wrapper)
 		)
 
