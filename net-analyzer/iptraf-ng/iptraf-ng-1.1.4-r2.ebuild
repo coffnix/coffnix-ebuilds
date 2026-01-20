@@ -6,7 +6,8 @@ inherit eutils toolchain-funcs
 
 DESCRIPTION="A console-based network monitoring utility"
 HOMEPAGE="http://fedorahosted.org/iptraf-ng/"
-SRC_URI="http://fedorahosted.org/releases/${PN:0:1}/${PN:1:1}/${PN}/${P}.tar.gz"
+#SRC_URI="http://fedorahosted.org/releases/${PN:0:1}/${PN:1:1}/${PN}/${P}.tar.gz"
+SRC_URI="https://github.com/iptraf-ng/iptraf-ng/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="GPL-2 doc? ( FDL-1.1 )"
 SLOT="0"
