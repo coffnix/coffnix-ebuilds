@@ -2,25 +2,36 @@
 
 EAPI=7
 
-PYTHON_COMPAT=( python3+ pypy3 )
-inherit distutils-r1 toolchain-funcs
+DISTUTILS_EXT=1
+DISTUTILS_USE_PEP517=setuptools
+PYTHON_COMPAT=( python3+ )
+PYPI_PN="M2Crypto"
+PYTHON_REQ_USE="threads(+)"
+
+inherit distutils-r1 toolchain-funcs pypi
 
 DESCRIPTION="A Python crypto and SSL toolkit"
-HOMEPAGE="https://gitlab.com/m2crypto/m2crypto https://pypi.org/project/M2Crypto/"
-SRC_URI="https://files.pythonhosted.org/packages/ad/69/33db804ea9c50175df3508d97bd3c33926913480bbd951008b92f678b138/m2crypto-0.45.1.tar.gz -> m2crypto-0.45.1.tar.gz"
+HOMEPAGE="
+	https://sr.ht/~mcepl/m2crypto/
+	https://gitlab.com/m2crypto/m2crypto/
+	https://pypi.org/project/M2Crypto/
+"
 
-DEPEND=""
-RDEPEND="
-	libressl? ( dev-libs/libressl:0= )
-	!libressl? ( dev-libs/openssl:0= )
-	virtual/python-typing[$PYTHON_USEDEP]"
-BDEPEND="
-	>=dev-lang/swig-2.0.9"
-IUSE="libressl"
+# openssl via src/SWIG/_lib11_compat.i
+LICENSE="BSD-2 openssl"
 SLOT="0"
-LICENSE="MIT"
-KEYWORDS="*"
-S="${WORKDIR}/m2crypto-0.45.1"
+KEYWORDS="~alpha amd64 arm arm64 ~hppa ~loong ~mips ppc ppc64 ~riscv ~s390 ~sparc x86 ~x64-macos"
+IUSE="abi_mips_n32 abi_mips_n64 abi_mips_o32"
+
+DEPEND="
+	dev-libs/openssl:=
+"
+RDEPEND="
+	${DEPEND}
+"
+BDEPEND="
+	>=dev-lang/swig-2.0.9
+"
 
 swig_define() {
 	local x
@@ -30,6 +41,15 @@ swig_define() {
 		fi
 	done
 }
+
+src_prepare() {
+	# relies on very exact clock behavior which apparently fails
+	# with inconvenient CONFIG_HZ*
+	sed -e 's:test_server_simple_timeouts:_&:' \
+		-i tests/test_ssl.py || die
+	distutils-r1_src_prepare
+}
+
 python_compile() {
 	# setup.py looks at platform.machine() to determine swig options.
 	# For exotic ABIs, we need to give swig a hint.
@@ -43,6 +63,8 @@ python_compile() {
 
 	distutils-r1_python_compile
 }
+
 python_test() {
-	esetup.py test
+	"${EPYTHON}" -m unittest -b -v tests.alltests.suite ||
+		die "Tests failed for ${EPYTHON}"
 }
