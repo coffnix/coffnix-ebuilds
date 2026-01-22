@@ -7,7 +7,7 @@ DESCRIPTION="Compiler for the GObject type system"
 HOMEPAGE="https://wiki.gnome.org/Projects/Vala"
 
 LICENSE="LGPL-2.1"
-SLOT="0.54"
+SLOT="0.56"
 KEYWORDS="*"
 
 COMMON_DEPEND="
