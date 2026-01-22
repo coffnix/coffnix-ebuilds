@@ -10,9 +10,7 @@ DESCRIPTION="Driver for Wacom tablets and drawing devices"
 HOMEPAGE="https://linuxwacom.github.io/ https://github.com/X11Libre/xf86-input-wacom"
 
 LICENSE="GPL-2+"
-if [[ ${PV} != 9999* ]]; then
-	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~loong ~ppc ~ppc64 ~riscv ~sparc ~x86"
-fi
+KEYWORDS="*"
 IUSE="test"
 RESTRICT="!test? ( test )"
 
