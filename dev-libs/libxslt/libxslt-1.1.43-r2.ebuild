@@ -21,7 +21,7 @@ RDEPEND="
 	python? ( ${PYTHON_DEPS} )
 "
 DEPEND="${RDEPEND} ${PYTHON_DEPS}"
-SRC_URI="https://download.gnome.org/sources/libxslt/1.1/libxslt-1.1.38.tar.xz -> libxslt-1.1.38.tar.xz"
+SRC_URI="https://download.gnome.org/sources/libxslt/1.1/libxslt-1.1.43.tar.xz -> libxslt-1.1.43.tar.xz"
 KEYWORDS="*"
 
 src_prepare() {
