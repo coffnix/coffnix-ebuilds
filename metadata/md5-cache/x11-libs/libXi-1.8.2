@@ -1,0 +1,13 @@
+DEFINED_PHASES=compile configure install postinst postrm prepare test unpack
+DEPEND=x11-base/xorg-proto >=x11-libs/libX11-1.6.2[-mgorny(-)] >=x11-libs/libXext-1.3.2[-mgorny(-)] >=x11-libs/libXfixes-5.0.1[-mgorny(-)] >=app-portage/elt-patches-20170815 || ( >=sys-devel/automake-1.16.5:1.16 ) >=sys-devel/autoconf-2.71 >=sys-devel/libtool-2.4 ppc-aix? ( >=sys-devel/libtool-2.2.6a sys-devel/m4 >=x11-misc/util-macros-1.18 >=media-fonts/font-util-1.2.0 ) x86-winnt? ( >=sys-devel/libtool-2.2.6a sys-devel/m4 >=x11-misc/util-macros-1.18 >=media-fonts/font-util-1.2.0 ) virtual/pkgconfig[-mgorny(-)] doc? ( doc? ( || ( app-text/asciidoc dev-ruby/asciidoctor ) app-text/xmlto app-doc/doxygen app-text/docbook-xml-dtd:4.1.2 app-text/docbook-xml-dtd:4.2 app-text/docbook-xml-dtd:4.3 ) )
+DESCRIPTION=X.Org Xi library
+EAPI=5
+HOMEPAGE=https://www.x.org/wiki/ https://gitlab.freedesktop.org/xorg/lib/libXi
+IUSE=abi_x86_32 abi_x86_64 abi_x86_x32 abi_mips_n32 abi_mips_n64 abi_mips_o32 abi_s390_32 abi_s390_64 static-libs doc
+KEYWORDS=*
+LICENSE=MIT
+RDEPEND=x11-base/xorg-proto >=x11-libs/libX11-1.6.2[-mgorny(-)] >=x11-libs/libXext-1.3.2[-mgorny(-)] >=x11-libs/libXfixes-5.0.1[-mgorny(-)]
+SLOT=0
+SRC_URI=https://www.x.org/releases/individual/lib/libXi-1.8.2.tar.xz
+_eclasses_=autotools	e9ade2787b2f54643c7cdffbfa1cca9c	autotools-multilib	d4c92668ddddff2b1da2efb74daa43be	autotools-utils	696393cddf6200db17a31641f597b403	desktop	b1d22ac8bdd4679ab79c71aca235009d	epatch	cb17fbe94a2c43cbc0f8e76abf15479a	eqawarn	bb3d80ca38bc542ed397ab65f64256a6	estack	43ddf5aaffa7a8d0482df54d25a66a1f	eutils	6e6c2737b59a4b982de6fb3ecefd87f8	flag-o-matic	d0939f99dd528dd0c5ec25284877bf5c	libtool	f143db5a74ccd9ca28c1234deffede96	ltprune	22f9f14d105434e9c400ccac3bbb64ae	multibuild	b2c915190b051f55a23b9354b9849847	multilib	d410501a125f99ffb560b0c523cd3d1e	multilib-build	dbed54cab0d2fac962c6342aeae40ef9	multilib-minimal	8bddda43703ba94d8341f4e247f97566	preserve-libs	d521bde96a41ef9807fcf99977841b26	toolchain-funcs	24921b57d6561d87cbef4916a296ada4	vcs-clean	2a0f74a496fa2b1552c4f3398258b7bf	xorg-2	e417539b7a655ced6d5cdc54576dafa7
+_md5_=ed24b4e9f84eaf9dd4e6400e349657f0

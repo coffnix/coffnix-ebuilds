@@ -1,0 +1,15 @@
+BDEPEND=dev-lang/perl virtual/pkgconfig
+DEFINED_PHASES=compile configure install postinst postrm prepare test
+DEPEND==dev-qt/qtcore-5.15.17*:5= test? ( =dev-qt/qttest-5.15.17* )
+DESCRIPTION=Tool that generates certain boilerplate C++ code from Wayland protocol xml spec
+EAPI=7
+HOMEPAGE=https://www.qt.io/
+IUSE=debug test
+KEYWORDS=amd64 arm arm64 ~hppa ~loong ppc ppc64 ~riscv ~sparc x86
+LICENSE=|| ( GPL-2 GPL-3 LGPL-3 ) FDL-1.3
+RDEPEND==dev-qt/qtcore-5.15.17*:5= !<dev-qt/qtwayland-5.15.3:5
+RESTRICT=test
+SLOT=5/5.15
+SRC_URI=https://download.qt.io/official_releases/qt/5.15/5.15.17/submodules/qtwayland-everywhere-src-5.15.17.tar.xz
+_eclasses_=estack	43ddf5aaffa7a8d0482df54d25a66a1f	eutils	6e6c2737b59a4b982de6fb3ecefd87f8	flag-o-matic	d0939f99dd528dd0c5ec25284877bf5c	multilib	d410501a125f99ffb560b0c523cd3d1e	qt5-build	2927a6fb54fc6ab941bc4f4fcd43bd63	toolchain-funcs	24921b57d6561d87cbef4916a296ada4	virtualx	7c3a8bd4a54ffb8aadb5ea2b9c6ab380
+_md5_=3c60b72022c2f67ef0aa202b342f9a9b

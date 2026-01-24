@@ -1,0 +1,14 @@
+DEFINED_PHASES=compile install prepare test
+DEPEND=~sys-libs/libapparmor-2.13.3 dev-lang/perl sys-devel/bison sys-devel/gettext sys-devel/flex doc? ( dev-tex/latex2html )
+DESCRIPTION=Userspace utils and init scripts for the AppArmor application security system
+EAPI=7
+HOMEPAGE=https://gitlab.com/apparmor/apparmor/wikis/home
+IUSE=doc
+KEYWORDS=*
+LICENSE=GPL-2
+RDEPEND=~sys-libs/libapparmor-2.13.3 ~sec-policy/apparmor-profiles-2.13.3
+RESTRICT=test
+SLOT=0
+SRC_URI=https://launchpad.net/apparmor/2.13/2.13.3/+download/apparmor-2.13.3.tar.gz
+_eclasses_=multilib	d410501a125f99ffb560b0c523cd3d1e	toolchain-funcs	24921b57d6561d87cbef4916a296ada4
+_md5_=36d958fb84d41e510b1871f216f81d94

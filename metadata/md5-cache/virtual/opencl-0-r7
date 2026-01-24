@@ -1,0 +1,8 @@
+DEFINED_PHASES=postinst
+DESCRIPTION=Virtual for OpenCL implementations
+EAPI=6
+IUSE=video_cards_amdgpu video_cards_i965 video_cards_nvidia video_cards_panfrost
+KEYWORDS=amd64 x86
+RDEPEND=|| ( amd64? ( video_cards_amdgpu? ( dev-libs/amdgpu-pro-opencl ) dev-util/intel-ocl-sdk ) video_cards_i965? ( dev-libs/beignet ) video_cards_nvidia? ( >=x11-drivers/nvidia-drivers-290.10-r2[opencl] ) video_cards_panfrost? ( dev-util/opencl-icd-loader ) ) video_cards_panfrost? ( dev-util/opencl-headers )
+SLOT=0
+_md5_=260b9407371c3082d6aa81d9defdb09b

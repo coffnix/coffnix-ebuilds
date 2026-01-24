@@ -1,0 +1,62 @@
+diff -urN gtk-vnc-1.0.0/examples/meson.build gtk-vnc-1.0.0-fixed/examples/meson.build
+--- gtk-vnc-1.0.0/examples/meson.build	2019-08-07 08:45:58.000000000 -0600
++++ gtk-vnc-1.0.0-fixed/examples/meson.build	2020-01-04 20:59:20.260425336 -0700
+@@ -1,7 +1,7 @@
+ 
+ gvncviewer_deps = [gtk_vnc_dep]
+ 
+-if libpulse_dep.found()
++if with_pulse and libpulse_dep.found()
+   gvncviewer_deps += [gvncpulse_dep]
+ endif
+ 
+diff -urN gtk-vnc-1.0.0/meson.build gtk-vnc-1.0.0-fixed/meson.build
+--- gtk-vnc-1.0.0/meson.build	2019-08-07 08:45:58.000000000 -0600
++++ gtk-vnc-1.0.0-fixed/meson.build	2020-01-04 20:58:27.461041723 -0700
+@@ -77,6 +77,8 @@
+   gthread_dep = disabler()
+ endif
+ 
++with_pulse = get_option('with-pulseaudio')
++
+ gdk_pixbuf_dep = dependency('gdk-pixbuf-2.0', version: '>= ' + gdk_pixbuf_min_version)
+ gtk_dep = dependency('gtk+-3.0', version: '>= ' + gtk_min_version)
+ gcrypt_dep = dependency('libgcrypt', version: '>= ' + gcrypt_min_version)
+@@ -84,7 +86,7 @@
+ cairo_dep = dependency('cairo', version: '>= ' + cairo_min_version)
+ x11_dep = dependency('x11', version: '>= ' + x11_min_version, required: false)
+ libpulse_dep = dependency('libpulse-simple', version: '>= ' + libpulse_min_version, required: false)
+-if libpulse_dep.found()
++if with_pulse and libpulse_dep.found()
+   conf_data.set('HAVE_PULSEAUDIO', true)
+ endif
+ zlib_dep = dependency('zlib', version: '>= ' + zlib_min_version)
+@@ -300,7 +302,7 @@
+   install_dir: gtk_vnc_pkgconfdir,
+ )
+ 
+-if libpulse_dep.found()
++if with_pulse and libpulse_dep.found()
+   configure_file(
+     input: 'gvncpulse-1.0.pc.in',
+     output: 'gvncpulse-1.0.pc',
+diff -urN gtk-vnc-1.0.0/meson_options.txt gtk-vnc-1.0.0-fixed/meson_options.txt
+--- gtk-vnc-1.0.0/meson_options.txt	2019-08-07 08:45:58.000000000 -0600
++++ gtk-vnc-1.0.0-fixed/meson_options.txt	2020-01-04 20:58:27.461041723 -0700
+@@ -2,3 +2,4 @@
+ option('with-coroutine', type: 'string', value: 'auto', description: 'Build with coroutine backend: [auto, ucontext, gthread]')
+ option('with-tls-priority', type: 'string', value: 'NORMAL', description: 'Set default TLS priority string')
+ option('with-vala', type: 'boolean', value: true, description: 'Enable Vala bindings')
++option('with-pulseaudio', type: 'boolean', value: true, description: 'Enable PulseAudio')
+diff -urN gtk-vnc-1.0.0/src/meson.build gtk-vnc-1.0.0-fixed/src/meson.build
+--- gtk-vnc-1.0.0/src/meson.build	2019-08-07 08:45:58.000000000 -0600
++++ gtk-vnc-1.0.0-fixed/src/meson.build	2020-01-04 20:58:27.465041677 -0700
+@@ -165,7 +165,7 @@
+   endif
+ endif
+ 
+-if libpulse_dep.found()
++if with_pulse and libpulse_dep.found()
+   gvncpulse_headers = [
+     'gvncpulse.h',
+     'vncaudiopulse.h',

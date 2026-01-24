@@ -1,0 +1,15 @@
+BDEPEND=>=sys-devel/gettext-0.26 >=app-portage/elt-patches-20170815 virtual/pkgconfig || ( >=sys-devel/automake-1.16.5:1.16 ) >=sys-devel/autoconf-2.71 >=sys-devel/libtool-2.4
+DEFINED_PHASES=configure install prepare setup
+DEPEND=virtual/pkgconfig
+DESCRIPTION=An interface for filesystems implemented in userspace
+EAPI=7
+HOMEPAGE=https://github.com/libfuse/libfuse
+IUSE=examples kernel_linux kernel_FreeBSD static-libs kernel_linux
+KEYWORDS=*
+LICENSE=GPL-2
+PDEPEND=kernel_FreeBSD? ( sys-fs/fuse4bsd )
+RDEPEND=>=sys-fs/fuse-common-3.3.0-r1
+SLOT=0
+SRC_URI=https://github.com/libfuse/libfuse/releases/download/fuse-2.9.9/fuse-2.9.9.tar.gz
+_eclasses_=autotools	e9ade2787b2f54643c7cdffbfa1cca9c	libtool	f143db5a74ccd9ca28c1234deffede96	linux-info	c90a203b1c14cfa77bd3e37a0e96c955	multilib	d410501a125f99ffb560b0c523cd3d1e	toolchain-funcs	24921b57d6561d87cbef4916a296ada4	udev	7752f306eec7b286d00bdb47b763e7ac
+_md5_=b5378b49288137e6d35e21bd9baa605d

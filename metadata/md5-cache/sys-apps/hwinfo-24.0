@@ -1,0 +1,12 @@
+DEFINED_PHASES=compile install prepare
+DEPEND=amd64? ( dev-libs/libx86emu ) x86? ( dev-libs/libx86emu ) sys-devel/flex >=sys-kernel/linux-headers-2.6.17
+DESCRIPTION=Hardware information tool
+EAPI=7
+HOMEPAGE=https://github.com/openSUSE/hwinfo
+KEYWORDS=*
+LICENSE=GPL-2
+RDEPEND=amd64? ( dev-libs/libx86emu ) x86? ( dev-libs/libx86emu )
+SLOT=0
+SRC_URI=https://github.com/openSUSE/hwinfo/tarball/23e902b07a4b09e5348d7387bda8b7f206ea2695 -> hwinfo-24.0-23e902b.tar.gz
+_eclasses_=multilib	d410501a125f99ffb560b0c523cd3d1e	toolchain-funcs	24921b57d6561d87cbef4916a296ada4
+_md5_=80faef61dc3d8690ee4c8958e71166c1

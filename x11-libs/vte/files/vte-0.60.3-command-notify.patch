@@ -1,0 +1,902 @@
+From 100b3f8acecf8c68201d6bbb7fc05e9475d8d401 Mon Sep 17 00:00:00 2001
+From: Debarshi Ray <debarshir@gnome.org>
+Date: Wed, 7 Jan 2015 16:01:00 +0100
+Subject: [PATCH 01/12] Add sequences and signals for desktop notification
+
+Add sequences
+  OSC 777 ; notify ; SUMMARY ; BODY BEL
+  OSC 777 ; notify ; SUMMARY BEL
+  OSC 777 ; notify ; SUMMARY ; BODY ST
+  OSC 777 ; notify ; SUMMARY ST
+
+that let terminal applications send a notification to the desktop
+environment.
+
+Based on Enlightenment's Terminology:
+https://phab.enlightenment.org/T1765
+
+https://bugzilla.gnome.org/show_bug.cgi?id=711059
+---
+ src/marshal.list      |  1 +
+ src/vte.cc            |  9 +++++++++
+ src/vte/vteterminal.h |  4 +++-
+ src/vtegtk.cc         | 21 +++++++++++++++++++++
+ src/vtegtk.hh         |  1 +
+ src/vteinternal.hh    |  8 ++++++++
+ src/vteseq.cc         | 32 +++++++++++++++++++++++++++++++-
+ 7 files changed, 74 insertions(+), 2 deletions(-)
+
+diff --git a/src/marshal.list b/src/marshal.list
+index 241128c3ccfe..4412cf3d5f5c 100644
+--- a/src/marshal.list
++++ b/src/marshal.list
+@@ -1,3 +1,4 @@
+ VOID:STRING,BOXED
++VOID:STRING,STRING
+ VOID:STRING,UINT
+ VOID:UINT,UINT
+diff --git a/src/vte.cc b/src/vte.cc
+index cba606e853a4..ae49a07d7376 100644
+--- a/src/vte.cc
++++ b/src/vte.cc
+@@ -10239,6 +10239,15 @@ Terminal::emit_pending_signals()
+ 
+ 	emit_adjustment_changed();
+ 
++        if (m_notification_received) {
++                _vte_debug_print (VTE_DEBUG_SIGNALS,
++                                  "Emitting `notification-received'.\n");
++                g_signal_emit(object, signals[SIGNAL_NOTIFICATION_RECEIVED], 0,
++                              m_notification_summary.c_str(),
++                              m_notification_body.c_str());
++                m_notification_received = false;
++        }
++
+ 	if (m_window_title_changed) {
+                 if (m_window_title != m_window_title_pending) {
+                         m_window_title.swap(m_window_title_pending);
+diff --git a/src/vte/vteterminal.h b/src/vte/vteterminal.h
+index 31012518362e..6ad0987d22ca 100644
+--- a/src/vte/vteterminal.h
++++ b/src/vte/vteterminal.h
+@@ -104,8 +104,10 @@ struct _VteTerminalClass {
+ 
+ 	void (*bell)(VteTerminal* terminal);
+ 
++	void (*notification_received)(VteTerminal* terminal, const gchar *summary, const gchar *body);
++
+         /* Padding for future expansion. */
+-        gpointer padding[16];
++        gpointer padding[15];
+ 
+         VteTerminalClassPrivate *priv;
+ };
+diff --git a/src/vtegtk.cc b/src/vtegtk.cc
+index 5808a210d3d4..005423567073 100644
+--- a/src/vtegtk.cc
++++ b/src/vtegtk.cc
+@@ -738,6 +738,7 @@ vte_terminal_class_init(VteTerminalClass *klass)
+ 	klass->child_exited = NULL;
+ 	klass->encoding_changed = NULL;
+ 	klass->char_size_changed = NULL;
++	klass->notification_received = NULL;
+ 	klass->window_title_changed = NULL;
+ 	klass->icon_title_changed = NULL;
+ 	klass->selection_changed = NULL;
+@@ -819,6 +820,26 @@ vte_terminal_class_init(VteTerminalClass *klass)
+                                    G_OBJECT_CLASS_TYPE(klass),
+                                    g_cclosure_marshal_VOID__INTv);
+ 
++        /**
++         * VteTerminal::notification-received:
++         * @vteterminal: the object which received the signal
++         * @summary: The summary
++         * @body: (allow-none): Extra optional text
++         *
++         * Emitted when a process running in the terminal wants to
++         * send a notification to the desktop environment.
++         */
++        signals[SIGNAL_NOTIFICATION_RECEIVED] =
++                g_signal_new(I_("notification-received"),
++                             G_OBJECT_CLASS_TYPE(klass),
++                             G_SIGNAL_RUN_LAST,
++                             G_STRUCT_OFFSET(VteTerminalClass, notification_received),
++                             NULL,
++                             NULL,
++                             _vte_marshal_VOID__STRING_STRING,
++                             G_TYPE_NONE,
++                             2, G_TYPE_STRING, G_TYPE_STRING);
++
+         /**
+          * VteTerminal::window-title-changed:
+          * @vteterminal: the object which received the signal
+diff --git a/src/vtegtk.hh b/src/vtegtk.hh
+index ae9fb08c310a..baf681e45b2c 100644
+--- a/src/vtegtk.hh
++++ b/src/vtegtk.hh
+@@ -56,6 +56,7 @@ enum {
+         SIGNAL_TEXT_INSERTED,
+         SIGNAL_TEXT_MODIFIED,
+         SIGNAL_TEXT_SCROLLED,
++        SIGNAL_NOTIFICATION_RECEIVED,
+         SIGNAL_WINDOW_TITLE_CHANGED,
+         LAST_SIGNAL
+ };
+diff --git a/src/vteinternal.hh b/src/vteinternal.hh
+index 93e905270c29..ae4f705ea80d 100644
+--- a/src/vteinternal.hh
++++ b/src/vteinternal.hh
+@@ -709,6 +709,11 @@ public:
+         gboolean m_cursor_moved_pending;
+         gboolean m_contents_changed_pending;
+ 
++        /* desktop notification */
++        bool m_notification_received{false};
++        std::string m_notification_summary;
++        std::string m_notification_body;
++
+         std::string m_window_title{};
+         std::string m_current_directory_uri{};
+         std::string m_current_file_uri{};
+@@ -1426,6 +1431,9 @@ public:
+                              int osc) noexcept;
+ 
+         /* OSC handlers */
++        void handle_urxvt_extension(vte::parser::Sequence const& seq,
++                                    vte::parser::StringTokeniser::const_iterator& token,
++                                    vte::parser::StringTokeniser::const_iterator const& endtoken) noexcept;
+         void set_color(vte::parser::Sequence const& seq,
+                        vte::parser::StringTokeniser::const_iterator& token,
+                        vte::parser::StringTokeniser::const_iterator const& endtoken,
+diff --git a/src/vteseq.cc b/src/vteseq.cc
+index 2d00ceec5509..2b69ca2c14f0 100644
+--- a/src/vteseq.cc
++++ b/src/vteseq.cc
+@@ -1377,6 +1377,33 @@ Terminal::delete_lines(vte::grid::row_t param)
+         m_text_deleted_flag = TRUE;
+ }
+ 
++void
++Terminal::handle_urxvt_extension(vte::parser::Sequence const& seq,
++                                 vte::parser::StringTokeniser::const_iterator& token,
++                                 vte::parser::StringTokeniser::const_iterator const& endtoken) noexcept
++{
++        if (token == endtoken)
++                return;
++
++        if (*token == "notify") {
++                ++token;
++
++                if (token == endtoken)
++                        return;
++
++                m_notification_summary = *token;
++                m_notification_body.clear();
++                m_notification_received = true;
++                ++token;
++
++                if (token == endtoken)
++                        return;
++
++                m_notification_body = *token;
++                return;
++        }
++}
++
+ bool
+ Terminal::get_osc_color_index(int osc,
+                                         int value,
+@@ -6464,6 +6491,10 @@ Terminal::OSC(vte::parser::Sequence const& seq)
+                 reset_color(VTE_HIGHLIGHT_FG, VTE_COLOR_SOURCE_ESCAPE);
+                 break;
+ 
++        case VTE_OSC_URXVT_EXTENSION:
++                handle_urxvt_extension(seq, it, cend);
++                break;
++
+         case VTE_OSC_XTERM_SET_ICON_TITLE:
+         case VTE_OSC_XTERM_SET_XPROPERTY:
+         case VTE_OSC_XTERM_SET_COLOR_MOUSE_CURSOR_FG:
+@@ -6504,7 +6535,6 @@ Terminal::OSC(vte::parser::Sequence const& seq)
+         case VTE_OSC_URXVT_SET_FONT_BOLD_ITALIC:
+         case VTE_OSC_URXVT_VIEW_UP:
+         case VTE_OSC_URXVT_VIEW_DOWN:
+-        case VTE_OSC_URXVT_EXTENSION:
+         case VTE_OSC_YF_RQGWR:
+         default:
+                 break;
+-- 
+2.24.1
+
+
+From 2a509fab63f42995d4b0f77bac4a9d79e508880e Mon Sep 17 00:00:00 2001
+From: Debarshi Ray <debarshir@gnome.org>
+Date: Thu, 29 Jan 2015 13:09:17 +0100
+Subject: [PATCH 02/12] vte.sh: Emit OSC 777 from PROMPT_COMMAND
+
+For some reason, the three consecutive backslashes break the parsing.
+As Christian Persch suggested, replacing the double quotes with
+singles fixes it.
+
+https://bugzilla.gnome.org/show_bug.cgi?id=711059
+---
+ src/vte.sh.in | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/vte.sh.in b/src/vte.sh.in
+index 8b3153da0f1a..d6769de82766 100644
+--- a/src/vte.sh.in
++++ b/src/vte.sh.in
+@@ -27,10 +27,12 @@ __vte_osc7 () {
+ }
+ 
+ __vte_prompt_command() {
++  local command=$(HISTTIMEFORMAT= history 1 | sed 's/^ *[0-9]\+ *//')
++  command="${command//;/ }"
+   local pwd='~'
+   [ "$PWD" != "$HOME" ] && pwd=${PWD/#$HOME\//\~\/}
+   pwd="${pwd//[[:cntrl:]]}"
+-  printf "\033]0;%s@%s:%s\033\\" "${USER}" "${HOSTNAME%%.*}" "${pwd}"
++  printf '\033]777;notify;Command completed;%s\033\\\033]0;%s@%s:%s\033\\' "${command}" "${USER}" "${HOSTNAME%%.*}" "${pwd}"
+   __vte_osc7
+ }
+ 
+-- 
+2.24.1
+
+
+From 268e1f1f5e71822b9e43ae4bfeea43710de32152 Mon Sep 17 00:00:00 2001
+From: Debarshi Ray <debarshir@gnome.org>
+Date: Thu, 22 Jan 2015 16:37:10 +0100
+Subject: [PATCH 03/12] Test the notification-received signal
+
+---
+ bindings/vala/app.vala |  7 +++++++
+ src/app/app.cc         | 10 ++++++++++
+ 2 files changed, 17 insertions(+)
+
+diff --git a/bindings/vala/app.vala b/bindings/vala/app.vala
+index fc26c2b0dfc3..634b8ddeeb91 100644
+--- a/bindings/vala/app.vala
++++ b/bindings/vala/app.vala
+@@ -309,6 +309,8 @@ class Window : Gtk.ApplicationWindow
+     if (Options.object_notifications)
+       terminal.notify.connect(notify_cb);
+ 
++    terminal.notification_received.connect(notification_received_cb);
++
+     /* Settings */
+     if (Options.no_double_buffer)
+       terminal.set_double_buffered(false);
+@@ -780,6 +782,11 @@ class Window : Gtk.ApplicationWindow
+     set_title(terminal.get_window_title());
+   }
+ 
++  private void notification_received_cb(Vte.Terminal terminal, string summary, string? body)
++  {
++    print ("[%s]: %s\n", summary, body);
++  }
++
+ } /* class Window */
+ 
+ class App : Gtk.Application
+diff --git a/src/app/app.cc b/src/app/app.cc
+index 0c7eed5d18f1..6086c0a65db2 100644
+--- a/src/app/app.cc
++++ b/src/app/app.cc
+@@ -1639,6 +1639,14 @@ window_window_title_changed_cb(VteTerminal* terminal,
+                              vte_terminal_get_window_title(window->terminal));
+ }
+ 
++static void
++notification_received_cb(VteTerminal *terminal,
++                         const gchar *summary,
++                         const gchar *body)
++{
++        g_print("[%s]: %s\n", summary, body);
++}
++
+ static void
+ window_lower_window_cb(VteTerminal* terminal,
+                        VteappWindow* window)
+@@ -1871,6 +1879,8 @@ vteapp_window_constructed(GObject *object)
+         if (options.object_notifications)
+                 g_signal_connect(window->terminal, "notify", G_CALLBACK(window_notify_cb), window);
+ 
++        g_signal_connect(window->terminal, "notification-received", G_CALLBACK(notification_received_cb), NULL);
++
+         /* Settings */
+         if (options.no_double_buffer) {
+                 G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
+-- 
+2.24.1
+
+
+From 1df88d4cb8ebdbcac0ad55c43ed17e91b7396ea6 Mon Sep 17 00:00:00 2001
+From: Debarshi Ray <debarshir@gnome.org>
+Date: Wed, 7 Jan 2015 16:01:00 +0100
+Subject: [PATCH 06/12] Support preexec notifications from an interactive shell
+
+Add sequences
+  OSC 777 ; preexec BEL
+  OSC 777 ; preexec ST
+
+that can be used from an interactive shell's preexec hook to notify
+the terminal emulator that a new command is about to be executed.
+Examples of such hooks are Bash's PS0 and Zsh's preexec.
+
+The OSC 777 escape sequence is taken from Enlightenment's Terminology:
+https://phab.enlightenment.org/T1765
+
+https://bugzilla.gnome.org/show_bug.cgi?id=711059
+https://bugzilla.gnome.org/show_bug.cgi?id=711060
+---
+ src/vte.cc            |  7 +++++++
+ src/vte.sh.in         |  2 +-
+ src/vte/vteterminal.h |  3 ++-
+ src/vtegtk.cc         | 18 ++++++++++++++++++
+ src/vtegtk.hh         |  1 +
+ src/vteinternal.hh    |  2 ++
+ src/vteseq.cc         |  4 ++++
+ 7 files changed, 35 insertions(+), 2 deletions(-)
+
+diff --git a/src/vte.cc b/src/vte.cc
+index 8fad2b477950..b103f3cee0ce 100644
+--- a/src/vte.cc
++++ b/src/vte.cc
+@@ -10265,6 +10265,13 @@ Terminal::emit_pending_signals()
+                 m_notification_received = false;
+         }
+ 
++        if (m_shell_preexec) {
++                _vte_debug_print (VTE_DEBUG_SIGNALS,
++                                  "Emitting `shell-preexec'.\n");
++                g_signal_emit(object, signals[SIGNAL_SHELL_PREEXEC], 0);
++                m_shell_preexec = FALSE;
++        }
++
+ 	if (m_window_title_changed) {
+                 if (m_window_title != m_window_title_pending) {
+                         m_window_title.swap(m_window_title_pending);
+diff --git a/src/vte.sh.in b/src/vte.sh.in
+index d6769de82766..c7a3b07f9ea4 100644
+--- a/src/vte.sh.in
++++ b/src/vte.sh.in
+@@ -38,7 +38,7 @@ __vte_prompt_command() {
+ 
+ case "$TERM" in
+   xterm*|vte*)
+-    [ -n "$BASH_VERSION" ] && PROMPT_COMMAND="__vte_prompt_command"
++    [ -n "$BASH_VERSION" ] && PROMPT_COMMAND="__vte_prompt_command" && PS0=$(printf "\033]777;preexec\033\\")
+     [ -n "$ZSH_VERSION"  ] && precmd_functions+=(__vte_osc7)
+     ;;
+ esac
+diff --git a/src/vte/vteterminal.h b/src/vte/vteterminal.h
+index 94febee1d494..2d757afbdcc0 100644
+--- a/src/vte/vteterminal.h
++++ b/src/vte/vteterminal.h
+@@ -105,9 +105,10 @@ struct _VteTerminalClass {
+ 	void (*bell)(VteTerminal* terminal);
+ 
+ 	void (*notification_received)(VteTerminal* terminal, const gchar *summary, const gchar *body);
++	void (*shell_preexec)(VteTerminal* terminal);
+ 
+         /* Padding for future expansion. */
+-        gpointer padding[15];
++        gpointer padding[14];
+ 
+         VteTerminalClassPrivate *priv;
+ };
+diff --git a/src/vtegtk.cc b/src/vtegtk.cc
+index ecd004a814e7..1b3e2690164f 100644
+--- a/src/vtegtk.cc
++++ b/src/vtegtk.cc
+@@ -745,6 +745,7 @@ vte_terminal_class_init(VteTerminalClass *klass)
+ 	klass->encoding_changed = NULL;
+ 	klass->char_size_changed = NULL;
+ 	klass->notification_received = NULL;
++	klass->shell_preexec = NULL;
+ 	klass->window_title_changed = NULL;
+ 	klass->icon_title_changed = NULL;
+ 	klass->selection_changed = NULL;
+@@ -846,6 +847,23 @@ vte_terminal_class_init(VteTerminalClass *klass)
+                              G_TYPE_NONE,
+                              2, G_TYPE_STRING, G_TYPE_STRING);
+ 
++        /**
++         * VteTerminal::shell-preexec:
++         * @vteterminal: the object which received the signal
++         *
++         * Emitted when the interactive shell has read in a complete
++         * command and is about to execute it.
++         */
++        signals[SIGNAL_SHELL_PREEXEC] =
++                g_signal_new(I_("shell-preexec"),
++                             G_OBJECT_CLASS_TYPE(klass),
++                             G_SIGNAL_RUN_LAST,
++                             G_STRUCT_OFFSET(VteTerminalClass, shell_preexec),
++                             NULL,
++                             NULL,
++                             g_cclosure_marshal_VOID__VOID,
++                             G_TYPE_NONE, 0);
++
+         /**
+          * VteTerminal::window-title-changed:
+          * @vteterminal: the object which received the signal
+diff --git a/src/vtegtk.hh b/src/vtegtk.hh
+index a9c256635948..79c528ea8243 100644
+--- a/src/vtegtk.hh
++++ b/src/vtegtk.hh
+@@ -52,6 +52,7 @@ enum {
+         SIGNAL_RESIZE_WINDOW,
+         SIGNAL_RESTORE_WINDOW,
+         SIGNAL_SELECTION_CHANGED,
++        SIGNAL_SHELL_PREEXEC,
+         SIGNAL_TEXT_DELETED,
+         SIGNAL_TEXT_INSERTED,
+         SIGNAL_TEXT_MODIFIED,
+diff --git a/src/vteinternal.hh b/src/vteinternal.hh
+index 9c0b8b454468..dd98905860f4 100644
+--- a/src/vteinternal.hh
++++ b/src/vteinternal.hh
+@@ -715,6 +715,8 @@ public:
+         std::string m_notification_summary;
+         std::string m_notification_body;
+ 
++        gboolean m_shell_preexec;
++
+         std::string m_window_title{};
+         std::string m_current_directory_uri{};
+         std::string m_current_file_uri{};
+diff --git a/src/vteseq.cc b/src/vteseq.cc
+index 2b69ca2c14f0..d8866cbeb225 100644
+--- a/src/vteseq.cc
++++ b/src/vteseq.cc
+@@ -1402,6 +1402,10 @@ Terminal::handle_urxvt_extension(vte::parser::Sequence const& seq,
+                 m_notification_body = *token;
+                 return;
+         }
++
++        if (*token == "preexec") {
++                m_shell_preexec = TRUE;
++        }
+ }
+ 
+ bool
+-- 
+2.24.1
+
+
+From f2581b1532eebc4bcfc2337eb367abfd5599dd0c Mon Sep 17 00:00:00 2001
+From: Debarshi Ray <debarshir@gnome.org>
+Date: Fri, 20 Apr 2018 18:21:53 +0200
+Subject: [PATCH 07/12] Test the shell-preexec signal
+
+https://bugzilla.gnome.org/show_bug.cgi?id=711059
+https://bugzilla.gnome.org/show_bug.cgi?id=711060
+---
+ bindings/vala/app.vala | 6 ++++++
+ src/app/app.cc         | 7 +++++++
+ 2 files changed, 13 insertions(+)
+
+diff --git a/bindings/vala/app.vala b/bindings/vala/app.vala
+index c984b868246d..83af686be106 100644
+--- a/bindings/vala/app.vala
++++ b/bindings/vala/app.vala
+@@ -310,6 +310,7 @@ class Window : Gtk.ApplicationWindow
+       terminal.notify.connect(notify_cb);
+ 
+     terminal.notification_received.connect(notification_received_cb);
++    terminal.shell_preexec.connect(shell_preexec_cb);
+ 
+     /* Settings */
+     if (Options.no_double_buffer)
+@@ -788,6 +789,11 @@ class Window : Gtk.ApplicationWindow
+     print ("[%s]: %s\n", summary, body);
+   }
+ 
++  private void shell_preexec_cb(Vte.Terminal terminal)
++  {
++    print("[shell] executing command\n");
++  }
++
+ } /* class Window */
+ 
+ class App : Gtk.Application
+diff --git a/src/app/app.cc b/src/app/app.cc
+index 0c7a70bf6da5..2dece3ddb724 100644
+--- a/src/app/app.cc
++++ b/src/app/app.cc
+@@ -1650,6 +1650,12 @@ notification_received_cb(VteTerminal *terminal,
+         g_print("[%s]: %s\n", summary, body);
+ }
+ 
++static void
++shell_preexec_cb(VteTerminal *terminal)
++{
++        g_print("[shell] executing command\n");
++}
++
+ static void
+ window_lower_window_cb(VteTerminal* terminal,
+                        VteappWindow* window)
+@@ -1883,6 +1889,7 @@ vteapp_window_constructed(GObject *object)
+                 g_signal_connect(window->terminal, "notify", G_CALLBACK(window_notify_cb), window);
+ 
+         g_signal_connect(window->terminal, "notification-received", G_CALLBACK(notification_received_cb), NULL);
++        g_signal_connect(window->terminal, "shell-preexec", G_CALLBACK(shell_preexec_cb), NULL);
+ 
+         /* Settings */
+         if (options.no_double_buffer) {
+-- 
+2.24.1
+
+
+From cee3f876af49aa199955e557001a57b317f93634 Mon Sep 17 00:00:00 2001
+From: Debarshi Ray <debarshir@gnome.org>
+Date: Wed, 2 May 2018 17:20:30 +0200
+Subject: [PATCH 08/12] Support precmd notifications from an interactive shell
+
+Add sequences
+  OSC 777 ; precmd BEL
+  OSC 777 ; precmd ST
+
+that can be used from an interactive shell's precmd hook to notify the
+terminal emulator that a first level prompt is about to be shown.
+Examples of such hooks are Bash's PROMPT_COMMAND and Zsh's precmd.
+
+The OSC 777 escape sequence is taken from Enlightenment's Terminology:
+https://phab.enlightenment.org/T1765
+
+https://bugzilla.gnome.org/show_bug.cgi?id=711059
+https://bugzilla.gnome.org/show_bug.cgi?id=711060
+---
+ src/vte.cc            |  7 +++++++
+ src/vte.sh.in         |  2 +-
+ src/vte/vteterminal.h |  3 ++-
+ src/vtegtk.cc         | 18 ++++++++++++++++++
+ src/vtegtk.hh         |  1 +
+ src/vteinternal.hh    |  1 +
+ src/vteseq.cc         |  4 +++-
+ 7 files changed, 33 insertions(+), 3 deletions(-)
+
+diff --git a/src/vte.cc b/src/vte.cc
+index b103f3cee0ce..1bda2bfbca39 100644
+--- a/src/vte.cc
++++ b/src/vte.cc
+@@ -10272,6 +10272,13 @@ Terminal::emit_pending_signals()
+                 m_shell_preexec = FALSE;
+         }
+ 
++        if (m_shell_precmd) {
++                _vte_debug_print (VTE_DEBUG_SIGNALS,
++                                  "Emitting `shell-precmd'.\n");
++                g_signal_emit(object, signals[SIGNAL_SHELL_PRECMD], 0);
++                m_shell_precmd = FALSE;
++        }
++
+ 	if (m_window_title_changed) {
+                 if (m_window_title != m_window_title_pending) {
+                         m_window_title.swap(m_window_title_pending);
+diff --git a/src/vte.sh.in b/src/vte.sh.in
+index c7a3b07f9ea4..4cff7dd1fb71 100644
+--- a/src/vte.sh.in
++++ b/src/vte.sh.in
+@@ -32,7 +32,7 @@ __vte_prompt_command() {
+   local pwd='~'
+   [ "$PWD" != "$HOME" ] && pwd=${PWD/#$HOME\//\~\/}
+   pwd="${pwd//[[:cntrl:]]}"
+-  printf '\033]777;notify;Command completed;%s\033\\\033]0;%s@%s:%s\033\\' "${command}" "${USER}" "${HOSTNAME%%.*}" "${pwd}"
++  printf '\033]777;notify;Command completed;%s\033\\\033]777;precmd\033\\\033]0;%s@%s:%s\033\\' "${command}" "${USER}" "${HOSTNAME%%.*}" "${pwd}"
+   __vte_osc7
+ }
+ 
+diff --git a/src/vte/vteterminal.h b/src/vte/vteterminal.h
+index 2d757afbdcc0..a75ae7ee2640 100644
+--- a/src/vte/vteterminal.h
++++ b/src/vte/vteterminal.h
+@@ -105,10 +105,11 @@ struct _VteTerminalClass {
+ 	void (*bell)(VteTerminal* terminal);
+ 
+ 	void (*notification_received)(VteTerminal* terminal, const gchar *summary, const gchar *body);
++	void (*shell_precmd)(VteTerminal* terminal);
+ 	void (*shell_preexec)(VteTerminal* terminal);
+ 
+         /* Padding for future expansion. */
+-        gpointer padding[14];
++        gpointer padding[13];
+ 
+         VteTerminalClassPrivate *priv;
+ };
+diff --git a/src/vtegtk.cc b/src/vtegtk.cc
+index 1b3e2690164f..0d61f90cda76 100644
+--- a/src/vtegtk.cc
++++ b/src/vtegtk.cc
+@@ -745,6 +745,7 @@ vte_terminal_class_init(VteTerminalClass *klass)
+ 	klass->encoding_changed = NULL;
+ 	klass->char_size_changed = NULL;
+ 	klass->notification_received = NULL;
++	klass->shell_precmd = NULL;
+ 	klass->shell_preexec = NULL;
+ 	klass->window_title_changed = NULL;
+ 	klass->icon_title_changed = NULL;
+@@ -847,6 +848,23 @@ vte_terminal_class_init(VteTerminalClass *klass)
+                              G_TYPE_NONE,
+                              2, G_TYPE_STRING, G_TYPE_STRING);
+ 
++        /**
++         * VteTerminal::shell-precmd:
++         * @vteterminal: the object which received the signal
++         *
++         * Emitted right before an interactive shell shows a
++         * first-level prompt.
++         */
++        signals[SIGNAL_SHELL_PRECMD] =
++                g_signal_new(I_("shell-precmd"),
++                             G_OBJECT_CLASS_TYPE(klass),
++                             G_SIGNAL_RUN_LAST,
++                             G_STRUCT_OFFSET(VteTerminalClass, shell_precmd),
++                             NULL,
++                             NULL,
++                             g_cclosure_marshal_VOID__VOID,
++                             G_TYPE_NONE, 0);
++
+         /**
+          * VteTerminal::shell-preexec:
+          * @vteterminal: the object which received the signal
+diff --git a/src/vtegtk.hh b/src/vtegtk.hh
+index 79c528ea8243..534298ada75c 100644
+--- a/src/vtegtk.hh
++++ b/src/vtegtk.hh
+@@ -52,6 +52,7 @@ enum {
+         SIGNAL_RESIZE_WINDOW,
+         SIGNAL_RESTORE_WINDOW,
+         SIGNAL_SELECTION_CHANGED,
++        SIGNAL_SHELL_PRECMD,
+         SIGNAL_SHELL_PREEXEC,
+         SIGNAL_TEXT_DELETED,
+         SIGNAL_TEXT_INSERTED,
+diff --git a/src/vteinternal.hh b/src/vteinternal.hh
+index dd98905860f4..6b1feb377df7 100644
+--- a/src/vteinternal.hh
++++ b/src/vteinternal.hh
+@@ -715,6 +715,7 @@ public:
+         std::string m_notification_summary;
+         std::string m_notification_body;
+ 
++        gboolean m_shell_precmd;
+         gboolean m_shell_preexec;
+ 
+         std::string m_window_title{};
+diff --git a/src/vteseq.cc b/src/vteseq.cc
+index d8866cbeb225..f6669f853204 100644
+--- a/src/vteseq.cc
++++ b/src/vteseq.cc
+@@ -1403,7 +1403,9 @@ Terminal::handle_urxvt_extension(vte::parser::Sequence const& seq,
+                 return;
+         }
+ 
+-        if (*token == "preexec") {
++        if (*token == "precmd") {
++                m_shell_precmd = TRUE;
++        } else if (*token == "preexec") {
+                 m_shell_preexec = TRUE;
+         }
+ }
+-- 
+2.24.1
+
+
+From 827f0406565cad98f835909451a854c7f8f3ead1 Mon Sep 17 00:00:00 2001
+From: Debarshi Ray <debarshir@gnome.org>
+Date: Wed, 2 May 2018 17:30:48 +0200
+Subject: [PATCH 09/12] Test the shell-precmd signal
+
+https://bugzilla.gnome.org/show_bug.cgi?id=711059
+https://bugzilla.gnome.org/show_bug.cgi?id=711060
+---
+ bindings/vala/app.vala | 6 ++++++
+ src/app/app.cc         | 7 +++++++
+ 2 files changed, 13 insertions(+)
+
+diff --git a/bindings/vala/app.vala b/bindings/vala/app.vala
+index 83af686be106..300384f5c74b 100644
+--- a/bindings/vala/app.vala
++++ b/bindings/vala/app.vala
+@@ -310,6 +310,7 @@ class Window : Gtk.ApplicationWindow
+       terminal.notify.connect(notify_cb);
+ 
+     terminal.notification_received.connect(notification_received_cb);
++    terminal.shell_precmd.connect(shell_precmd_cb);
+     terminal.shell_preexec.connect(shell_preexec_cb);
+ 
+     /* Settings */
+@@ -789,6 +790,11 @@ class Window : Gtk.ApplicationWindow
+     print ("[%s]: %s\n", summary, body);
+   }
+ 
++  private void shell_precmd_cb(Vte.Terminal terminal)
++  {
++    print("[shell] showing command prompt\n");
++  }
++
+   private void shell_preexec_cb(Vte.Terminal terminal)
+   {
+     print("[shell] executing command\n");
+diff --git a/src/app/app.cc b/src/app/app.cc
+index 2dece3ddb724..960aadc3cdc8 100644
+--- a/src/app/app.cc
++++ b/src/app/app.cc
+@@ -1650,6 +1650,12 @@ notification_received_cb(VteTerminal *terminal,
+         g_print("[%s]: %s\n", summary, body);
+ }
+ 
++static void
++shell_precmd_cb(VteTerminal *terminal)
++{
++        g_print("[shell] showing command prompt\n");
++}
++
+ static void
+ shell_preexec_cb(VteTerminal *terminal)
+ {
+@@ -1889,6 +1895,7 @@ vteapp_window_constructed(GObject *object)
+                 g_signal_connect(window->terminal, "notify", G_CALLBACK(window_notify_cb), window);
+ 
+         g_signal_connect(window->terminal, "notification-received", G_CALLBACK(notification_received_cb), NULL);
++        g_signal_connect(window->terminal, "shell-precmd", G_CALLBACK(shell_precmd_cb), NULL);
+         g_signal_connect(window->terminal, "shell-preexec", G_CALLBACK(shell_preexec_cb), NULL);
+ 
+         /* Settings */
+-- 
+2.24.1
+
+
+From e2c44d1e7cf544f26dddfe7ea21452eb53800b83 Mon Sep 17 00:00:00 2001
+From: Jakub Steiner <jimmac@gmail.com>
+Date: Thu, 2 Apr 2020 18:20:44 +0200
+Subject: [PATCH 11/12] widget: Improve legibility when using colours from the
+ system theme
+
+https://gitlab.gnome.org/GNOME/vte/-/issues/225
+---
+ src/vtegtk.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/vtegtk.cc b/src/vtegtk.cc
+index 15a7f1ab1ce0..5999272c0648 100644
+--- a/src/vtegtk.cc
++++ b/src/vtegtk.cc
+@@ -1922,7 +1922,7 @@ vte_terminal_class_init(VteTerminalClass *klass)
+                                          "VteTerminal, " VTE_TERMINAL_CSS_NAME " {\n"
+                                          "padding: 1px 1px 1px 1px;\n"
+                                          "background-color: @theme_base_color;\n"
+-                                         "color: @theme_fg_color;\n"
++                                         "color: @theme_text_color;\n"
+                                          "}\n",
+                                          -1, NULL);
+ 
+-- 
+2.24.1
+
+
+From 68d735ef2649df34f4a283d70555a88f04231ecc Mon Sep 17 00:00:00 2001
+From: Jakub Steiner <jimmac@gmail.com>
+Date: Tue, 31 Mar 2020 20:55:23 +0200
+Subject: [PATCH 12/12] widget: Improve legibility by tweaking the system
+ theme's base colour
+
+Some changes by Debarshi Ray.
+
+https://gitlab.gnome.org/GNOME/vte/-/issues/226
+---
+ src/vtegtk.cc | 67 ++++++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 58 insertions(+), 9 deletions(-)
+
+diff --git a/src/vtegtk.cc b/src/vtegtk.cc
+index 5999272c0648..a54c85b42e9d 100644
+--- a/src/vtegtk.cc
++++ b/src/vtegtk.cc
+@@ -73,7 +73,8 @@
+ #define VTE_TERMINAL_CSS_NAME "vte-terminal"
+ 
+ struct _VteTerminalClassPrivate {
+-        GtkStyleProvider *style_provider;
++        GtkStyleProvider *style_provider_dark;
++        GtkStyleProvider *style_provider_light;
+ };
+ 
+ #ifdef VTE_DEBUG
+@@ -127,6 +128,41 @@ valid_color(GdkRGBA const* color)
+                color->alpha >= 0. && color->alpha <= 1.;
+ }
+ 
++static void
++vte_terminal_theme_update (VteTerminal *terminal)
++{
++        GtkSettings *settings;
++        GtkStyleContext *context;
++        gboolean application_prefer_dark_theme;
++
++        settings = gtk_settings_get_default ();
++        g_object_get (settings, "gtk-application-prefer-dark-theme", &application_prefer_dark_theme, nullptr);
++
++        context = gtk_widget_get_style_context (&terminal->widget);
++
++        if (application_prefer_dark_theme) {
++                gtk_style_context_remove_provider (context,
++                                                   VTE_TERMINAL_GET_CLASS (terminal)->priv->style_provider_light);
++
++                gtk_style_context_add_provider (context,
++                                                VTE_TERMINAL_GET_CLASS (terminal)->priv->style_provider_dark,
++                                                GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
++        } else {
++                gtk_style_context_remove_provider (context,
++                                                   VTE_TERMINAL_GET_CLASS (terminal)->priv->style_provider_dark);
++
++                gtk_style_context_add_provider (context,
++                                                VTE_TERMINAL_GET_CLASS (terminal)->priv->style_provider_light,
++                                                GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
++        }
++}
++
++static void
++vte_terminal_theme_changed (VteTerminal *terminal)
++{
++        vte_terminal_theme_update (terminal);
++}
++
+ static void
+ vte_terminal_set_hadjustment(VteTerminal *terminal,
+                              GtkAdjustment *adjustment)
+@@ -392,14 +428,18 @@ static void
+ vte_terminal_init(VteTerminal *terminal)
+ {
+         void *place;
+-	GtkStyleContext *context;
++        GtkSettings *settings;
+ 
+ 	_vte_debug_print(VTE_DEBUG_LIFECYCLE, "vte_terminal_init()\n");
+ 
+-        context = gtk_widget_get_style_context(&terminal->widget);
+-        gtk_style_context_add_provider (context,
+-                                        VTE_TERMINAL_GET_CLASS (terminal)->priv->style_provider,
+-                                        GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
++        vte_terminal_theme_update (terminal);
++
++        settings = gtk_settings_get_default ();
++        g_signal_connect_object (settings,
++                                 "notify::gtk-application-prefer-dark-theme",
++                                 G_CALLBACK (vte_terminal_theme_changed),
++                                 terminal,
++                                 G_CONNECT_SWAPPED);
+ 
+ 	/* Initialize private data. NOTE: place is zeroed */
+ 	place = vte_terminal_get_instance_private(terminal);
+@@ -1917,11 +1957,20 @@ vte_terminal_class_init(VteTerminalClass *klass)
+ 
+         klass->priv = G_TYPE_CLASS_GET_PRIVATE (klass, VTE_TYPE_TERMINAL, VteTerminalClassPrivate);
+ 
+-        klass->priv->style_provider = GTK_STYLE_PROVIDER (gtk_css_provider_new ());
+-        gtk_css_provider_load_from_data (GTK_CSS_PROVIDER (klass->priv->style_provider),
++        klass->priv->style_provider_dark = GTK_STYLE_PROVIDER (gtk_css_provider_new ());
++        gtk_css_provider_load_from_data (GTK_CSS_PROVIDER (klass->priv->style_provider_dark),
++                                         "VteTerminal, " VTE_TERMINAL_CSS_NAME " {\n"
++                                         "padding: 1px 1px 1px 1px;\n"
++                                         "background-color: shade(@theme_base_color, 0.67);\n"
++                                         "color: @theme_text_color;\n"
++                                         "}\n",
++                                         -1, NULL);
++
++        klass->priv->style_provider_light = GTK_STYLE_PROVIDER (gtk_css_provider_new ());
++        gtk_css_provider_load_from_data (GTK_CSS_PROVIDER (klass->priv->style_provider_light),
+                                          "VteTerminal, " VTE_TERMINAL_CSS_NAME " {\n"
+                                          "padding: 1px 1px 1px 1px;\n"
+-                                         "background-color: @theme_base_color;\n"
++                                         "background-color: shade(@theme_base_color, 1.1);\n"
+                                          "color: @theme_text_color;\n"
+                                          "}\n",
+                                          -1, NULL);
+-- 
+2.24.1
+

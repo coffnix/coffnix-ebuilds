@@ -1,0 +1,12 @@
+BDEPEND=>=dev-util/cmake-3.20.5 virtual/pkgconfig
+DEFINED_PHASES=compile configure install postinst prepare test
+DESCRIPTION=Raspberry Pi userspace tools and libraries
+EAPI=7
+HOMEPAGE=https://github.com/raspberrypi/userland
+KEYWORDS=arm arm64
+LICENSE=BSD
+RDEPEND=!media-libs/raspberrypi-userland-bin
+SLOT=0
+SRC_URI=https://github.com/raspberrypi/userland/archive/a54a0dbb2b8dcf9bafdddfc9a9374fb51d97e976.tar.gz -> raspberrypi-userland-0_pre20241223.tar.gz
+_eclasses_=cmake	0f2e0c197fad0312f3c4765c9cf36271	eutils	6e6c2737b59a4b982de6fb3ecefd87f8	flag-o-matic	d0939f99dd528dd0c5ec25284877bf5c	multilib	d410501a125f99ffb560b0c523cd3d1e	multiprocessing	cac3169468f893670dac3e7cb940e045	ninja-utils	e7575bc4a90349d76e72777013b2bbc2	toolchain-funcs	24921b57d6561d87cbef4916a296ada4	udev	7752f306eec7b286d00bdb47b763e7ac	xdg-utils	baea6080dd821f5562d715887954c9d3
+_md5_=5d4b9c613ff347a60b1eceb4c04167da

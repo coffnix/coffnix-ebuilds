@@ -1,0 +1,27 @@
+--- a/meson_options.txt	2018-02-15 15:32:22.000000000 -0600
++++ b/meson_options.txt	2018-08-09 16:03:03.755580081 -0500
+@@ -2,3 +2,5 @@
+ option('vapi', type : 'boolean', value : true, description : 'Build VAPI')
+ option('usb_ids', type : 'string', value : '/usr/share/hwdata/usb.ids', description : 'Path to usb.ids file')
+ option('docs', type : 'boolean', value : true, description : 'Generate documentation')
++option('introspection', type: 'boolean', value: 'true', description : 'Build introspection data (requires gobject-introspection)')
++
+
+--- a/gusb/meson.build	2018-02-15 15:32:22.000000000 -0600
++++ b/gusb/meson.build	2018-08-09 16:04:51.735525551 -0500
+@@ -78,6 +78,7 @@
+   description : 'GUsb is a GLib binding for libusb1',
+ )
+ 
++if get_option('introspection')
+ libgusb_girtarget = gnome.generate_gir(gusb,
+   sources : [
+     gusb_version_h,
+@@ -127,6 +128,7 @@
+   install: true,
+ )
+ endif
++endif
+ 
+ if get_option('tests')
+   e = executable(

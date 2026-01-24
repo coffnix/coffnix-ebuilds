@@ -1,0 +1,17 @@
+BDEPEND=>=virtual/pkgconfig-0-r1 >=app-portage/elt-patches-20170815 || ( >=sys-devel/automake-1.16.5:1.16 ) >=sys-devel/autoconf-2.71 >=sys-devel/libtool-2.4
+DEFINED_PHASES=compile configure install postinst postrm preinst prepare setup test
+DEPEND=app-text/libpaper sys-libs/zlib acl? ( kernel_linux? ( sys-apps/acl sys-apps/attr ) ) dbus? ( >=sys-apps/dbus-1.6.18-r1 ) kerberos? ( >=virtual/krb5-0-r1 ) !lprng-compat? ( !net-print/lprng ) pam? ( virtual/pam ) ssl? ( >=net-libs/gnutls-2.12.23-r6:0= ) usb? ( virtual/libusb:1 ) X? ( x11-misc/xdg-utils ) xinetd? ( sys-apps/xinetd ) zeroconf? ( >=net-dns/avahi-0.6.31-r2 ) dev-util/desktop-file-utils x11-misc/shared-mime-info sys-apps/shadow
+DESCRIPTION=CUPS - Common Unix Printing System
+EAPI=7
+HOMEPAGE=https://wiki.linuxfoundation.org/openprinting/cups
+IUSE=acl dbus debug kerberos lprng-compat pam selinux +ssl static-libs +threads usb X xinetd zeroconf kernel_linux
+KEYWORDS=*
+LICENSE=Apache-2.0
+PDEPEND=>=net-print/cups-filters-1.0.43
+RDEPEND=app-text/libpaper sys-libs/zlib acl? ( kernel_linux? ( sys-apps/acl sys-apps/attr ) ) dbus? ( >=sys-apps/dbus-1.6.18-r1 ) kerberos? ( >=virtual/krb5-0-r1 ) !lprng-compat? ( !net-print/lprng ) pam? ( virtual/pam ) ssl? ( >=net-libs/gnutls-2.12.23-r6:0= ) usb? ( virtual/libusb:1 ) X? ( x11-misc/xdg-utils ) xinetd? ( sys-apps/xinetd ) zeroconf? ( >=net-dns/avahi-0.6.31-r2 ) selinux? ( sec-policy/selinux-cups )
+REQUIRED_USE=usb? ( threads )
+RESTRICT=test
+SLOT=0
+SRC_URI=https://github.com/OpenPrinting/cups/releases/download/v2.4.12/cups-2.4.12-source.tar.gz -> cups-2.4.12-source.tar.gz
+_eclasses_=autotools	e9ade2787b2f54643c7cdffbfa1cca9c	eutils	6e6c2737b59a4b982de6fb3ecefd87f8	flag-o-matic	d0939f99dd528dd0c5ec25284877bf5c	libtool	f143db5a74ccd9ca28c1234deffede96	linux-info	c90a203b1c14cfa77bd3e37a0e96c955	multilib	d410501a125f99ffb560b0c523cd3d1e	pam	756a09f72c4cdbb55f2694c95f1e0860	toolchain-funcs	24921b57d6561d87cbef4916a296ada4	user	875055ddd565382c728563992ae3abf7	xdg	4a14c5c24f121e7da66e5aab4a168c6e	xdg-utils	baea6080dd821f5562d715887954c9d3
+_md5_=e8239928f37e3b41f59135ae4e581adc

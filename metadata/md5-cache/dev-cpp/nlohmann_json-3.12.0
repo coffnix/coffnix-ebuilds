@@ -1,0 +1,12 @@
+BDEPEND=doc? ( app-doc/doxygen ) >=dev-util/cmake-3.20.5
+DEFINED_PHASES=compile configure install prepare test unpack
+DESCRIPTION=JSON for Modern C++
+EAPI=7
+HOMEPAGE=https://github.com/nlohmann/json
+IUSE=doc test
+KEYWORDS=*
+LICENSE=MIT
+SLOT=0
+SRC_URI=https://api.github.com/repos/nlohmann/json/tarball/v3.12.0 -> json-3.12.0.tar.gz test? ( https://api.github.com/repos/nlohmann/json_test_data/tarball/v3.1.0 -> json_test_data-3.1.0.tar.gz )
+_eclasses_=cmake	0f2e0c197fad0312f3c4765c9cf36271	eutils	6e6c2737b59a4b982de6fb3ecefd87f8	flag-o-matic	d0939f99dd528dd0c5ec25284877bf5c	multilib	d410501a125f99ffb560b0c523cd3d1e	multiprocessing	cac3169468f893670dac3e7cb940e045	ninja-utils	e7575bc4a90349d76e72777013b2bbc2	toolchain-funcs	24921b57d6561d87cbef4916a296ada4	xdg-utils	baea6080dd821f5562d715887954c9d3
+_md5_=74b276cafef5309b88f611e580fccd7d

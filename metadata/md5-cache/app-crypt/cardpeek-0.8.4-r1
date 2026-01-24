@@ -1,0 +1,14 @@
+BDEPEND=virtual/pkgconfig >=app-portage/elt-patches-20170815 || ( >=sys-devel/automake-1.16.5:1.16 ) >=sys-devel/autoconf-2.71 >=sys-devel/libtool-2.4
+DEFINED_PHASES=configure postinst postrm preinst prepare
+DEPEND=sys-apps/pcsc-lite dev-lua/lua:5.2 x11-libs/gtk+:3 net-misc/curl !libressl? ( dev-libs/openssl:0= ) libressl? ( dev-libs/libressl:0= ) dev-util/desktop-file-utils x11-misc/shared-mime-info
+DESCRIPTION=Tool to read the contents of smartcards
+EAPI=7
+HOMEPAGE=http://pannetrat.com/Cardpeek
+IUSE=libressl
+KEYWORDS=*
+LICENSE=GPL-3
+RDEPEND=sys-apps/pcsc-lite dev-lua/lua:5.2 x11-libs/gtk+:3 net-misc/curl !libressl? ( dev-libs/openssl:0= ) libressl? ( dev-libs/libressl:0= )
+SLOT=0
+SRC_URI=http://downloads.pannetrat.com/install/cardpeek-0.8.4.tar.gz
+_eclasses_=autotools	e9ade2787b2f54643c7cdffbfa1cca9c	libtool	f143db5a74ccd9ca28c1234deffede96	multilib	d410501a125f99ffb560b0c523cd3d1e	toolchain-funcs	24921b57d6561d87cbef4916a296ada4	xdg	4a14c5c24f121e7da66e5aab4a168c6e	xdg-utils	baea6080dd821f5562d715887954c9d3
+_md5_=461b516768a89e51297f118c37c019b3

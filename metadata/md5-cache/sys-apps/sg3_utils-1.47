@@ -1,0 +1,12 @@
+DEFINED_PHASES=configure install
+DEPEND=sys-devel/libtool
+DESCRIPTION=Apps for querying the sg SCSI interface
+EAPI=7
+HOMEPAGE=https://sg.danny.cz/sg/
+IUSE=static-libs
+KEYWORDS=*
+LICENSE=GPL-2
+RDEPEND=!sys-apps/rescan-scsi-bus
+SLOT=0/1.47
+SRC_URI=https://sg.danny.cz/sg/p/sg3_utils-1.47.tar.xz
+_md5_=630f2b0fa47b882ff5d00b816eff132f

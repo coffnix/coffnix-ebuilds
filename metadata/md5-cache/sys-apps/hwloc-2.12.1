@@ -1,0 +1,14 @@
+BDEPEND=>=sys-devel/autoconf-2.69-r4 virtual/pkgconfig >=app-portage/elt-patches-20170815 || ( >=sys-devel/automake-1.16.5:1.16 ) >=sys-devel/autoconf-2.71 >=sys-devel/libtool-2.4
+DEFINED_PHASES=configure install prepare unpack
+DEPEND=>=sys-libs/ncurses-5.9-r3:= cairo? ( >=x11-libs/cairo-1.12.14-r4[X?,svg(+)?] ) pci? ( >=sys-apps/pciutils-3.3.0-r2 >=x11-libs/libpciaccess-0.13.1-r1 ) udev? ( virtual/libudev:= ) xml? ( >=dev-libs/libxml2-2.9.1-r4 )
+DESCRIPTION=Displays the hardware topology in convenient formats
+EAPI=7
+HOMEPAGE=https://www.open-mpi.org/projects/hwloc/
+IUSE=cairo +cpuid debug +pci static-libs svg udev xml X
+KEYWORDS=*
+LICENSE=BSD
+RDEPEND=>=sys-libs/ncurses-5.9-r3:= cairo? ( >=x11-libs/cairo-1.12.14-r4[X?,svg(+)?] ) pci? ( >=sys-apps/pciutils-3.3.0-r2 >=x11-libs/libpciaccess-0.13.1-r1 ) udev? ( virtual/libudev:= ) xml? ( >=dev-libs/libxml2-2.9.1-r4 )
+SLOT=0/15
+SRC_URI=https://github.com/open-mpi/hwloc/tarball/86c9e486a5212611abf0c20d84c0a833e145f1bd -> hwloc-2.12.1-86c9e48.tar.gz
+_eclasses_=autotools	e9ade2787b2f54643c7cdffbfa1cca9c	bash-completion-r1	47a7402d95930413ce25ba8d857339bb	desktop	b1d22ac8bdd4679ab79c71aca235009d	eutils	6e6c2737b59a4b982de6fb3ecefd87f8	flag-o-matic	d0939f99dd528dd0c5ec25284877bf5c	libtool	f143db5a74ccd9ca28c1234deffede96	multilib	d410501a125f99ffb560b0c523cd3d1e	toolchain-funcs	24921b57d6561d87cbef4916a296ada4
+_md5_=f65e564a0bda9290b7f65b54006ea9f0

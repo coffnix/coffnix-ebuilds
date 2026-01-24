@@ -1,0 +1,11 @@
+DEFINED_PHASES=configure install prepare
+DESCRIPTION=Utility to change hard drive performance parameters
+EAPI=7
+HOMEPAGE=https://sourceforge.net/projects/hdparm/
+IUSE=static
+KEYWORDS=*
+LICENSE=BSD GPL-2
+SLOT=0
+SRC_URI=https://downloads.sourceforge.net/hdparm/hdparm/hdparm-9.65.tar.gz -> hdparm-9.65.tar.gz
+_eclasses_=eutils	6e6c2737b59a4b982de6fb3ecefd87f8	flag-o-matic	d0939f99dd528dd0c5ec25284877bf5c	multilib	d410501a125f99ffb560b0c523cd3d1e	toolchain-funcs	24921b57d6561d87cbef4916a296ada4
+_md5_=e4cc60b942e3fd42460c09277f56fe77

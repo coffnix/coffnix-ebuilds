@@ -1,0 +1,15 @@
+BDEPEND=|| ( dev-lang/python:3.8 dev-lang/python:3.9 dev-lang/python:3.7 dev-lang/python:3.10 ) >=app-portage/elt-patches-20170815 || ( >=sys-devel/automake-1.16.5:1.16 ) >=sys-devel/autoconf-2.71 >=sys-devel/libtool-2.4
+DEFINED_PHASES=configure install preinst prepare setup
+DEPEND=fuse? ( dev-libs/glib:2 sys-fs/fuse:0 ) gnutls? ( dev-libs/libtasn1:= >=net-libs/gnutls-3.4.0:=[tools,pkcs11] ) seccomp? ( sys-libs/libseccomp ) dev-libs/openssl:0= dev-libs/json-glib dev-libs/libtpms test? ( net-misc/socat dev-tcltk/expect ) sys-apps/shadow
+DESCRIPTION=Libtpms-based TPM emulator
+EAPI=7
+HOMEPAGE=https://github.com/stefanberger/swtpm
+IUSE=fuse +gnutls seccomp test
+KEYWORDS=*
+LICENSE=BSD
+RDEPEND=fuse? ( dev-libs/glib:2 sys-fs/fuse:0 ) gnutls? ( dev-libs/libtasn1:= >=net-libs/gnutls-3.4.0:=[tools,pkcs11] ) seccomp? ( sys-libs/libseccomp ) dev-libs/openssl:0= dev-libs/json-glib dev-libs/libtpms
+RESTRICT=!test? ( test )
+SLOT=0
+SRC_URI=https://github.com/stefanberger/swtpm/archive/v0.8.0.tar.gz -> swtpm-0.8.0.tar.gz
+_eclasses_=autotools	e9ade2787b2f54643c7cdffbfa1cca9c	eapi8-dosym	cd7d420bb5be5ee079f27239ce76b8f5	libtool	f143db5a74ccd9ca28c1234deffede96	multilib	d410501a125f99ffb560b0c523cd3d1e	multiprocessing	cac3169468f893670dac3e7cb940e045	python-any-r1	54a3178500786b0a7ede4a23b7f2a6ad	python-utils-r1	d3f9ec72badd0291b655682d67876adc	toolchain-funcs	24921b57d6561d87cbef4916a296ada4	user	875055ddd565382c728563992ae3abf7
+_md5_=249ddcd7d66548bee5b808259985323b

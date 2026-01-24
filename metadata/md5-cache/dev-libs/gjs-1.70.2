@@ -1,0 +1,14 @@
+BDEPEND=virtual/pkgconfig app-arch/xz-utils >=dev-util/meson-0.48.2 >=dev-util/ninja-1.7.2
+DEFINED_PHASES=compile configure install test
+DEPEND=>=dev-libs/glib-2.66.0 dev-libs/libffi:= >=dev-libs/gobject-introspection-1.66.1:= dev-lang/spidermonkey:78 cairo? ( x11-libs/cairo[X,svg] ) readline? ( sys-libs/readline:0= )
+DESCRIPTION=Javascript bindings for GNOME
+EAPI=7
+HOMEPAGE=https://wiki.gnome.org/Projects/Gjs
+IUSE=+cairo examples gtk readline
+KEYWORDS=*
+LICENSE=MIT || ( MPL-1.1 LGPL-2+ GPL-2+ )
+RDEPEND=>=dev-libs/glib-2.66.0 dev-libs/libffi:= >=dev-libs/gobject-introspection-1.66.1:= dev-lang/spidermonkey:78 cairo? ( x11-libs/cairo[X,svg] ) readline? ( sys-libs/readline:0= )
+SLOT=0
+SRC_URI=mirror://gnome/sources/gjs/1.70/gjs-1.70.2.tar.xz
+_eclasses_=eapi8-dosym	cd7d420bb5be5ee079f27239ce76b8f5	gnome.org	532d56d07b9eace4831aaa817d2b756a	meson	cb9f4401ad11252ec125536564d50832	multilib	d410501a125f99ffb560b0c523cd3d1e	multiprocessing	cac3169468f893670dac3e7cb940e045	ninja-utils	e7575bc4a90349d76e72777013b2bbc2	python-utils-r1	d3f9ec72badd0291b655682d67876adc	toolchain-funcs	24921b57d6561d87cbef4916a296ada4
+_md5_=201bfcf7f66ea415087d45d2f08b0cbb

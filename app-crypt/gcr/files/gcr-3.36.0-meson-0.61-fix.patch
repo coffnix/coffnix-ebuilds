@@ -1,0 +1,33 @@
+diff -urN gcr-3.36.0/gck/meson.build gcr-3.36.0-fixed/gck/meson.build
+--- gcr-3.36.0/gck/meson.build	2023-06-09 16:36:12.691131163 -0400
++++ gcr-3.36.0-fixed/gck/meson.build	2023-06-09 16:41:11.972263775 -0400
+@@ -131,7 +131,6 @@
+     sources: gck_gir_sources,
+     namespace: 'Gck',
+     nsversion: '@0@'.format(gck_major_version),
+-    packages: gck_deps,
+     export_packages: 'gck-@0@'.format(gck_major_version),
+     includes: [ 'GObject-2.0', 'Gio-2.0' ],
+     header: 'gck/gck.h',
+diff -urN gcr-3.36.0/gcr/meson.build gcr-3.36.0-fixed/gcr/meson.build
+--- gcr-3.36.0/gcr/meson.build	2023-06-09 16:36:12.695131231 -0400
++++ gcr-3.36.0-fixed/gcr/meson.build	2023-06-09 16:41:27.844535979 -0400
+@@ -186,7 +186,6 @@
+     sources: [ gcr_base_public_sources, gcr_base_headers ],
+     namespace: 'Gcr',
+     nsversion: '@0@'.format(gcr_major_version),
+-    packages: gcr_base_deps,
+     export_packages: 'gcr-base-@0@'.format(gcr_major_version),
+     includes: [
+       'GObject-2.0',
+diff -urN gcr-3.36.0/ui/meson.build gcr-3.36.0-fixed/ui/meson.build
+--- gcr-3.36.0/ui/meson.build	2023-06-09 16:36:12.695131231 -0400
++++ gcr-3.36.0-fixed/ui/meson.build	2023-06-09 16:41:37.588703091 -0400
+@@ -153,7 +153,6 @@
+     export_packages: 'gcr-ui-@0@'.format(gcr_major_version),
+     identifier_prefix: 'Gcr',
+     symbol_prefix: 'gcr',
+-    packages: gcr_ui_deps,
+     includes: [
+       'GObject-2.0',
+       'Gio-2.0',

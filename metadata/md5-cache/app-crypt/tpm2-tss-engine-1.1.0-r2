@@ -1,0 +1,15 @@
+BDEPEND=sys-devel/autoconf-archive virtual/pkgconfig >=app-portage/elt-patches-20170815 || ( >=sys-devel/automake-1.16.5:1.16 ) >=sys-devel/autoconf-2.71 >=sys-devel/libtool-2.4
+DEFINED_PHASES=configure install prepare
+DEPEND=app-crypt/tpm2-tss:= >=dev-libs/openssl-1.1.1:= <dev-libs/openssl-3.0.0:= test? ( dev-util/cmocka )
+DESCRIPTION=OpenSSL Engine for TPM2 devices
+EAPI=7
+HOMEPAGE=https://github.com/tpm2-software/tpm2-tss-engine
+IUSE=test
+KEYWORDS=*
+LICENSE=BSD
+RDEPEND=app-crypt/tpm2-tss:= >=dev-libs/openssl-1.1.1:= <dev-libs/openssl-3.0.0:=
+RESTRICT=!test? ( test )
+SLOT=0/1.1.0
+SRC_URI=https://github.com/tpm2-software/tpm2-tss-engine/releases/download/v1.1.0/tpm2-tss-engine-1.1.0.tar.gz
+_eclasses_=autotools	e9ade2787b2f54643c7cdffbfa1cca9c	bash-completion-r1	47a7402d95930413ce25ba8d857339bb	libtool	f143db5a74ccd9ca28c1234deffede96	multilib	d410501a125f99ffb560b0c523cd3d1e	toolchain-funcs	24921b57d6561d87cbef4916a296ada4
+_md5_=a852ab03aa9f608f205565b332e176b3

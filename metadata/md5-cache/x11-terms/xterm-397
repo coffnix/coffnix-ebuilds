@@ -1,0 +1,14 @@
+BDEPEND=virtual/pkgconfig x11-base/xorg-proto
+DEFINED_PHASES=configure install setup
+DEPEND=kernel_linux? ( sys-libs/libutempter ) kernel_FreeBSD? ( || ( >=sys-freebsd/freebsd-lib-9.0 sys-libs/libutempter ) ) media-libs/fontconfig:1.0 >=sys-libs/ncurses-5.7-r7:0= x11-apps/xmessage x11-libs/libICE x11-libs/libX11 x11-libs/libXaw x11-libs/libXft x11-libs/libxkbfile x11-libs/libXmu x11-libs/libXrender x11-libs/libXt unicode? ( x11-apps/luit ) Xaw3d? ( x11-libs/libXaw3d ) xinerama? ( x11-libs/libXinerama )
+DESCRIPTION=Terminal Emulator for X Windows
+EAPI=7
+HOMEPAGE=https://invisible-island.net/xterm/
+IUSE=+openpty sixel toolbar truetype unicode Xaw3d xinerama
+KEYWORDS=*
+LICENSE=MIT
+RDEPEND=kernel_linux? ( sys-libs/libutempter ) kernel_FreeBSD? ( || ( >=sys-freebsd/freebsd-lib-9.0 sys-libs/libutempter ) ) media-libs/fontconfig:1.0 >=sys-libs/ncurses-5.7-r7:0= x11-apps/xmessage x11-libs/libICE x11-libs/libX11 x11-libs/libXaw x11-libs/libXft x11-libs/libxkbfile x11-libs/libXmu x11-libs/libXrender x11-libs/libXt unicode? ( x11-apps/luit ) Xaw3d? ( x11-libs/libXaw3d ) xinerama? ( x11-libs/libXinerama ) media-fonts/font-misc-misc x11-apps/rgb
+SLOT=0
+SRC_URI=https://invisible-island.net/archives/xterm/xterm-397.tgz
+_eclasses_=desktop	b1d22ac8bdd4679ab79c71aca235009d	eutils	6e6c2737b59a4b982de6fb3ecefd87f8	flag-o-matic	d0939f99dd528dd0c5ec25284877bf5c	multilib	d410501a125f99ffb560b0c523cd3d1e	toolchain-funcs	24921b57d6561d87cbef4916a296ada4
+_md5_=fb7f9e0535877f12cc47d07b4965c12f

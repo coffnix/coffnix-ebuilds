@@ -1,0 +1,15 @@
+BDEPEND=python_targets_python3_10? ( dev-lang/python:3.10 ) python_targets_pypy3? ( >=dev-python/pypy3-7.3.0:0= ) python_targets_python3_7? ( dev-lang/python:3.7 ) python_targets_python3_9? ( dev-lang/python:3.9 ) python_targets_python3_8? ( dev-lang/python:3.8 ) >=dev-lang/python-exec-2:=[python_targets_python3_10(-)?,python_targets_pypy3(-)?,python_targets_python3_7(-)?,python_targets_python3_9(-)?,python_targets_python3_8(-)?,-python_single_target_python3_10(-),-python_single_target_pypy3(-),-python_single_target_python3_7(-),-python_single_target_python3_9(-),-python_single_target_python3_8(-)] >=dev-python/setuptools-42.0.2[python_targets_python3_10(-)?,python_targets_pypy3(-)?,python_targets_python3_7(-)?,python_targets_python3_9(-)?,python_targets_python3_8(-)?,-python_single_target_python3_10(-),-python_single_target_pypy3(-),-python_single_target_python3_7(-),-python_single_target_python3_9(-),-python_single_target_python3_8(-)]
+DEFINED_PHASES=compile configure install prepare test
+DEPEND=libyaml? ( dev-libs/libyaml )
+DESCRIPTION=YAML parser and emitter for Python
+EAPI=7
+HOMEPAGE=https://pyyaml.org/wiki/PyYAML https://pypi.org/project/PyYAML/ https://github.com/yaml/pyyaml
+IUSE=+libyaml examples python_targets_python3_10 python_targets_pypy3 python_targets_python3_7 python_targets_python3_9 python_targets_python3_8
+KEYWORDS=*
+LICENSE=MIT
+RDEPEND=libyaml? ( dev-libs/libyaml ) python_targets_python3_10? ( dev-lang/python:3.10 ) python_targets_pypy3? ( >=dev-python/pypy3-7.3.0:0= ) python_targets_python3_7? ( dev-lang/python:3.7 ) python_targets_python3_9? ( dev-lang/python:3.9 ) python_targets_python3_8? ( dev-lang/python:3.8 ) >=dev-lang/python-exec-2:=[python_targets_python3_10(-)?,python_targets_pypy3(-)?,python_targets_python3_7(-)?,python_targets_python3_9(-)?,python_targets_python3_8(-)?,-python_single_target_python3_10(-),-python_single_target_pypy3(-),-python_single_target_python3_7(-),-python_single_target_python3_9(-),-python_single_target_python3_8(-)]
+REQUIRED_USE=|| ( python_targets_python3_10 python_targets_pypy3 python_targets_python3_7 python_targets_python3_9 python_targets_python3_8 )
+SLOT=0
+SRC_URI=https://files.pythonhosted.org/packages/54/ed/79a089b6be93607fa5cdaedf301d7dfb23af5f25c398d5ead2525b063e17/pyyaml-6.0.2.tar.gz -> pyyaml-6.0.2.tar.gz
+_eclasses_=distutils-r1	375e743a19d209e116f6fd7494a3fdb3	eapi8-dosym	cd7d420bb5be5ee079f27239ce76b8f5	multibuild	b2c915190b051f55a23b9354b9849847	multilib	d410501a125f99ffb560b0c523cd3d1e	multiprocessing	cac3169468f893670dac3e7cb940e045	python-r1	5bbb250a8d0b8f4496dcef8e8c1c1a8a	python-utils-r1	d3f9ec72badd0291b655682d67876adc	toolchain-funcs	24921b57d6561d87cbef4916a296ada4
+_md5_=a9da2b48ef41a8713b3395a71c1ab2d8

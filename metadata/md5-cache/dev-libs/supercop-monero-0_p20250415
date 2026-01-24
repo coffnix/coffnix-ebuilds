@@ -1,0 +1,12 @@
+DEFINED_PHASES=compile install prepare
+DEPEND=dev-lang/nasm
+DESCRIPTION=Fast cryptographic operations for Monero wallets
+EAPI=7
+HOMEPAGE=https://bench.cr.yp.to/supercop.html
+KEYWORDS=*
+LICENSE=public-domain BSD
+RDEPEND=dev-lang/nasm
+SLOT=0
+SRC_URI=https://bench.cr.yp.to/supercop/supercop-20250415.tar.xz
+_eclasses_=multilib	d410501a125f99ffb560b0c523cd3d1e	toolchain-funcs	24921b57d6561d87cbef4916a296ada4
+_md5_=a268e3d0220713667e15d116d922e773

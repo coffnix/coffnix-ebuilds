@@ -1,0 +1,14 @@
+BDEPEND=>=app-portage/elt-patches-20170815 || ( >=sys-devel/automake-1.16.5:1.16 ) >=sys-devel/autoconf-2.71 >=sys-devel/libtool-2.4
+DEFINED_PHASES=configure prepare
+DEPEND=dev-libs/libgcrypt:0= >=sys-fs/e2fsprogs-1.41.4 lz4? ( app-arch/lz4 ) lzma? ( >=app-arch/xz-utils-4.999.9_beta ) lzo? ( >=dev-libs/lzo-2.02 ) zstd? ( app-arch/zstd ) static? ( app-arch/bzip2[static-libs] dev-libs/libgcrypt:0=[static-libs] dev-libs/libgpg-error[static-libs] sys-apps/util-linux[static-libs] >=sys-fs/e2fsprogs-1.41.4[static-libs] sys-libs/zlib[static-libs] lz4? ( app-arch/lz4[static-libs] ) lzma? ( app-arch/xz-utils[static-libs] ) lzo? ( dev-libs/lzo[static-libs] ) zstd? ( app-arch/zstd[static-libs] ) )
+DESCRIPTION=Flexible filesystem archiver for backup and deployment tool
+EAPI=7
+HOMEPAGE=https://www.fsarchiver.org
+IUSE=debug lz4 lzma lzo static +zstd
+KEYWORDS=*
+LICENSE=GPL-2
+RDEPEND=dev-libs/libgcrypt:0= >=sys-fs/e2fsprogs-1.41.4 lz4? ( app-arch/lz4 ) lzma? ( >=app-arch/xz-utils-4.999.9_beta ) lzo? ( >=dev-libs/lzo-2.02 ) zstd? ( app-arch/zstd ) static? ( app-arch/bzip2[static-libs] dev-libs/libgcrypt:0=[static-libs] dev-libs/libgpg-error[static-libs] sys-apps/util-linux[static-libs] >=sys-fs/e2fsprogs-1.41.4[static-libs] sys-libs/zlib[static-libs] lz4? ( app-arch/lz4[static-libs] ) lzma? ( app-arch/xz-utils[static-libs] ) lzo? ( dev-libs/lzo[static-libs] ) zstd? ( app-arch/zstd[static-libs] ) )
+SLOT=0
+SRC_URI=https://github.com/fdupoux/fsarchiver/releases/download/0.8.6/fsarchiver-0.8.6.tar.gz
+_eclasses_=autotools	e9ade2787b2f54643c7cdffbfa1cca9c	libtool	f143db5a74ccd9ca28c1234deffede96	multilib	d410501a125f99ffb560b0c523cd3d1e	toolchain-funcs	24921b57d6561d87cbef4916a296ada4
+_md5_=c65a2ab97c8449ff877ca4d9964ed779

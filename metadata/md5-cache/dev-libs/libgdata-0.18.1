@@ -1,0 +1,16 @@
+BDEPEND=dev-util/glib-utils gtk-doc? ( >=dev-util/gtk-doc-1.25 app-text/docbook-xml-dtd:4.3 ) >=sys-devel/gettext-0.19.8 virtual/pkgconfig test? ( >=net-libs/uhttpmock-0.5.0:0 >=x11-libs/gdk-pixbuf-2.14:2 ) vala? ( || ( dev-lang/vala:0.56 ) ) app-arch/xz-utils >=dev-util/meson-0.48.2 >=dev-util/ninja-1.7.2
+DEFINED_PHASES=compile configure install postinst postrm preinst prepare test
+DEPEND=>=dev-libs/glib-2.44.0:2 >=dev-libs/json-glib-0.15[introspection?] >=dev-libs/libxml2-2:2 >=net-libs/libsoup-2.55.90:2.4[introspection?,vala?] crypt? ( app-crypt/gcr:0= ) gnome-online-accounts? ( >=net-libs/gnome-online-accounts-3.8:=[introspection?,vala?] ) introspection? ( >=dev-libs/gobject-introspection-1.54:= ) dev-util/desktop-file-utils x11-misc/shared-mime-info
+DESCRIPTION=GLib-based library for accessing online service APIs using the GData protocol
+EAPI=7
+HOMEPAGE=https://wiki.gnome.org/Projects/libgdata
+IUSE=+crypt gnome-online-accounts gtk-doc +introspection test vala
+KEYWORDS=*
+LICENSE=LGPL-2.1+
+RDEPEND=>=dev-libs/glib-2.44.0:2 >=dev-libs/json-glib-0.15[introspection?] >=dev-libs/libxml2-2:2 >=net-libs/libsoup-2.55.90:2.4[introspection?,vala?] crypt? ( app-crypt/gcr:0= ) gnome-online-accounts? ( >=net-libs/gnome-online-accounts-3.8:=[introspection?,vala?] ) introspection? ( >=dev-libs/gobject-introspection-1.54:= )
+REQUIRED_USE=vala? ( introspection )
+RESTRICT=!test? ( test )
+SLOT=0/22
+SRC_URI=mirror://gnome/sources/libgdata/0.18/libgdata-0.18.1.tar.xz
+_eclasses_=eapi8-dosym	cd7d420bb5be5ee079f27239ce76b8f5	gnome.org	532d56d07b9eace4831aaa817d2b756a	gnome2-utils	532371cfcba45b2ab0d2950547c97d95	meson	cb9f4401ad11252ec125536564d50832	multilib	d410501a125f99ffb560b0c523cd3d1e	multiprocessing	cac3169468f893670dac3e7cb940e045	ninja-utils	e7575bc4a90349d76e72777013b2bbc2	python-utils-r1	d3f9ec72badd0291b655682d67876adc	toolchain-funcs	24921b57d6561d87cbef4916a296ada4	vala	fb8d4700a0cda20b01937a4088133526	xdg	4a14c5c24f121e7da66e5aab4a168c6e	xdg-utils	baea6080dd821f5562d715887954c9d3
+_md5_=38da7d845e1f0a6e398ae857917c8953

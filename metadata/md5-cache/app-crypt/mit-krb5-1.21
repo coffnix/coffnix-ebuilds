@@ -1,0 +1,15 @@
+BDEPEND=|| ( dev-lang/python:3.8 dev-lang/python:3.9 dev-lang/python:3.7 dev-lang/python:3.10 ) virtual/yacc cpu_flags_x86_aes? ( amd64? ( dev-lang/yasm ) x86? ( dev-lang/yasm ) ) doc? ( virtual/latex-base ) test? ( dev-util/cmocka ) >=app-portage/elt-patches-20170815 || ( >=sys-devel/automake-1.16.5:1.16 ) >=sys-devel/autoconf-2.71 >=sys-devel/libtool-2.4
+DEFINED_PHASES=compile configure install prepare setup test
+DEPEND=!!app-crypt/heimdal >=sys-fs/e2fsprogs-1.46.4-r51 || ( >=dev-libs/libverto-0.2.5[libev] >=dev-libs/libverto-0.2.5[libevent] ) keyutils? ( >=sys-apps/keyutils-1.5.8:= ) lmdb? ( dev-db/lmdb:= ) nls? ( sys-devel/gettext ) openldap? ( >=net-nds/openldap-2.4.38-r1:= ) pkinit? ( >=dev-libs/openssl-1.0.1h-r2:0= ) xinetd? ( sys-apps/xinetd )
+DESCRIPTION=MIT Kerberos V
+EAPI=7
+HOMEPAGE=https://web.mit.edu/kerberos/www/
+IUSE=cpu_flags_x86_aes doc +keyutils lmdb nls openldap +pkinit selinux +threads test xinetd
+KEYWORDS=*
+LICENSE=openafs-krb5-a BSD MIT OPENLDAP BSD-2 HPND BSD-4 ISC RSA CC-BY-SA-3.0 || ( BSD-2 GPL-2+ )
+RDEPEND=!!app-crypt/heimdal >=sys-fs/e2fsprogs-1.46.4-r51 || ( >=dev-libs/libverto-0.2.5[libev] >=dev-libs/libverto-0.2.5[libevent] ) keyutils? ( >=sys-apps/keyutils-1.5.8:= ) lmdb? ( dev-db/lmdb:= ) nls? ( sys-devel/gettext ) openldap? ( >=net-nds/openldap-2.4.38-r1:= ) pkinit? ( >=dev-libs/openssl-1.0.1h-r2:0= ) xinetd? ( sys-apps/xinetd ) selinux? ( sec-policy/selinux-kerberos )
+RESTRICT=!test? ( test )
+SLOT=0
+SRC_URI=https://web.mit.edu/kerberos/dist/krb5/1.21/krb5-1.21.tar.gz
+_eclasses_=autotools	e9ade2787b2f54643c7cdffbfa1cca9c	eapi8-dosym	cd7d420bb5be5ee079f27239ce76b8f5	libtool	f143db5a74ccd9ca28c1234deffede96	multilib	d410501a125f99ffb560b0c523cd3d1e	multiprocessing	cac3169468f893670dac3e7cb940e045	python-any-r1	54a3178500786b0a7ede4a23b7f2a6ad	python-utils-r1	d3f9ec72badd0291b655682d67876adc	toolchain-funcs	24921b57d6561d87cbef4916a296ada4
+_md5_=583fa6fafc9e38c724ed8e6e97e41ba8

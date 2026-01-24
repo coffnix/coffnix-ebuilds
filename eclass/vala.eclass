@@ -20,7 +20,7 @@ inherit multilib
 EXPORT_FUNCTIONS src_prepare
 
 # Mínimo e máximo de API de Vala aceitos
-VALA_MIN_API_VERSION=${VALA_MIN_API_VERSION:-0.36}
+VALA_MIN_API_VERSION=${VALA_MIN_API_VERSION:-0.56}
 VALA_MAX_API_VERSION=${VALA_MAX_API_VERSION:-0.56}
 
 # Opcional, exemplo: VALA_USE_DEPEND="vapigen"

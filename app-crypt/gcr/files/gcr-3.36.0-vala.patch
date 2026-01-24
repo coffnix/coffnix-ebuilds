@@ -1,0 +1,54 @@
+diff -urN a/gck/meson.build b/gck/meson.build
+--- a/gck/meson.build	2020-08-18 09:34:47.870665365 -0300
++++ b/gck/meson.build	2020-08-18 09:53:32.353641887 -0300
+@@ -141,7 +141,9 @@
+     ],
+     install: true,
+   )
++endif
+ 
++if get_option('vapi')
+   gck_vapi = gnome.generate_vapi('gck-@0@'.format(gck_major_version),
+     sources: gck_gir[0],
+     metadata_dirs: meson.current_source_dir(),
+diff -urN a/gcr/meson.build b/gcr/meson.build
+--- a/gcr/meson.build	2020-08-18 09:34:47.895665365 -0300
++++ b/gcr/meson.build	2020-08-18 09:53:23.724642067 -0300
+@@ -200,7 +200,9 @@
+     ],
+     install: true,
+   )
++endif
+ 
++if get_option('vapi')
+   gcr_vapi = gnome.generate_vapi('gcr-@0@'.format(gcr_major_version),
+     sources: gcr_gir[0],
+     packages: [ 'glib-2.0', 'gio-2.0', 'gck-@0@'.format(gck_major_version) ],
+diff -urN a/meson_options.txt b/meson_options.txt
+--- a/meson_options.txt	2020-08-18 09:34:47.903665365 -0300
++++ b/meson_options.txt	2020-08-18 09:43:00.112655088 -0300
+@@ -3,6 +3,11 @@
+   value: true,
+   description: 'Build GObject Introspection (GIR) files',
+ )
++option('vapi',
++  type: 'boolean',
++  value: true,
++  description: 'Build Vala bindings (requires introspection)',
++)
+ option('gtk',
+   type: 'boolean',
+   value: true,
+diff -urN a/ui/meson.build b/ui/meson.build
+--- a/ui/meson.build	2020-08-18 09:34:47.880665365 -0300
++++ b/ui/meson.build	2020-08-18 09:52:40.256642974 -0300
+@@ -168,7 +168,9 @@
+     ],
+     install: true,
+   )
++endif
+ 
++if get_option('vapi')
+   gcr_ui_vapi = gnome.generate_vapi('gcr-ui-@0@'.format(gcr_major_version),
+     sources: gcr_ui_gir[0],
+     packages: [

@@ -1,0 +1,15 @@
+BDEPEND=doc? ( dev-python/sphinx ) virtual/pkgconfig >=app-portage/elt-patches-20170815 || ( >=sys-devel/automake-1.16.5:1.16 ) >=sys-devel/autoconf-2.71 >=sys-devel/libtool-2.4
+DEFINED_PHASES=configure install prepare
+DEPEND=dev-libs/libuv:= dev-libs/openssl:= dev-libs/userspace-rcu sys-libs/libcap xml? ( dev-libs/libxml2 ) idn? ( net-dns/libidn2:= ) gssapi? ( virtual/krb5 ) libedit? ( dev-libs/libedit ) !libedit? ( readline? ( sys-libs/readline:= ) )
+DESCRIPTION=bind tools: dig, nslookup, host, nsupdate, dnssec-keygen
+EAPI=7
+HOMEPAGE=https://www.isc.org/software/bind
+IUSE=doc gssapi idn ipv6 libedit readline xml
+KEYWORDS=*
+LICENSE=Apache-2.0 BSD BSD-2 GPL-2 HPND ISC MPL-2.0
+RDEPEND=dev-libs/libuv:= dev-libs/openssl:= dev-libs/userspace-rcu sys-libs/libcap xml? ( dev-libs/libxml2 ) idn? ( net-dns/libidn2:= ) gssapi? ( virtual/krb5 ) libedit? ( dev-libs/libedit ) !libedit? ( readline? ( sys-libs/readline:= ) ) !<=net-dns/bind-9.18.1-r2
+RESTRICT=test
+SLOT=0
+SRC_URI=https://downloads.isc.org/isc/bind9/9.20.11/bind-9.20.11.tar.xz -> bind-9.20.11.tar.xz
+_eclasses_=autotools	e9ade2787b2f54643c7cdffbfa1cca9c	eutils	6e6c2737b59a4b982de6fb3ecefd87f8	flag-o-matic	d0939f99dd528dd0c5ec25284877bf5c	libtool	f143db5a74ccd9ca28c1234deffede96	multilib	d410501a125f99ffb560b0c523cd3d1e	toolchain-funcs	24921b57d6561d87cbef4916a296ada4
+_md5_=3aa5345dbcc09929461d184f177f86d0

@@ -1,0 +1,12 @@
+BDEPEND=>=app-portage/elt-patches-20170815 || ( >=sys-devel/automake-1.16.5:1.16 ) >=sys-devel/autoconf-2.71 >=sys-devel/libtool-2.4
+DEFINED_PHASES=configure install prepare
+DESCRIPTION=A selection of tools from Debian
+EAPI=7
+HOMEPAGE=https://packages.qa.debian.org/d/debianutils.html
+IUSE=+installkernel static
+KEYWORDS=*
+LICENSE=BSD GPL-2 SMAIL
+SLOT=0
+SRC_URI=http://ftp.it.debian.org/debian/pool/main/d/debianutils/debianutils_5.23.2.tar.xz -> debianutils_5.23.2.tar.xz
+_eclasses_=autotools	e9ade2787b2f54643c7cdffbfa1cca9c	eutils	6e6c2737b59a4b982de6fb3ecefd87f8	flag-o-matic	d0939f99dd528dd0c5ec25284877bf5c	libtool	f143db5a74ccd9ca28c1234deffede96	multilib	d410501a125f99ffb560b0c523cd3d1e	toolchain-funcs	24921b57d6561d87cbef4916a296ada4
+_md5_=f4cc84b3e092e176cefd1a891e8c9168

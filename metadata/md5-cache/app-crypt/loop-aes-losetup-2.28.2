@@ -1,0 +1,13 @@
+DEFINED_PHASES=configure install prepare
+DEPEND=selinux? ( sys-libs/libselinux ) nls? ( sys-devel/gettext ) virtual/os-headers >=app-portage/elt-patches-20170815 || ( >=sys-devel/automake-1.16.5:1.16 ) >=sys-devel/autoconf-2.71 >=sys-devel/libtool-2.4
+DESCRIPTION=Loop-AES losetup utility
+EAPI=6
+HOMEPAGE=https://www.kernel.org/pub/linux/utils/util-linux/
+IUSE=nls selinux static
+KEYWORDS=~amd64 ~arm ~hppa ~ppc ~sparc ~x86
+LICENSE=GPL-2 LGPL-2.1 BSD-4 MIT public-domain
+RDEPEND=selinux? ( sys-libs/libselinux )
+SLOT=0
+SRC_URI=https://www.kernel.org/pub/linux/utils/util-linux/v2.28/util-linux-2.28.2.tar.xz http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.7j.tar.bz2
+_eclasses_=autotools	e9ade2787b2f54643c7cdffbfa1cca9c	desktop	b1d22ac8bdd4679ab79c71aca235009d	epatch	cb17fbe94a2c43cbc0f8e76abf15479a	eqawarn	bb3d80ca38bc542ed397ab65f64256a6	estack	43ddf5aaffa7a8d0482df54d25a66a1f	eutils	6e6c2737b59a4b982de6fb3ecefd87f8	flag-o-matic	d0939f99dd528dd0c5ec25284877bf5c	libtool	f143db5a74ccd9ca28c1234deffede96	ltprune	22f9f14d105434e9c400ccac3bbb64ae	multilib	d410501a125f99ffb560b0c523cd3d1e	preserve-libs	d521bde96a41ef9807fcf99977841b26	toolchain-funcs	24921b57d6561d87cbef4916a296ada4	vcs-clean	2a0f74a496fa2b1552c4f3398258b7bf
+_md5_=f96a04e8b24959be35001766b436bdc9

@@ -1,0 +1,15 @@
+BDEPEND=virtual/pkgconfig >=app-portage/elt-patches-20170815 || ( >=sys-devel/automake-1.16.5:1.16 ) >=sys-devel/autoconf-2.71 >=sys-devel/libtool-2.4
+DEFINED_PHASES=configure install postinst postrm prepare
+DEPEND=dev-libs/libbsd fbcon? ( media-libs/libpng:= ) gpm? ( sys-libs/gpm ) jpeg? ( media-libs/libjpeg-turbo:= ) libevent? ( dev-libs/libevent:= ) ssl? ( dev-libs/openssl:= ) tiff? ( media-libs/tiff:= ) webp? ( media-libs/libwebp:= ) freetype? ( media-libs/fontconfig media-libs/freetype ) livecd? ( media-libs/libpng:= sys-libs/gpm media-libs/libjpeg-turbo:= ) svga? ( media-libs/libpng:= media-libs/svgalib ) X? ( media-libs/libpng:= x11-libs/libXext ) brotli? ( app-arch/brotli:= ) bzip2? ( app-arch/bzip2 ) lzip? ( app-arch/lzip ) lzma? ( app-arch/xz-utils ) zlib? ( sys-libs/zlib ) zstd? ( app-arch/zstd:= ) fbcon? ( virtual/os-headers ) livecd? ( virtual/os-headers )
+DESCRIPTION=A fast and lightweight web browser running in both graphics and text mode
+EAPI=7
+HOMEPAGE=http://links.twibright.com/
+IUSE=brotli bzip2 fbcon freetype gpm ipv6 jpeg libevent livecd lzip lzma ssl suid svga tiff unicode webp X zlib zstd
+KEYWORDS=*
+LICENSE=GPL-2
+RDEPEND=dev-libs/libbsd fbcon? ( media-libs/libpng:= ) gpm? ( sys-libs/gpm ) jpeg? ( media-libs/libjpeg-turbo:= ) libevent? ( dev-libs/libevent:= ) ssl? ( dev-libs/openssl:= ) tiff? ( media-libs/tiff:= ) webp? ( media-libs/libwebp:= ) freetype? ( media-libs/fontconfig media-libs/freetype ) livecd? ( media-libs/libpng:= sys-libs/gpm media-libs/libjpeg-turbo:= ) svga? ( media-libs/libpng:= media-libs/svgalib ) X? ( media-libs/libpng:= x11-libs/libXext ) brotli? ( app-arch/brotli:= ) bzip2? ( app-arch/bzip2 ) lzip? ( app-arch/lzip ) lzma? ( app-arch/xz-utils ) zlib? ( sys-libs/zlib ) zstd? ( app-arch/zstd:= )
+REQUIRED_USE=!livecd? ( fbcon? ( gpm ) ) svga? ( suid )
+SLOT=2
+SRC_URI=http://links.twibright.com/download/links-2.30.tar.bz2 -> links-2.30.tar.bz2 https://dashboard.snapcraft.io/site_media/appmedia/2018/07/links-graphics-xlinks-logo-pic.png -> links-graphics-xlinks-logo-pic.png
+_eclasses_=autotools	e9ade2787b2f54643c7cdffbfa1cca9c	desktop	b1d22ac8bdd4679ab79c71aca235009d	libtool	f143db5a74ccd9ca28c1234deffede96	multilib	d410501a125f99ffb560b0c523cd3d1e	toolchain-funcs	24921b57d6561d87cbef4916a296ada4	xdg-utils	baea6080dd821f5562d715887954c9d3
+_md5_=c2647d6f52d8d4eb43bfdc0a7ed1ea5e

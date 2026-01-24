@@ -1,0 +1,13 @@
+BDEPEND=>=app-portage/elt-patches-20170815 || ( >=sys-devel/automake-1.16.5:1.16 ) >=sys-devel/autoconf-2.71 >=sys-devel/libtool-2.4 virtual/pkgconfig
+DEFINED_PHASES=compile configure install postinst postrm prepare unpack
+DEPEND=sys-libs/zlib x11-libs/libX11 x11-libs/libfontenc
+DESCRIPTION=Locale and ISO 2022 support for Unicode terminals
+EAPI=7
+HOMEPAGE=https://www.x.org/wiki/ https://gitlab.freedesktop.org/xorg/app/luit
+KEYWORDS=*
+LICENSE=MIT
+RDEPEND=sys-libs/zlib x11-libs/libX11 x11-libs/libfontenc
+SLOT=0
+SRC_URI=https://invisible-mirror.net/archives/luit/luit-20240910.tgz
+_eclasses_=autotools	e9ade2787b2f54643c7cdffbfa1cca9c	eutils	6e6c2737b59a4b982de6fb3ecefd87f8	flag-o-matic	d0939f99dd528dd0c5ec25284877bf5c	libtool	f143db5a74ccd9ca28c1234deffede96	multilib	d410501a125f99ffb560b0c523cd3d1e	toolchain-funcs	24921b57d6561d87cbef4916a296ada4	xorg-3	76251867925642cdf10645288f8b837d
+_md5_=382e687eb72d95fe0b3d75b582ee5a75

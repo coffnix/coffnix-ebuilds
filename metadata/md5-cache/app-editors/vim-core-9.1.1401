@@ -1,0 +1,13 @@
+BDEPEND=sys-devel/autoconf
+DEFINED_PHASES=compile configure install postinst postrm prepare setup test
+DEPEND=>=sys-libs/ncurses-5.2-r2:0
+DESCRIPTION=Vim and GVim shared files
+EAPI=7
+HOMEPAGE=http://www.vim.org/ https://github.com/vim/vim
+IUSE=nls acl minimal
+KEYWORDS=*
+LICENSE=vim
+SLOT=0
+SRC_URI=https://github.com/vim/vim/archive/v9.1.1401/v9.1.1401.tar.gz -> vim-9.1.1401.tar.gz
+_eclasses_=bash-completion-r1	47a7402d95930413ce25ba8d857339bb	desktop	b1d22ac8bdd4679ab79c71aca235009d	eutils	6e6c2737b59a4b982de6fb3ecefd87f8	flag-o-matic	d0939f99dd528dd0c5ec25284877bf5c	multilib	d410501a125f99ffb560b0c523cd3d1e	prefix	e51c7882b7b721e54e684f7eb143cbfe	toolchain-funcs	24921b57d6561d87cbef4916a296ada4	vim-doc	af2c81a1feeb0a99e91bee3e20769edb	xdg-utils	baea6080dd821f5562d715887954c9d3
+_md5_=d6e9ed1bcac1ba05a824f7ced5c47b89

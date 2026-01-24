@@ -1,0 +1,12 @@
+DEFINED_PHASES=install postinst postrm prepare setup
+DEPEND=X? ( >=x11-apps/mkfontscale-1.2.0 media-fonts/encodings )
+DESCRIPTION=(URW)++ base 35 font set
+EAPI=7
+HOMEPAGE=https://github.com/ArtifexSoftware/urw-base35-fonts
+IUSE=X
+KEYWORDS=*
+LICENSE=AGPL-3
+SLOT=0
+SRC_URI=https://github.com/ArtifexSoftware/urw-base35-fonts/archive/3c0ba3b5687632dfc66526544a4e811fe0ec0cd9.zip -> urw-fonts-20230503-3c0ba3b.zip
+_eclasses_=font	dd073b36fe3fd8b868c23bc23209db45
+_md5_=73e14ee6ea6aebcfafc2de90985c38b6
