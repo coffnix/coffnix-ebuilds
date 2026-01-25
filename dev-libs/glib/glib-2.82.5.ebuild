@@ -162,7 +162,7 @@ src_configure() {
         $(meson_feature selinux)
         $(meson_use xattr)
         -Dlibmount=enabled # only used if host_system == 'linux'
-        -Dman-pages=enabled
+        -Dman-pages=disabled
         $(meson_feature systemtap dtrace)
         $(meson_feature systemtap)
         $(meson_feature sysprof)
@@ -173,7 +173,7 @@ src_configure() {
         -Doss_fuzz=disabled
         $(meson_native_use_feature elf libelf)
         -Dmultiarch=false
-        $(meson_native_use_feature introspection)
+		-Dintrospection=enabled
     )
 	meson_src_configure
 }
