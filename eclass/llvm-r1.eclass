@@ -26,7 +26,7 @@
 #
 # Example:
 # @CODE
-# LLVM_COMPAT=( {16..18} )
+# LLVM_COMPAT=( {20} )
 #
 # inherit llvm-r1
 #
@@ -56,7 +56,7 @@ inherit llvm-utils
 # @DESCRIPTION:
 # Oldest supported LLVM slot.  This is used to automatically filter out
 # unsupported LLVM_COMPAT values.
-_LLVM_OLDEST_SLOT=16
+_LLVM_OLDEST_SLOT=20
 
 # @ECLASS_VARIABLE: _LLVM_NEWEST_STABLE
 # @INTERNAL
@@ -75,7 +75,7 @@ _LLVM_NEWEST_STABLE=20
 #
 # Example:
 # @CODE
-# LLVM_COMPAT=( {15..17} )
+# LLVM_COMPAT=( {20} )
 # @CODE
 
 # @ECLASS_VARIABLE: LLVM_OPTIONAL

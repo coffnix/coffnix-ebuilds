@@ -3,8 +3,8 @@
 
 EAPI=7
 
-LLVM_SLOT=16
-LLVM_COMPAT=( 16 )
+LLVM_SLOT=20
+LLVM_COMPAT=( 20 )
 PYTHON_COMPAT=( python3+ )
 
 inherit llvm-r1 meson python-any-r1
@@ -32,7 +32,7 @@ RDEPEND="
 	$(llvm_gen_dep '
 		dev-util/spirv-llvm-translator:${LLVM_SLOT}
 		sys-devel/clang:${LLVM_SLOT}=
-		=sys-devel/libclc-${LLVM_SLOT}*
+		=dev-libs/libclc-${LLVM_SLOT}*
 		sys-devel/llvm:${LLVM_SLOT}=
 	')
 "
