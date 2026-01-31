@@ -14,7 +14,7 @@ S="${WORKDIR}/${MY_P}"
 
 LICENSE="w3m"
 SLOT="0"
-KEYWORDS="¨*"
+KEYWORDS="*"
 IUSE="gpm nls ssl"
 
 DEPEND=">=dev-libs/boehm-gc-7.2
