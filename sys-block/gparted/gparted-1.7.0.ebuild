@@ -1,56 +1,73 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
+inherit gnome3
 
-inherit gnome2 optfeature virtualx
-
-DESCRIPTION="Partition editor for graphically managing your disk partitions"
-HOMEPAGE="https://gparted.org/ https://gitlab.gnome.org/GNOME/gparted/"
-SRC_URI="https://downloads.sourceforge.net/project/${PN}/${PN}/${PN}-$PV/${P}.tar.gz"
+DESCRIPTION="Gnome Partition Editor"
+HOMEPAGE="https://gparted.org/"
+SRC_URI="mirror://sourceforge/${PN}/${P}.tar.gz"
 
 LICENSE="GPL-2+ FDL-1.2+"
 SLOT="0"
 KEYWORDS="*"
-IUSE="kde policykit wayland"
+IUSE="btrfs cryptsetup dmraid f2fs fat hfs jfs kde mdadm ntfs policykit reiserfs reiser4 udf wayland xfs"
 
-DEPEND="
-	!policykit? ( kde? ( || (
-		kde-plasma/kdesu-gui
-		>=kde-plasma/kde-cli-tools-5.8.6-r1:*[kdesu]
-	) ) )
+COMMON_DEPEND="
+	!policykit? (
+		kde? ( >=kde-plasma/kde-cli-tools-5.8.6-r1[kdesu] ) )
 	policykit? ( >=sys-auth/polkit-0.102 )
 	dev-cpp/glibmm:2
-	>=dev-cpp/gtkmm-3.24
-	>=dev-libs/glib-2.58.3-r1:2
+	dev-cpp/gtkmm:3.0
+	>=dev-cpp/atkmm-2.28.3:1
+	dev-libs/glib
 	>=sys-block/parted-3.2:=
-	>=dev-libs/libsigc++-2.10.1:2
+	>=dev-libs/libsigc++-2.5.1:2
 "
-RDEPEND="${DEPEND}
-	>=sys-apps/util-linux-2.33.2
+RDEPEND="${COMMON_DEPEND}
+	>=sys-apps/util-linux-2.20
+	>=sys-fs/e2fsprogs-1.41
+	btrfs? ( sys-fs/btrfs-progs )
+	cryptsetup? ( sys-fs/cryptsetup )
+	dmraid? (
+		>=sys-fs/lvm2-2.02.45
+		sys-fs/dmraid
+		sys-fs/multipath-tools )
+	f2fs? ( sys-fs/f2fs-tools )
+	fat? (
+		sys-fs/dosfstools
+		sys-fs/mtools )
+	hfs? (
+		sys-fs/diskdev_cmds
+		virtual/udev
+		sys-fs/hfsutils )
+	jfs? ( sys-fs/jfsutils )
+	mdadm? ( sys-fs/mdadm )
+	ntfs? ( >=sys-fs/ntfs3g-2011.4.12[ntfsprogs] )
+	reiserfs? ( sys-fs/reiserfsprogs )
+	reiser4? ( sys-fs/reiser4progs )
+	udf? ( sys-fs/udftools )
 	wayland? ( x11-apps/xhost )
+	xfs? ( sys-fs/xfsprogs sys-fs/xfsdump )
 "
-BDEPEND="
+DEPEND="${COMMON_DEPEND}
 	app-text/docbook-xml-dtd:4.1.2
-	dev-util/itstool
+	app-text/gnome-doc-utils
+	>=dev-util/intltool-0.36.0
 	sys-devel/gettext
 	virtual/pkgconfig
 "
 
-PATCHES=(
-	"${FILESDIR}"/${PN}-1.6.0-handle-failing-pixbuf.patch
-	"${FILESDIR}"/${PN}-1.7.0-gtest-gcc-15.patch
-)
-
 src_configure() {
-	gnome2_src_configure \
+	gnome3_src_configure \
 		--enable-doc \
+		--enable-online-resize \
 		$(use_enable wayland xhost-root) \
 		GKSUPROG=kdesu \
 		ac_cv_prog_have_scrollkeeper_update=no
 }
 
 src_install() {
-	gnome2_src_install
+	gnome3_src_install
 
 	local _ddir="${D}"/usr/share/applications
 	local _bdir="${D}"/usr/bin
@@ -65,32 +82,4 @@ src_install() {
 	else
 		sed -i -e 's:kdesu::' "${_bdir}"/gparted || die
 	fi
-
-	mv "${ED}"/usr/share/{appdata,metainfo}
-}
-
-src_test() {
-	virtx emake check
-}
-
-pkg_postinst() {
-	gnome2_pkg_postinst
-
-	optfeature_header
-	optfeature "Bcachefs support"                sys-fs/bcachefs-tools
-	optfeature "BTRFS support"                   sys-fs/btrfs-progs
-	optfeature "DMRAID support"                  sys-fs/dmraid sys-fs/multipath-tools
-	optfeature "Encrypted device / LUKS support" sys-fs/cryptsetup
-	optfeature "exFAT support"                   sys-fs/exfatprogs
-	optfeature "EXT2/EXT3/EXT4 support"          sys-fs/e2fsprogs
-	optfeature "F2FS support"                    sys-fs/f2fs-tools
-	optfeature "FAT support"                     sys-fs/dosfstools sys-fs/mtools
-	optfeature "HFS support"                     sys-fs/diskdev_cmds sys-fs/hfsutils virtual/udev
-	optfeature "JFS support"                     sys-fs/jfsutils
-	optfeature "MDADM support"                   sys-fs/mdadm
-	optfeature "NTFS support"                    sys-fs/ntfs3g[ntfsprogs]
-	optfeature "Reiser4 support"                 sys-fs/reiser4progs
-	optfeature "ReiserFS support"                sys-fs/reiserfsprogs
-	optfeature "UDF support"                     sys-fs/udftools
-	optfeature "XFS support"                     sys-fs/xfsprogs sys-fs/xfsdump
 }
