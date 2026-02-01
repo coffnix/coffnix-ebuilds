@@ -18,7 +18,7 @@ COMMON_DEPEND="
 	policykit? ( >=sys-auth/polkit-0.102 )
 	dev-cpp/glibmm:2
 	dev-cpp/gtkmm:3.0
-	>=dev-cpp/atkmm-2.28.3:1
+	>=dev-cpp/atkmm-2.28.3:2.36
 	dev-libs/glib
 	>=sys-block/parted-3.2:=
 	>=dev-libs/libsigc++-2.5.1:2
