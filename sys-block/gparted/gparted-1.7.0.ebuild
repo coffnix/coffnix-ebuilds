@@ -14,15 +14,20 @@ IUSE="btrfs cryptsetup dmraid f2fs fat hfs jfs kde mdadm ntfs policykit reiserfs
 
 COMMON_DEPEND="
 	!policykit? (
-		kde? ( >=kde-plasma/kde-cli-tools-5.8.6-r1[kdesu] ) )
+		kde? ( >=kde-plasma/kde-cli-tools-5.8.6-r1[kdesu] )
+	)
 	policykit? ( >=sys-auth/polkit-0.102 )
+
 	dev-cpp/glibmm:2
-	dev-cpp/pangomm-2.56.1:2.48
+	dev-cpp/gtkmm:3.0
+	dev-cpp/pangomm:2.48
+	dev-cpp/atkmm:2.36
+
 	dev-libs/glib
-	dev-cpp/atkmm:0
 	>=sys-block/parted-3.2:=
 	>=dev-libs/libsigc++-2.5.1:2
 "
+
 RDEPEND="${COMMON_DEPEND}
 	>=sys-apps/util-linux-2.20
 	>=sys-fs/e2fsprogs-1.41
