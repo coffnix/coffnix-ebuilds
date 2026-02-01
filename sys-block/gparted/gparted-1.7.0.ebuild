@@ -17,7 +17,7 @@ COMMON_DEPEND="
 		kde? ( >=kde-plasma/kde-cli-tools-5.8.6-r1[kdesu] ) )
 	policykit? ( >=sys-auth/polkit-0.102 )
 	dev-cpp/glibmm:2
-	>=dev-cpp/pangomm-2.46.0:1.4
+	dev-cpp/pangomm-2.56.1:2.48
 	dev-libs/glib
 	dev-cpp/atkmm:0
 	>=sys-block/parted-3.2:=
