@@ -14,7 +14,7 @@ KEYWORDS=""
 IUSE="+gtk-doc doc"
 
 RDEPEND="
-	>=dev-cpp/cairomm-1.14.5[doc?]
+	>=dev-cpp/cairomm-1.14.5
 	>=dev-cpp/glibmm-2.66.8:2[doc?]
 	dev-libs/libsigc++:2[doc?]
 	>=x11-libs/pango-1.45.1
