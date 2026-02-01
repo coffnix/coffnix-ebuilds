@@ -82,13 +82,14 @@ RDEPEND="dev-libs/openssl:0=
 "
 DEPEND="${RDEPEND}
 "
-
-post_src_unpack() {
-	mv FreeRDP-FreeRDP-* ${S}
-}
+#
+#post_src_unpack() {
+#	mv FreeRDP-FreeRDP-* ${S}
+#}
 
 
 src_configure() {
+	CMAKE_BUILD_TYPE=Release
 	local mycmakeargs=(
 	  -DBUILD_TESTING=OFF
 	  -DCHANNEL_URBDRC=$(usex usb ON OFF)
