@@ -1,6 +1,6 @@
 EAPI="7"
 
-DESCRIPTION="Scripts to build livecd Funtoo"
+DESCRIPTION="Scripts to build livecd Vipnix based on MacaroniOS"
 HOMEPAGE="https://vipnix.com.br"
 
 LICENSE="BSD"
@@ -23,8 +23,7 @@ src_install() {
     
     # Instala os arquivos existentes em /etc
     insinto /etc
-    doins "${FILESDIR}/funtoo.ascii"
-    doins "${FILESDIR}/funtoo_small.ascii"
+    doins "${FILESDIR}/macaronios.ascii"
     
     # Instala os novos arquivos em /etc/vipnix
     insinto /etc/vipnix
