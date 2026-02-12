@@ -35,8 +35,11 @@ DEPEND="
 	monitor? ( kde-plasma/libkscreen:6= )
 	touchpad? (
 		virtual/libudev:=
-		x11-drivers/xf86-input-libinput
 		x11-libs/libXi
+		|| (
+			x11-drivers/xf86-input-libinput
+			xlibre-drivers/xf86-input-libinput
+		)
 	)
 "
 RDEPEND="${DEPEND}"
