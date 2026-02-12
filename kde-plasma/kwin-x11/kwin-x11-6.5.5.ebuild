@@ -64,7 +64,7 @@ COMMON_DEPEND="
 	x11-libs/libX11
 	x11-libs/libXi
 	>=x11-libs/libdrm-2.4.116
-	>=x11-libs/libxcb-1.10:=
+	x11-libs/libxcb
 	>=x11-libs/libxkbcommon-1.5.0
 	x11-libs/xcb-util-cursor
 	x11-libs/xcb-util-keysyms
