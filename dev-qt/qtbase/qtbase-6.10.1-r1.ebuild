@@ -9,7 +9,7 @@ HOMEPAGE="https://invent.kde.org/qt/qt/"
 SRC_URI="https://download.qt.io/archive/qt/6.10/6.10.1/submodules/qtbase-everywhere-src-6.10.1.tar.xz -> qtbase-everywhere-src-6.10.1.tar.xz"
 SLOT="6"
 KEYWORDS="*"
-IUSE="+X +dbus +widgets +xml brotli cups gles2-only gtk gssapi +gui journald libinput libproxy mysql postgres renderdoc +sql sqlite vulkan wayland zstd"
+IUSE="+X +dbus +widgets +xml +network brotli cups gles2-only gtk gssapi +gui journald libinput libproxy mysql postgres renderdoc +sql sqlite vulkan wayland zstd"
 REQUIRED_USE="gui? ( || ( X wayland ) )
 sql? ( || ( mysql postgres sqlite ) )
 "
