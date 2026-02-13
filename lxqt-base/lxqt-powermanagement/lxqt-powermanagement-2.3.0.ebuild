@@ -33,3 +33,7 @@ DEPEND="
 	sys-power/upower
 "
 RDEPEND="${DEPEND}"
+
+src_prepare() {
+	cmake_src_prepare
+}
