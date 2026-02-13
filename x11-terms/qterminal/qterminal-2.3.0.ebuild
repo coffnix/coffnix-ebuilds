@@ -12,18 +12,22 @@ KEYWORDS="*"
 
 LICENSE="GPL-2 GPL-2+"
 SLOT="0"
-IUSE="test"
+IUSE="test wayland"
 RESTRICT="!test? ( test )"
 
 BDEPEND=">=dev-util/lxqt-build-tools-2.3.0"
 DEPEND="
 	>=dev-qt/qtbase-6.6:6=[dbus,gui,widgets,X]
-	kde-plasma/layer-shell-qt:6
+	wayland? ( kde-plasma/layer-shell-qt:6 )
 	media-libs/libcanberra
 	x11-libs/libX11
 	~x11-libs/qtermwidget-${PV}:=
 "
 RDEPEND="${DEPEND}"
+
+src_prepare() {
+	cmake_src_prepare
+}
 
 src_configure() {
 	local mycmakeargs=(
