@@ -43,6 +43,10 @@ DEPEND="
 "
 RDEPEND="${DEPEND}"
 
+src_prepare() {
+	cmake_src_prepare
+}
+
 src_configure() {
 	local mycmakeargs=(
 		-DWITH_MONITOR=$(usex monitor)

@@ -22,3 +22,6 @@ DEPEND="
 	>=lxqt-base/liblxqt-2.3:=
 "
 RDEPEND="${DEPEND}"
+src_prepare() {
+	cmake_src_prepare
+}
