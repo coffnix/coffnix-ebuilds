@@ -29,3 +29,7 @@ DEPEND="
 	x11-libs/libxcb:=
 "
 RDEPEND="${DEPEND}"
+
+src_prepare() {
+	cmake_src_prepare
+}
