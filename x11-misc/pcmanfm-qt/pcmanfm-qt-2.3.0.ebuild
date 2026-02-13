@@ -32,6 +32,9 @@ DEPEND="
 RDEPEND="${DEPEND}
 	=lxqt-base/lxqt-menu-data-${MY_PV}*
 "
+src_prepare() {
+	cmake_src_prepare
+}
 
 pkg_postinst() {
 	xdg_desktop_database_update
