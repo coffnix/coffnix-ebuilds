@@ -33,20 +33,19 @@ nssarch() {
 		aarch64*) echo "aarch64" ;;
 		x86_64*)  echo "x86_64" ;;
 		i?86*)    echo "i686" ;;
-		*86*-pc-solaris2*) echo "i86pc" ;;
-		hppa*)    echo "parisc" ;;
 		*)        tc-arch ${t} ;;
 	esac
 }
 
 src_prepare() {
 	default
-
-	sed -e "/print('-Werror')/d" -i -e "s|'-Werror',||g" coreconf/werror.py || die
+	sed -e "/print('-Werror')/d" -i -e "s|'-Werror',||g" \
+		coreconf/werror.py || die
 	sed -i -e 's|gtests$||g' manifest.mn || die
 
 	pushd coreconf >/dev/null || die
-	echo 'INCLUDES += -I$(DIST)/include/dbm' >> headers.mk || die
+	echo 'INCLUDES += -I$(DIST)/include/dbm' \
+		>> headers.mk || die "failed to append include"
 	sed -e '/CORE_DEPTH/s:SOURCE_PREFIX.*$:SOURCE_PREFIX = $(CORE_DEPTH)/dist:' \
 		-i source.mk || die
 	sed -i -e 's/\$(MKSHLIB) -o/\$(MKSHLIB) \$(LDFLAGS) -o/g' rules.mk || die
@@ -65,7 +64,7 @@ src_compile() {
 	unset NSPR_INCLUDE_DIR
 
 	export NSS_ALLOW_SSLKEYLOGFILE=1
-	export NSS_ENABLE_WERROR=0
+	export NSS_ENABLE_WERROR=0 #567158
 	export BUILD_OPT=1
 	export NSS_USE_SYSTEM_SQLITE=1
 	export NSDISTMODE=copy
@@ -83,6 +82,7 @@ src_compile() {
 		export CC_IS_CLANG=1
 	fi
 
+	local d
 	local ostest="$(nssarch)"
 	export USE_64=1
 
@@ -101,42 +101,95 @@ src_compile() {
 }
 
 src_install() {
+	local nss_vmajor=$(awk '/#define.*NSS_VMAJOR/ {print $3}' lib/nss/nss.h)
+	local nss_vminor=$(awk '/#define.*NSS_VMINOR/ {print $3}' lib/nss/nss.h)
+	local nss_vpatch=$(awk '/#define.*NSS_VPATCH/ {print $3}' lib/nss/nss.h)
+	local nspr_version="$(pkg-config --modversion nspr)"
+
 	pushd dist >/dev/null || die
 
 	dodir /usr/$(get_libdir)
-	cp -L */lib/*$(get_libname) "${ED}"/usr/$(get_libdir) || die
+	cp -L */lib/*$(get_libname) "${ED}"/usr/$(get_libdir) || die "copying shared libs failed"
 
+	local i
 	for i in crmf freebl nssb nssckfw ; do
-		cp -L */lib/lib${i}.a "${ED}"/usr/$(get_libdir) || die
+		cp -L */lib/lib${i}.a "${ED}"/usr/$(get_libdir) || die "copying libs failed"
 	done
 
 	dodir /usr/$(get_libdir)/pkgconfig
-	cp -L */lib/pkgconfig/nss.pc "${ED}"/usr/$(get_libdir)/pkgconfig || die
-	cp -L */lib/pkgconfig/nss-util.pc "${ED}"/usr/$(get_libdir)/pkgconfig || die
+	local _pc
+	for _pc in nss.pc nss-util.pc nss-softokn.pc; do
+		sed "${FILESDIR}"/${_pc}.in \
+			-e "s,%libdir%,/usr/$(get_libdir),g" \
+			-e "s,%prefix%,/usr,g" \
+			-e "s,%exec_prefix%,/usr/bin,g" \
+			-e "s,%includedir%,/usr/include/nss,g" \
+			-e "s,%SOFTOKEN_VERSION%,${PV},g" \
+			-e "s,%NSPR_VERSION%,$nspr_version,g" \
+			-e "s,%NSS_VERSION%,${PV}r,g" \
+			-e "s,%NSSUTIL_VERSION%,${PV},g" \
+			> "${ED}"/usr/$(get_libdir)/pkgconfig/${_pc} || die
+	done
+	dosym /usr/$(get_libdir)/pkgconfig/nss.pc /usr/$(get_libdir)/pkgconfig/mozilla-nss.pc
 
-	sed -e 's#Libs:#Libs: -lfreebl#' \
-		-e 's#Cflags:#Cflags: -I${includedir}/private#' \
-		*/lib/pkgconfig/nss.pc \
-		> "${ED}"/usr/$(get_libdir)/pkgconfig/nss-softokn.pc || die
-
-	dosym /usr/$(get_libdir)/pkgconfig/nss.pc \
-		/usr/$(get_libdir)/pkgconfig/mozilla-nss.pc
+	dodir /usr/bin
+	sed "${FILESDIR}"/nss-config.in \
+		-e "s,@libdir@,/usr/$(get_libdir),g" \
+		-e "s,@prefix@,/usr/bin,g" \
+		-e "s,@exec_prefix@,/usr/bin,g" \
+		-e "s,@includedir@,/usr/include/nss,g" \
+		-e "s,@MOD_MAJOR_VERSION@,${nss_vmajor},g" \
+		-e "s,@MOD_MINOR_VERSION@,${nss_vminor},g" \
+		-e "s,@MOD_PATCH_VERSION@,${nss_vpatch},g" \
+		> "${ED}"/usr/bin/nss-config || die
+	chmod 755 "${ED}"/usr/bin/nss-config || die
 
 	insinto /usr/include/nss
 	doins public/nss/*.{h,api}
 	insinto /usr/include/nss/private
 	doins private/nss/{blapi,alghmac,cmac}.h
 
+	popd >/dev/null || die
+
 	local f nssutils
 	nssutils=( shlibsign )
 
 	if use utils; then
 		nssutils+=(
-			addbuiltin atob baddbdir btoa certutil cmsutil conflict crlutil
-			derdump digest makepqg mangle modutil multinit nonspr10
-			ocspclnt oidcalc p7content p7env p7sign p7verify pk11mode
-			pk12util pp rsaperf selfserv signtool signver ssltap
-			strsclnt symkeyutil tstclnt vfychain vfyserv
+			addbuiltin
+			atob
+			baddbdir
+			btoa
+			certutil
+			cmsutil
+			conflict
+			crlutil
+			derdump
+			digest
+			makepqg
+			mangle
+			modutil
+			multinit
+			nonspr10
+			ocspclnt
+			oidcalc
+			p7content
+			p7env
+			p7sign
+			p7verify
+			pk11mode
+			pk12util
+			pp
+			rsaperf
+			selfserv
+			signtool
+			signver
+			ssltap
+			strsclnt
+			symkeyutil
+			tstclnt
+			vfychain
+			vfyserv
 		)
 		doman doc/nroff/*.1
 	fi
@@ -145,8 +198,6 @@ src_install() {
 	for f in "${nssutils[@]}"; do
 		dobin "${f}"
 	done
-	popd >/dev/null || die
-
 	popd >/dev/null || die
 
 	dodir /etc/prelink.conf.d
