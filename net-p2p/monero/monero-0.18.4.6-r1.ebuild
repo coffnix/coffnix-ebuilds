@@ -17,7 +17,7 @@ KEYWORDS="*"
 
 LICENSE="BSD MIT"
 SLOT="0"
-IUSE="+daemon hw-wallet readline +tools +wallet-cli +wallet-rpc cpu_flags_x86_aes"
+IUSE="+daemon hw-wallet readline +tools +wallet-cli +wallet-rpc +aes"
 REQUIRED_USE="|| ( daemon tools wallet-cli wallet-rpc )"
 RESTRICT="test"
 # Test requires python's requests, psutil, deepdiff which are packaged
@@ -72,7 +72,7 @@ src_configure() {
 		-DBUILD_DOCUMENTATION=OFF
 		-DMANUAL_SUBMODULES=ON
 		-DUSE_CCACHE=OFF
-		-DNO_AES=$(usex !cpu_flags_x86_aes)
+		-DNO_AES=$(usex !aes)
 		-DUSE_DEVICE_TREZOR=$(usex hw-wallet)
 		-DUSE_READLINE=$(usex readline)
 		-DCMAKE_CXX_STANDARD=17
