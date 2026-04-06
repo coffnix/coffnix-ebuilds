@@ -14,12 +14,9 @@ LICENSE="BSD"
 SLOT="0"
 KEYWORDS="*"
 
+PATCHES=( "${FILESDIR}"/randomx-aarch64-shared-fix.patch )
+
 src_configure() {
 	append-ldflags -Wl,-z,noexecstack
-
-	local mycmakeargs=(
-		-DBUILD_SHARED_LIBS=OFF
-	)
-
 	cmake_src_configure
 }
