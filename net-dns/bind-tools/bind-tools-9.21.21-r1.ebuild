@@ -15,6 +15,7 @@ IUSE="gssapi idn ipv6 libedit readline xml"
 # no PKCS11 currently as it requires OpenSSL to be patched, also see bug 409687
 
 COMMON_DEPEND="
+	dev-db/lmdb
 	dev-libs/libuv:=
 	dev-libs/openssl
 	dev-libs/userspace-rcu
