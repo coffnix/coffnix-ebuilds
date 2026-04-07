@@ -34,10 +34,9 @@ S="${WORKDIR}/libxkbfile-${PV}"
 src_install() {
 	meson_src_install
 
-	insinto /usr/$(get_libdir)/pkgconfig
+	insinto /usr/lib64/pkgconfig
 	doins "${BUILD_DIR}/xkbfile.pc" || die
 
 	find "${ED}" -type f -name '*.la' -delete || die
 }
-
 # vim: filetype=ebuild
