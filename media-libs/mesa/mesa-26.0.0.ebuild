@@ -18,11 +18,6 @@ SRC_URI="
 	sky1-patches? ( https://github.com/Sky1-Linux/mesa-sky1/archive/refs/tags/mesa-${PV}.tar.gz -> mesa-${PV}-sky1.tar.gz )
 "
 
-if use sky1-patches; then
-	S="${WORKDIR}/mesa-sky1-mesa-${PV}"
-else
-	S="${WORKDIR}/mesa-${PV}"
-fi
 LICENSE="MIT"
 SLOT="0"
 KEYWORDS="*"
@@ -150,6 +145,14 @@ DEPEND="${RDEPEND}
 	  x11-base/xorg-proto
 	)
 
+src_unpack() {
+	default
+	if use sky1-patches; then
+		S="${WORKDIR}/mesa-sky1-mesa-${PV}"
+	else
+		S="${WORKDIR}/mesa-${PV}"
+	fi
+}
 "
 pkg_setup() {
 	python-any-r1_pkg_setup
