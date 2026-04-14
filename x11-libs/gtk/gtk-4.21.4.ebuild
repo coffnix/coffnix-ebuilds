@@ -19,6 +19,8 @@ REQUIRED_USE="|| ( aqua wayland X )
 gtk-doc? ( introspection )
 "
 # Commons depends
+
+
 CDEPEND="dev-libs/glib:2
 	x11-libs/cairo[aqua?,glib,X?]
 	x11-libs/pango[introspection?]
@@ -38,33 +40,35 @@ CDEPEND="dev-libs/glib:2
 	cups? ( net-print/cups )
 	examples? ( gnome-base/librsvg:2 )
 	gstreamer? (
-	  media-libs/gstreamer
-	  media-libs/gst-plugins-bad
-	  || (
-	    media-libs/gst-plugins-base[gles2]
-	    media-libs/gst-plugins-base[opengl]
-	  )
+		media-libs/gstreamer
+		media-libs/gst-plugins-bad
+		|| (
+			media-libs/gst-plugins-base[gles2]
+			media-libs/gst-plugins-base[opengl]
+		)
 	)
 	introspection? ( dev-libs/gobject-introspection:= )
 	vulkan? ( media-libs/vulkan-loader[wayland?,X?] )
 	wayland? (
-	  dev-libs/wayland
-	  dev-libs/wayland-protocols
-	  media-libs/mesa[wayland]
-	  x11-libs/libxkbcommon
+		dev-libs/wayland
+		dev-libs/wayland-protocols
+		|| (
+			media-libs/mesa[wayland]
+			media-libs/mesa-sky1[wayland]
+		)
+		x11-libs/libxkbcommon
 	)
 	X? (
-	  media-libs/fontconfig
-	  media-libs/mesa[X(+)]
-	  x11-libs/libX11
-	  x11-libs/libXi
-	  x11-libs/libXext
-	  x11-libs/libXcursor
-	  x11-libs/libXfixes
-	  x11-libs/libXdamage
-	  x11-libs/libXinerama
+		media-libs/fontconfig
+		media-libs/mesa[X(+)]
+		x11-libs/libX11
+		x11-libs/libXi
+		x11-libs/libXext
+		x11-libs/libXcursor
+		x11-libs/libXfixes
+		x11-libs/libXdamage
+		x11-libs/libXinerama
 	)
-	
 "
 BDEPEND="dev-libs/gobject-introspection-common
 	introspection? (

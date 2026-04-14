@@ -17,7 +17,10 @@ LICENSE="MIT"
 SLOT="0"
 IUSE="+X"
 
-RDEPEND="media-libs/mesa"
+RDEPEND="|| (
+	media-libs/mesa
+	media-libs/mesa-sky1
+)"
 DEPEND="${PYTHON_DEPS}
 	${RDEPEND}
 	virtual/opengl
