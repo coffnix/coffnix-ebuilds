@@ -145,6 +145,7 @@ DEPEND="${RDEPEND}
 	  x11-base/xorg-proto
 	)
 
+"
 src_unpack() {
 	default
 	if use sky1-patches; then
@@ -153,7 +154,6 @@ src_unpack() {
 		S="${WORKDIR}/mesa-${PV}"
 	fi
 }
-"
 pkg_setup() {
 	python-any-r1_pkg_setup
 }
