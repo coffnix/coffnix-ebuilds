@@ -18,7 +18,11 @@ SRC_URI="
 	sky1-patches? ( https://github.com/Sky1-Linux/mesa-sky1/archive/refs/tags/mesa-${PV}.tar.gz -> mesa-${PV}-sky1.tar.gz )
 "
 
-S="${WORKDIR}/$(usex sky1-patches mesa-sky1-mesa-${PV} mesa-${PV})"
+if use sky1-patches; then
+	S="${WORKDIR}/mesa-sky1-mesa-${PV}"
+else
+	S="${WORKDIR}/mesa-${PV}"
+fi
 LICENSE="MIT"
 SLOT="0"
 KEYWORDS="*"
