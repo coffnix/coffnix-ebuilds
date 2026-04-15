@@ -109,8 +109,8 @@ src_install() {
 
 	newenvd "${FILESDIR}/99cuda.envd" 99cuda
 
-	dodir "${target_path}/lib/pkgconfig"
-	insinto "${target_path}/lib/pkgconfig"
+	dodir "${target_path}/pkgconfig"
+	insinto "${target_path}/pkgconfig"
 	cp "${FILESDIR}/nvidia-cuda-toolkit.pc" . || die
 	sed -i -e 's|VERSION|13.2.1|g' nvidia-cuda-toolkit.pc || die
 	doins nvidia-cuda-toolkit.pc
