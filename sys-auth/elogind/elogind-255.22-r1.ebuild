@@ -16,6 +16,8 @@ PATCHES=(
 	"${FILESDIR}/elogind-255.17-revert-s2idle.patch"
 	"${FILESDIR}/elogind-255.22-revert-openrc-user.patch"
 	"${FILESDIR}/elogind-255.22-musl.patch" # bug 967191
+	"${FILESDIR}/elogind-255.22-login-Continue-watching-leader-pidfd-after-stop.patch" # alpine linux patch https://gitlab.alpinelinux.org/alpine/aports/-/blob/master/community/elogind/0011-login-Continue-watching-leader-pidfd-after-stop.patch
+	"${FILESDIR}/elogind-255.22-Queue-session-for-garbage-collection-on-leader.patch" # alpine linux patch https://gitlab.alpinelinux.org/alpine/aports/-/blob/master/community/elogind/0012-login-Queue-session-for-garbage-collection-on-leader.patch
 )
 
 IUSE="+acl audit cgroup-hybrid debug doc +pam +policykit"
