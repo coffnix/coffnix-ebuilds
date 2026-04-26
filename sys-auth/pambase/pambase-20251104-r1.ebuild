@@ -94,7 +94,7 @@ src_configure() {
 		$(usex sssd '--sssd' '')
 	
 		--encrypt=${crypt}
-)
+	)
 
 	edo ${EPYTHON} ./${PN}.py "${pamargs[@]}"
 }
