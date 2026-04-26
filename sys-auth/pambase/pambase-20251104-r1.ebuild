@@ -75,29 +75,26 @@ src_configure() {
 	use yescrypt && crypt=yescrypt
 
 	local pamargs=(
-		# Not all 'upstream' options are (currently) wired up
-		# in the ebuild.
-		#
-		# TODO: pam_shells
-		$(usex caps '--caps')
-		$(usex debug '--debug')
-		$(usex elogind '--elogind')
-		$(usex gnome-keyring '--gnome-keyring')
-		$(usex homed '--homed')
-		$(usex minimal '--minimal')
-		$(usex mktemp '--mktemp')
-		$(usex nullok '--nullok')
-		$(usex pam_krb5 '--krb5')
-		$(usex pam_ssh '--pam-ssh')
-		$(usex passwdqc '--passwdqc')
-		$(usex pwhistory '--pwhistory')
-		$(usex pwquality '--pwquality')
-		$(usex securetty '--securetty')
-		$(usex selinux '--selinux')
+		$(usex caps '--caps' '')
+		$(usex debug '--debug' '')
+		$(usex elogind '--elogind' '')
+		$(usex gnome-keyring '--gnome-keyring' '')
+		$(usex homed '--homed' '')
+		$(usex minimal '--minimal' '')
+		$(usex mktemp '--mktemp' '')
+		$(usex nullok '--nullok' '')
+		$(usex pam_krb5 '--krb5' '')
+		$(usex pam_ssh '--pam-ssh' '')
+		$(usex passwdqc '--passwdqc' '')
+		$(usex pwhistory '--pwhistory' '')
+		$(usex pwquality '--pwquality' '')
+		$(usex securetty '--securetty' '')
+		$(usex selinux '--selinux' '')
 		$(usex systemd '--systemd' '--openrc')
-		$(usex sssd '--sssd')
-
+		$(usex sssd '--sssd' '')
+	
 		--encrypt=${crypt}
+)
 	)
 
 	edo ${EPYTHON} ./${PN}.py "${pamargs[@]}"
