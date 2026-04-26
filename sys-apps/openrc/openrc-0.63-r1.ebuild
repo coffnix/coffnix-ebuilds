@@ -17,7 +17,7 @@ fi
 
 LICENSE="BSD-2"
 SLOT="0"
-IUSE="audit +bash debug pam newnet selinux s6 +sysvinit sysv-utils unicode"
+IUSE="audit +bash debug pam newnet selinux s6 +sysvinit sysv-utils unicode -kernel_Hurd"
 
 COMMON_DEPEND="
 	kernel_linux? ( sys-libs/libcap )
