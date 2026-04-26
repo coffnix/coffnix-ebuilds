@@ -87,7 +87,7 @@ set_config_yes_no() {
 }
 
 src_install() {
-	meson_install
+	meson_src_install
 
 	keepdir /lib/rc/tmp
 
