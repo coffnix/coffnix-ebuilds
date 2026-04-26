@@ -95,7 +95,6 @@ src_configure() {
 	
 		--encrypt=${crypt}
 )
-	)
 
 	edo ${EPYTHON} ./${PN}.py "${pamargs[@]}"
 }
