@@ -1,0 +1,41 @@
+--- a/vmwgfx/vmwgfx_driver.c	2026-04-30 22:51:13.343717326 +0000
++++ b/vmwgfx/vmwgfx_driver.c	2026-04-30 22:52:06.036514615 +0000
+@@ -791,12 +791,12 @@
+     free(pixmaps);
+ }
+ 
+-static void drv_block_handler(ScreenPtr pScrn, void *pTimeout)
++static void drv_block_handler(ScreenPtr pScreen, void *pTimeout)
+ {
+     modesettingPtr ms = modesettingPTR(xf86ScreenToScrn(pScreen));
+ 
+     vmwgfx_swap(ms, pScreen, BlockHandler);
+-    pScreen->BlockHandler(arg, pTimeout);
++    pScreen->BlockHandler(pScreen, pTimeout);
+     vmwgfx_swap(ms, pScreen, BlockHandler);
+ 
+     if (vmwgfx_is_hosted(ms->hdriver))
+--- a/configure.ac	2026-04-30 22:52:45.473111326 +0000
++++ b/configure.ac	2026-04-30 22:54:05.358320062 +0000
+@@ -70,6 +70,9 @@
+ XORG_DRIVER_CHECK_EXT(XINERAMA, xineramaproto)
+ XORG_DRIVER_CHECK_EXT(XV, videoproto)
+ 
++# Enable vmwgfx by default
++BUILD_VMWGFX=yes
++
+ # Obtain compiler/linker options for the driver dependencies
+ PKG_CHECK_MODULES(XORG, [xorg-server >= 25.0.0 xproto fontsproto $REQUIRED_MODULES])
+ 
+@@ -79,9 +82,8 @@
+ 
+ AC_SUBST([moduledir])
+ 
+-if test x$BUILD_VMWGFX = xyes; then
+-	PKG_CHECK_MODULES([LIBDRM], [libdrm],[],[BUILD_VMWGFX=no])
+-fi
++PKG_CHECK_MODULES([LIBDRM], [libdrm],[],[BUILD_VMWGFX=no])
++
+ if test x$BUILD_VMWGFX = xyes; then
+ #
+ # Early versions of mesa 10 forgot to bump the XA major version number in

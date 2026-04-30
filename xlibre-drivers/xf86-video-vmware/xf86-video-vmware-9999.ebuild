@@ -18,3 +18,7 @@ RDEPEND="
 		media-libs/mesa[xa]
 	)"
 DEPEND="${RDEPEND}"
+
+PATCHES=(
+	"${FILESDIR}"/${PN}-fix-drv_block_handler.patch
+)
