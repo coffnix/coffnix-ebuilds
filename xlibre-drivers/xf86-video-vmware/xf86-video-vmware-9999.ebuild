@@ -21,4 +21,6 @@ DEPEND="${RDEPEND}"
 
 PATCHES=(
 	"${FILESDIR}"/${PN}-fix-drv_block_handler.patch
+	"${FILESDIR}"/${PN}-fix-segfault-without-3d.patch
+	"${FILESDIR}"/${PN}-fix-modesetting-instead-vmware.patch
 )

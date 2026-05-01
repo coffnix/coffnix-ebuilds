@@ -1,0 +1,24 @@
+--- a/src/vmware_bootstrap.c	2026-05-01 16:09:40.517589089 +0000
++++ b/src/vmware_bootstrap.c	2026-05-01 16:10:35.106379542 +0000
+@@ -237,7 +237,9 @@
+ #ifdef BUILD_VMWGFX
+ 	vmwgfx_hookup(scrn);
+ #else
+-	vmwlegacy_hookup(scrn);
++	xf86MsgVerb(X_INFO, 1,
++	            "VMwarePciProbe: refusing legacy vmware driver without KMS/3D so another driver can claim the device\n");
++	return FALSE;
+ #endif /* defined(BUILD_VMWGFX) */
+ 
+ 	scrn->driverPrivate = scrn->PreInit;
+@@ -279,7 +281,9 @@
+ #ifdef BUILD_VMWGFX
+     vmwgfx_hookup(pScrn);
+ #else
+-    vmwlegacy_hookup(pScrn);
++    xf86MsgVerb(X_INFO, 1,
++                "VMwarePlatformProbe: refusing legacy vmware driver without KMS/3D so another driver can claim the device\n");
++    return FALSE;
+ #endif
+     pScrn->driverPrivate = pScrn->PreInit;
+     pScrn->PreInit = VMwarePreinitStub;

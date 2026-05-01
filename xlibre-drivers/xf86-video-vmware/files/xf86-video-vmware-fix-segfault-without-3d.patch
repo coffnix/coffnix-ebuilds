@@ -1,0 +1,79 @@
+--- a/src/vmware.c	2026-05-01 15:50:57.833197493 +0000
++++ b/src/vmware.c	2026-05-01 15:53:03.679062545 +0000
+@@ -275,6 +275,10 @@
+         return FALSE;
+     }
+     pVMWARE = VMWAREPTR(pScrn);
++	xf86DrvMsg(pScrn->scrnIndex, X_INFO,
++	           "VMware legacy driver disabled, refusing device so modesetting can be used instead\n");
++	VMWAREFreeRec(pScrn);
++	return FALSE;
+ 
+     pVMWARE->pvtSema = &pScrn->vtSema;
+ 
+@@ -968,7 +972,7 @@
+     /* FIXME */
+ }
+ 
+-static void
++static Bool
+ VMWAREInitFIFO(ScrnInfoPtr pScrn)
+ {
+     VMWAREPtr pVMWARE = VMWAREPTR(pScrn);
+@@ -991,7 +995,7 @@
+         xf86DrvMsg(pScrn->scrnIndex, X_ERROR,
+                    "Unable to map mmio BAR. %s (%d)\n",
+                    strerror (err), err);
+-        return;
++        return FALSE;
+     }
+     pVMWARE->mmioVirtBase = mmioVirtBase;
+     vmwareFIFO = pVMWARE->vmwareFIFO = (CARD32*)pVMWARE->mmioVirtBase;
+@@ -1007,6 +1011,7 @@
+     vmwareFIFO[SVGA_FIFO_NEXT_CMD] = min * sizeof(CARD32);
+     vmwareFIFO[SVGA_FIFO_STOP] = min * sizeof(CARD32);
+     vmwareWriteReg(pVMWARE, SVGA_REG_CONFIG_DONE, 1);
++	return TRUE;
+ }
+ 
+ static void
+@@ -1307,7 +1312,11 @@
+     hwp = VGAHWPTR(pScrn);
+     vgaHWGetIOBase(hwp);
+ 
+-    VMWAREInitFIFO(pScrn);
++	if (!VMWAREInitFIFO(pScrn)) {
++    xf86DrvMsg(pScrn->scrnIndex, X_ERROR,
++               "Failed to initialize VMware legacy FIFO\n");
++    return FALSE;
++}
+ 
+     /* Initialise the first mode */
+     VMWAREModeInit(pScrn, pScrn->currentMode, FALSE);
+@@ -1319,7 +1328,11 @@
+      * Setup the screen's visuals, and initialise the framebuffer
+      * code.
+      */
+-    VMWAREMapMem(pScrn);
++	if (!VMWAREMapMem(pScrn)) {
++    xf86DrvMsg(pScrn->scrnIndex, X_ERROR,
++               "Failed to map VMware legacy framebuffer\n");
++    return FALSE;
++}
+ 
+     /*
+      * Clear the framebuffer (and any black-border mode areas).
+@@ -1536,9 +1549,10 @@
+      */
+     vmwareWriteReg(pVMWARE, SVGA_REG_ID, pVMWARE->suspensionSavedRegId);
+ 
+-    if (!pVMWARE->SavedReg.svga_fifo_enabled) {       
+-        VMWAREInitFIFO(pScrn);
+-    }
++	if (!pVMWARE->SavedReg.svga_fifo_enabled) {
++	    if (!VMWAREInitFIFO(pScrn))
++	        return FALSE;
++	}
+ 
+     return VMWAREModeInit(pScrn, pScrn->currentMode, TRUE);
+ }
