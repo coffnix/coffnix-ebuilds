@@ -64,15 +64,8 @@ sshd? ( binary )
 
 DESCRIPTION="Debian Sources (and optional binary kernel)"
 HOMEPAGE="https://packages.debian.org/unstable/kernel/"
-#SRC_URI="
-#https://deb.debian.org/debian/pool/main/l/linux/linux_7.0.3-1.debian.tar.xz -> linux_7.0.3-1.debian.tar.xz
-#https://mirrors.edge.kernel.org/pub/linux/kernel/v7.x/linux-7.0.3.tar.xz -> linux-7.0.3.tar.xz"
-#SRC_URI="
-#https://deb.debian.org/debian/pool/main/l/linux/linux_${PV/-/_}-1.debian.tar.xz -> linux_${PV/-/_}-1.debian.tar.xz
-#https://mirrors.edge.kernel.org/pub/linux/kernel/v${PV%%.*}.x/linux-${PV}.tar.xz -> linux-${PV}.tar.xz
-#"
-DEB_PV="${PV/_p/-}"
 
+DEB_PV="${PV/_p/-}"
 SRC_URI="
 https://deb.debian.org/debian/pool/main/l/linux/linux_${DEB_PV}.debian.tar.xz -> linux_${DEB_PV}.debian.tar.xz
 https://mirrors.edge.kernel.org/pub/linux/kernel/v${PV%%.*}.x/linux-${PV%%_p*}.tar.xz -> linux-${PV%%_p*}.tar.xz
