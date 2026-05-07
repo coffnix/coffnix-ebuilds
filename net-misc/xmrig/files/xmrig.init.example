@@ -1,0 +1,87 @@
+#!/sbin/openrc-run
+# Distributed under the terms of the GNU General Public License v2
+
+depend() {
+    need localmount
+    need net
+    need monerod
+}
+
+description="XMRig miner (stratum to p2pool)"
+name="XMRig daemon"
+
+# wallet em variável no começo do init
+XMRIG_WALLET="45X3VFtKhNUekHGTNfaPpqeNQ2foNY4WG4w9PG8rg1CwJL4KsCUpqf32dpdJbUTifEePPYP3Xx8H3QvhKD5JR5PCCGoUnGf"
+
+command="/usr/bin/xmrig"
+command_background=1
+command_progress=1
+pidfile="/run/${RC_SVCNAME}.pid"
+retry="SIGTERM/15/SIGKILL/5"
+
+command_user="root:root"
+umask="007"
+
+XMRIG_LOG="/root/xmr.log"
+XMRIG_POOL="192.168.200.145:4444"
+XMRIG_RIGID="opi5"
+XMRIG_THREADS="8"
+
+start_stop_daemon_args="--make-pidfile --pidfile ${pidfile}"
+command_args="\
+	-l ${XMRIG_LOG} \
+	-o ${XMRIG_POOL} \
+	-u ${XMRIG_WALLET} \
+	-a rx/0 \
+	-k \
+	--donate-level=0 \
+	--rig-id=${XMRIG_RIGID} \
+	--randomx-1gb-pages \
+	--threads=${XMRIG_THREADS} \
+	--cpu-affinity=0xff \
+	--cpu-priority=5 \
+	--cpu-no-yield \
+	--randomx-init=8 \
+	--randomx-cache-qos \
+"
+
+depend() {
+	need net
+}
+
+start_pre() {
+	#/usr/sbin/sysctl -w vm.nr_hugepages=5120 >/dev/null
+	/usr/sbin/sysctl -w vm.nr_hugepages=3027 >/dev/null
+	if [ $? -ne 0 ]; then
+		eerror "Falha ao ajustar vm.nr_hugepages=6144"
+		return 1
+	fi
+
+	rm -f /root/xmr.log
+	if [ $? -ne 0 ]; then
+		eerror "Falha ao remover /root/xmr.log"
+		return 1
+	fi
+
+	checkpath --directory --owner ${command_user} --mode 0755 /run
+	checkpath --file --owner ${command_user} --mode 0644 ${XMRIG_LOG}
+}
+
+status() {
+	count=$(pgrep -x xmrig | wc -l)
+
+	if [ "$count" -gt 1 ]; then
+		einfo "XMRig is running"
+		return 0
+	else
+		einfo "XMRig is not running"
+		return 3
+	fi
+}
+stop() {
+	ebegin "Stopping XMRig daemon (forced)"
+	killall -9 xmrig 2>/dev/null
+	rm -f "${pidfile}" 2>/dev/null
+	/usr/sbin/sysctl -w vm.nr_hugepages=4096 >/dev/null
+	eend $?
+}
