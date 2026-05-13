@@ -17,7 +17,7 @@ LICENSE="GPL-2"
 # the last time.
 SLOT="0/1.8.3"
 KEYWORDS="*"
-IUSE="conntrack ipv6 netlink +nftables pcap static-libs"
+IUSE="conntrack ipv6 netlink nftables pcap static-libs"
 
 COMMON_DEPEND="
 	conntrack? ( >=net-libs/libnetfilter_conntrack-1.0.6 )
@@ -85,8 +85,6 @@ src_install() {
 	default
 	dodoc iptables/iptables.xslt
 
-	# all the iptables binaries are in /sbin, so might as well
-	# put these small files in with them
 	into /
 	dosbin iptables/iptables-apply
 	dosym iptables-apply /sbin/ip6tables-apply
@@ -100,25 +98,23 @@ src_install() {
 	keepdir /var/lib/iptables
 	newinitd "${FILESDIR}"/${PN}-r2.init iptables
 	newconfd "${FILESDIR}"/${PN}-r1.confd iptables
+
 	if use ipv6 ; then
 		keepdir /var/lib/ip6tables
 		dosym iptables /etc/init.d/ip6tables
 		newconfd "${FILESDIR}"/ip6tables-r1.confd ip6tables
 	fi
 
+	rm -f "${ED}"/sbin/iptables
+	rm -f "${ED}"/sbin/ip6tables
+	rm -f "${ED}"/sbin/iptables-save
+	rm -f "${ED}"/sbin/iptables-restore
+	rm -f "${ED}"/sbin/ip6tables-save
+	rm -f "${ED}"/sbin/ip6tables-restore
+
 	if use nftables; then
-		# Bug 647458
 		rm "${ED}"/etc/ethertypes || die
-
-		# Bug 660886 and Bug 669894
 		rm "${ED}"/sbin/{arptables,ebtables}{,-{save,restore}} || die
-
-		rm -f "${ED}"/sbin/iptables
-		rm -f "${ED}"/sbin/ip6tables
-		rm -f "${ED}"/sbin/iptables-save
-		rm -f "${ED}"/sbin/iptables-restore
-		rm -f "${ED}"/sbin/ip6tables-save
-		rm -f "${ED}"/sbin/ip6tables-restore
 
 		dosym xtables-nft-multi /sbin/iptables
 		dosym xtables-nft-multi /sbin/ip6tables
@@ -126,6 +122,13 @@ src_install() {
 		dosym xtables-nft-multi /sbin/iptables-restore
 		dosym xtables-nft-multi /sbin/ip6tables-save
 		dosym xtables-nft-multi /sbin/ip6tables-restore
+	else
+		dosym xtables-legacy-multi /sbin/iptables
+		dosym xtables-legacy-multi /sbin/ip6tables
+		dosym xtables-legacy-multi /sbin/iptables-save
+		dosym xtables-legacy-multi /sbin/iptables-restore
+		dosym xtables-legacy-multi /sbin/ip6tables-save
+		dosym xtables-legacy-multi /sbin/ip6tables-restore
 	fi
 
 	find "${ED}" -type f -name "*.la" -delete || die
