@@ -11,7 +11,7 @@ SRC_URI="https://github.com/tevador/RandomX/archive/v${PV}.tar.gz -> ${P}.tar.gz
 S="${WORKDIR}"/RandomX-${PV}
 
 LICENSE="BSD"
-SLOT="0"
+SLOT="0/${PV}"
 KEYWORDS="*"
 
 src_configure() {

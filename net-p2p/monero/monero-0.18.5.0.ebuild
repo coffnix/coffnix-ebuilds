@@ -29,7 +29,7 @@ DEPEND="
 	dev-libs/libsodium:=
 	dev-libs/libbsd
 	dev-libs/openssl:=
-	dev-libs/randomx
+	dev-libs/randomx:=
 	dev-libs/rapidjson
 	dev-libs/supercop-monero
 	net-dns/unbound:=[threads]
@@ -46,8 +46,7 @@ RDEPEND="${DEPEND}"
 BDEPEND="virtual/pkgconfig"
 
 PATCHES=(
-	"${FILESDIR}"/${PN}-0.18.3.3-miniupnp-api-18.patch
-	"${FILESDIR}"/${PN}-0.18.4.1-unbundle-dependencies.patch
+	"${FILESDIR}"/${PN}-0.18.5.0-unbundle-dependencies.patch
 )
 
 pkg_setup() {
