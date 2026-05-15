@@ -26,6 +26,7 @@ BDEPEND="
 	sys-devel/make
 	>=sys-libs/ncurses-5.2
 	virtual/libelf
+	dev-lang/swig
 	virtual/pkgconfig
 	sys-apps/dtc
 	dev-vcs/git
