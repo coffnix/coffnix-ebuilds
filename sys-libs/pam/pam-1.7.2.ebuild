@@ -19,15 +19,12 @@ if [[ ${PV} == *_p* ]] ; then
 	S="${WORKDIR}"/linux-${PN}-${PAM_COMMIT}
 else
 	VERIFY_SIG_OPENPGP_KEY_PATH=/usr/share/openpgp-keys/pam.asc
-	inherit verify-sig
 
 	SRC_URI="
 		https://github.com/linux-pam/linux-pam/releases/download/v${PV}/${MY_P}.tar.xz
-		verify-sig? ( https://github.com/linux-pam/linux-pam/releases/download/v${PV}/${MY_P}.tar.xz.asc )
 	"
 	S="${WORKDIR}/${MY_P}"
 
-	BDEPEND="verify-sig? ( >=sec-keys/openpgp-keys-pam-20260122 )"
 fi
 
 LICENSE="|| ( BSD GPL-2 )"
