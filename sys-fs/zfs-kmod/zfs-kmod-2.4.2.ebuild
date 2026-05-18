@@ -2,18 +2,15 @@
 
 EAPI=7
 
-inherit autotools flag-o-matic linux-mod toolchain-funcs git-r3
+inherit autotools flag-o-matic linux-mod toolchain-funcs
 
 DESCRIPTION="Linux ZFS kernel module for sys-fs/zfs"
 HOMEPAGE="https://github.com/openzfs/zfs"
 
 MY_PV="${PV/_rc/-rc}"
-#SRC_URI="https://github.com/openzfs/zfs/releases/download/zfs-${MY_PV}/zfs-${MY_PV}.tar.gz"
-EGIT_REPO_URI="https://github.com/openzfs/zfs.git"
-#EGIT_BRANCH="master"
-EGIT_COMMIT="0a59f7845c2863b5370bfa38e4d397ba3d73b62a"
+SRC_URI="https://github.com/openzfs/zfs/releases/download/zfs-${MY_PV}/zfs-${MY_PV}.tar.gz"
 KEYWORDS="*"
-ZFS_KERNEL_COMPAT="7.0"
+ZFS_KERNEL_COMPAT="6.19"
 
 LICENSE="CDDL MIT debug? ( GPL-2+ )"
 SLOT="0"
@@ -30,9 +27,6 @@ BDEPEND="
 	virtual/awk
 "
 
-#PATCHES=(
-#    "${FILESDIR}"/maximum-7-0-kernel.patch
-#)
 RESTRICT="debug? ( strip ) test"
 
 DOCS=( AUTHORS COPYRIGHT META README.md )
