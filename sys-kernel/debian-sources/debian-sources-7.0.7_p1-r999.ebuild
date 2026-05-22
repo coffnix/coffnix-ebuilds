@@ -5,12 +5,12 @@ EAPI=6
 
 inherit check-reqs eutils ego savedconfig
 
-SLOT=sid/7.0.3_p1
+SLOT=sid/7.0.7_p1
 
 # NOTE: When updating: use the version from Debian testing (sid)
 # https://packages.debian.org/sid/linux-source
 DEB_PATCHLEVEL="1"
-KERNEL_TRIPLET="7.0.3"
+KERNEL_TRIPLET="7.0.7"
 
 # like "_p1-r1"
 #VERSION_SUFFIX="_p${DEB_PATCHLEVEL}"
