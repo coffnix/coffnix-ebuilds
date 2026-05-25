@@ -7,7 +7,7 @@ inherit flag-o-matic toolchain-funcs
 
 DESCRIPTION="Mozilla's Network Security Services library that implements PKI support"
 HOMEPAGE="https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSS"
-SRC_URI="https://ftp.mozilla.org/pub/security/nss/releases/NSS_3_123_1_RTM/src/nss-3.123.1.tar.gz -> nss-3.123.1.tar.gz"
+SRC_URI="https://ftp.mozilla.org/pub/security/nss/releases/NSS_3_122_RTM/src/nss-3.122.tar.gz -> nss-3.122.tar.gz"
 LICENSE="|| ( MPL-2.0 GPL-2 LGPL-2.1 )"
 SLOT="0"
 KEYWORDS="*"
@@ -23,6 +23,18 @@ RDEPEND="app-admin/whip
 DEPEND="${RDEPEND}
 "
 S="${WORKDIR}/${P}/${PN}"
+
+nssarch() {
+	local t=${1:-${CHOST}}
+	case ${t} in
+		aarch64*) echo "aarch64" ;;
+		x86_64*)  echo "x86_64" ;;
+		i?86*)    echo "i686" ;;
+		*86*-pc-solaris2*) echo "i86pc" ;;
+		hppa*)    echo "parisc" ;;
+		*)        tc-arch ${t} ;;
+	esac
+}
 src_prepare() {
 	default
 	 sed -e "/print('-Werror')/d" -i -e "s|'-Werror',||g" \
@@ -69,7 +81,7 @@ src_compile() {
 	    export CC_IS_CLANG=1
 	fi
 	 local d
-	local ostest="x86_64"
+	local ostest="$(nssarch)"
 	if use arm ; then
 	  ostest=$(tc-arch ${CHOST})
 	  export USE_N32=1
@@ -117,76 +129,76 @@ src_install() {
 	    > "${ED}"/usr/$(get_libdir)/pkgconfig/$_pc
 	done
 	dosym /usr/$(get_libdir)/pkgconfig/nss.pc /usr/$(get_libdir)/pkgconfig/mozilla-nss.pc
-	 # nss-config
+	# nss-config
 	dodir /usr/bin
 	sed "${FILESDIR}"/nss-config.in \
-	  -e "s,@libdir@,/usr/$(get_libdir),g" \
-	  -e "s,@prefix@,/usr/bin,g" \
-	  -e "s,@exec_prefix@,/usr/bin,g" \
-	  -e "s,@includedir@,/usr/include/nss,g" \
-	  -e "s,@MOD_MAJOR_VERSION@,${nss_vmajor},g" \
-	  -e "s,@MOD_MINOR_VERSION@,${nss_vminor},g" \
-	  -e "s,@MOD_PATCH_VERSION@,${nss_vpatch},g" \
-	  > "${ED}"/usr/bin/nss-config
+	-e "s,@libdir@,/usr/$(get_libdir),g" \
+	-e "s,@prefix@,/usr/bin,g" \
+	-e "s,@exec_prefix@,/usr/bin,g" \
+	-e "s,@includedir@,/usr/include/nss,g" \
+	-e "s,@MOD_MAJOR_VERSION@,${nss_vmajor},g" \
+	-e "s,@MOD_MINOR_VERSION@,${nss_vminor},g" \
+	-e "s,@MOD_PATCH_VERSION@,${nss_vpatch},g" \
+	> "${ED}"/usr/bin/nss-config
 	chmod 755 "${ED}"/usr/bin/nss-config
-	 # all the include files
+	# all the include files
 	insinto /usr/include/nss
 	doins public/nss/*.{h,api}
 	insinto /usr/include/nss/private
 	doins private/nss/{blapi,alghmac,cmac}.h
-	 popd >/dev/null || die
-	 local f nssutils
+	popd >/dev/null || die
+	local f nssutils
 	# Always enabled because we need it for chk generation.
 	nssutils=( shlibsign )
-	 if use utils; then
-	  nssutils+=(
-	    addbuiltin
-	    atob
-	    baddbdir
-	    btoa
-	    certutil
-	    cmsutil
-	    crlutil
-	    derdump
-	    digest
-	    makepqg
-	    mangle
-	    modutil
-	    multinit
-	    nonspr10
-	    ocspclnt
-	    oidcalc
-	    p7content
-	    p7env
-	    p7sign
-	    p7verify
-	    pk11mode
-	    pk12util
-	    pp
-	    rsaperf
-	    selfserv
-	    signtool
-	    signver
-	    ssltap
-	    strsclnt
-	    symkeyutil
-	    tstclnt
-	    vfychain
-	    vfyserv
-	  )
-	  # install man-pages for utils (bug #516810)
-	  doman doc/nroff/*.1
+	if use utils; then
+		nssutils+=(
+		addbuiltin
+		atob
+		baddbdir
+		btoa
+		certutil
+		cmsutil
+		crlutil
+		derdump
+		digest
+		makepqg
+		mangle
+		modutil
+		multinit
+		nonspr10
+		ocspclnt
+		oidcalc
+		p7content
+		p7env
+		p7sign
+		p7verify
+		pk11mode
+		pk12util
+		pp
+		rsaperf
+		selfserv
+		signtool
+		signver
+		ssltap
+		strsclnt
+		symkeyutil
+		tstclnt
+		vfychain
+		vfyserv
+		)
+		# install man-pages for utils (bug #516810)
+		doman doc/nroff/*.1
 	fi
 	pushd dist/*/bin >/dev/null || die
 	for f in ${nssutils[@]}; do
-	  dobin ${f}
+		dobin ${f}
 	done
 	popd >/dev/null || die
-	 # Prelink breaks the CHK files. We don't have any reliable way to run
+	# Prelink breaks the CHK files. We don't have any reliable way to run
 	# shlibsign after prelink.
 	dodir /etc/prelink.conf.d
 	printf -- "-b ${EPREFIX}/usr/$(get_libdir)/lib%s.so\n" ${NSS_CHK_SIGN_LIBS} \
-	  > "${ED}"/etc/prelink.conf.d/nss.conf
+	> "${ED}"/etc/prelink.conf.d/nss.conf
 }
 pkg_postinst() {
 	LIBS="/usr/$(get_libdir)" whip h nss.postinst || die "Failed to run whip h nss.postinst"
@@ -194,6 +206,3 @@ pkg_postinst() {
 pkg_postrm() {
 	LIBS="/usr/$(get_libdir)" whip h nss.postrm || die "Failed to run whip h nss.postrm"
 }
-
-
-# vim: filetype=ebuild
