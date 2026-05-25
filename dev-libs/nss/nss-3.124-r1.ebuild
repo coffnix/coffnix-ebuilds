@@ -1,4 +1,5 @@
 # Distributed under the terms of the GNU General Public License v2
+# Autogen by MARK Devkit
 
 EAPI=7
 NSS_CHK_SIGN_LIBS="freebl3 nssdbm3 softokn3"
@@ -6,7 +7,7 @@ inherit flag-o-matic toolchain-funcs
 
 DESCRIPTION="Mozilla's Network Security Services library that implements PKI support"
 HOMEPAGE="https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSS"
-SRC_URI="https://ftp.mozilla.org/pub/security/nss/releases/NSS_3_121_RTM/src/nss-3.121.tar.gz -> nss-3.121.tar.gz"
+SRC_URI="https://ftp.mozilla.org/pub/security/nss/releases/NSS_3_124_RTM/src/nss-3.124.tar.gz -> nss-3.124.tar.gz"
 LICENSE="|| ( MPL-2.0 GPL-2 LGPL-2.1 )"
 SLOT="0"
 KEYWORDS="*"
@@ -17,24 +18,22 @@ RDEPEND="app-admin/whip
 	dev-db/sqlite
 	sys-libs/zlib
 	virtual/pkgconfig
-
+	
 "
 DEPEND="${RDEPEND}
 "
 S="${WORKDIR}/${P}/${PN}"
-
 nssarch() {
 	local t=${1:-${CHOST}}
 	case ${t} in
-		aarch64*) echo "aarch64" ;;
-		x86_64*)  echo "x86_64" ;;
-		i?86*)    echo "i686" ;;
-		*86*-pc-solaris2*) echo "i86pc" ;;
-		hppa*)    echo "parisc" ;;
-		*)        tc-arch ${t} ;;
+	  aarch64*) echo "aarch64" ;;
+	  x86_64*)  echo "x86_64" ;;
+	  i?86*)    echo "i686" ;;
+	  *86*-pc-solaris2*) echo "i86pc" ;;
+	  hppa*)    echo "parisc" ;;
+	  *)        tc-arch ${t} ;;
 	esac
 }
-
 src_prepare() {
 	default
 	 sed -e "/print('-Werror')/d" -i -e "s|'-Werror',||g" \
@@ -57,7 +56,6 @@ src_prepare() {
 	  cmd/platlibs.mk || die
 	 strip-flags
 }
-
 src_compile() {
 	# Take care of nspr settings #436216
 	local myCPPFLAGS="${CPPFLAGS} $($(tc-getPKG_CONFIG) nspr --cflags)"
@@ -83,7 +81,12 @@ src_compile() {
 	fi
 	 local d
 	local ostest="$(nssarch)"
-	export USE_64=1
+	if use arm ; then
+	  ostest=$(tc-arch ${CHOST})
+	  export USE_N32=1
+	else
+	  export USE_64=1
+	fi
 	 # Build the host tools first.
 	NSPR_LIB_DIR="${T}/fakedir" \
 	emake -j1 -C coreconf
@@ -96,7 +99,6 @@ src_compile() {
 	  emake -j1 "${makeargs[@]}" -C ${d} OS_TEST="${ostest}"
 	done
 }
-
 src_install() {
 	local nss_vmajor=$(awk '/#define.*NSS_VMAJOR/ {print $3}' lib/nss/nss.h)
 	local nss_vminor=$(awk '/#define.*NSS_VMINOR/ {print $3}' lib/nss/nss.h)
@@ -106,7 +108,7 @@ src_install() {
 	 dodir /usr/$(get_libdir)
 	cp -L */lib/*$(get_libname) "${ED}"/usr/$(get_libdir) || die "copying shared libs failed"
 	local i
-	for i in crmf freebl nssb nssckfw ; do
+	for i in freebl nssb nssckfw ; do
 	  cp -L */lib/lib${i}.a "${ED}"/usr/$(get_libdir) || die "copying libs failed"
 	done
 	 # Install nss-config and pkgconfig file
@@ -155,7 +157,6 @@ src_install() {
 	    btoa
 	    certutil
 	    cmsutil
-	    conflict
 	    crlutil
 	    derdump
 	    digest
@@ -198,11 +199,12 @@ src_install() {
 	printf -- "-b ${EPREFIX}/usr/$(get_libdir)/lib%s.so\n" ${NSS_CHK_SIGN_LIBS} \
 	  > "${ED}"/etc/prelink.conf.d/nss.conf
 }
-
 pkg_postinst() {
-	whip h nss.postinst
+	LIBS="/usr/$(get_libdir)" whip h nss.postinst || die "Failed to run whip h nss.postinst"
+}
+pkg_postrm() {
+	LIBS="/usr/$(get_libdir)" whip h nss.postrm || die "Failed to run whip h nss.postrm"
 }
 
-pkg_postrm() {
-	whip h nss.postrm
-}
+
+# vim: filetype=ebuild
