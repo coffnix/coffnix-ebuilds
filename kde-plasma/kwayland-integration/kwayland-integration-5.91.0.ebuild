@@ -9,6 +9,7 @@ inherit ecm plasma.kde.org
 
 DESCRIPTION="Provides KWindowSystem integration plugin for Wayland"
 HOMEPAGE="https://invent.kde.org/plasma/kwayland-integration"
+SRC_URI="https://ftp.ntu.edu.tw/pub/kde/Attic/plasma/5.91.0/kwayland-integration-5.91.0.tar.xz"
 
 LICENSE="LGPL-2.1"
 SLOT="5"
