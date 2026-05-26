@@ -1,0 +1,11 @@
+diff -Nuar elogind-246.9.1/src/shared/test-tables.h elogind-246.9.1-fixed/src/shared/test-tables.h
+--- elogind-246.9.1/src/shared/test-tables.h    2020-12-21 16:39:39.000000000 -0000
++++ elogind-246.9.1-fixed/src/shared/test-tables.h      2024-07-19 04:33:53.159587916 -0000
+@@ -27,7 +27,7 @@
+                 }
+
+                 if (boring < 1 || i == size)
+-                        printf("%s: %d → %s → %d\n", name, i, val, rev);
++                        printf("%s: %d → %s → %d\n", name, i, strnull(val), rev);
+                 else if (boring == 1)
+                         printf("%*s  ...\n", (int) strlen(name), "");

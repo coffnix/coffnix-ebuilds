@@ -12,7 +12,7 @@ HOMEPAGE="https://github.com/dracutdevs/dracut/wiki"
 
 LICENSE="GPL-2"
 SLOT="0"
-IUSE="selinux test"
+IUSE="selinux elogind test"
 
 RESTRICT="!test? ( test )"
 
@@ -30,6 +30,7 @@ RDEPEND="
 	>=sys-apps/util-linux-2.21
 	virtual/pkgconfig
 	virtual/udev
+	elogind? ( sys-auth/elogind )
 
 	elibc_musl? ( sys-libs/fts-standalone )
 	selinux? (
@@ -111,6 +112,14 @@ src_install() {
 
 	docinto html
 	dodoc dracut.html
+
+	if use elogind; then
+		insinto /etc/dracut.conf.d
+
+		printf '%s\n' 'install_items+=" /usr/'"$(get_libdir)"'/elogind/elogind /usr/'"$(get_libdir)"'/elogind/elogind-cgroups-agent /usr/'"$(get_libdir)"'/elogind/elogind-uaccess-command /usr/'"$(get_libdir)"'/elogind/elogind-userdbd /usr/'"$(get_libdir)"'/elogind/elogind-userwork "' > "${T}"/elogind.conf || die
+
+		doins "${T}"/elogind.conf
+	fi
 }
 
 pkg_postinst() {
