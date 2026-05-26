@@ -46,6 +46,13 @@ RDEPEND="${COMMON_DEPEND}
 		>=sec-policy/selinux-openrc-2.20170204-r4
 	)
 "
+PATCHES=(
+	"${FILESDIR}"/openrc-0.40.2-systemd-cgroups.patch #FL-6105
+	"${FILESDIR}"/openrc-netmount-funtoo.patch # FL-6362
+	"${FILESDIR}"/openrc-0.44.10-filesystem-btrfs-funtoo.patch # FL-6211
+	"${FILESDIR}"/openrc-0.44.10-integer-expression-expected.patch # FL-6510
+	"${FILESDIR}"/openrc-0.44.10-cgroups.patch # FL-10036
+)
 
 src_configure() {
 	local emesonargs=(
