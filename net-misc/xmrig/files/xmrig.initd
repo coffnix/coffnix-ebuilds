@@ -63,7 +63,7 @@ start_pre() {
 status() {
 	count=$(pgrep -x xmrig | wc -l)
 
-	if [ "$count" -gt 1 ]; then
+	if [ "$count" -ge 1 ]; then
 		einfo "XMRig is running"
 		return 0
 	else
@@ -76,7 +76,9 @@ stop() {
 	if ! pidof xmrig >/dev/null 2>&1; then
 		einfo "XMRig já está parado"
 		rm -f "${pidfile}" 2>/dev/null
-		/usr/sbin/sysctl -w vm.nr_hugepages=4096 >/dev/null
+		if [ -e /proc/sys/vm/nr_hugepages ]; then
+			/usr/sbin/sysctl -w vm.nr_hugepages="${XMRIG_HUGEPAGES_STOP:-4096}" >/dev/null
+		fi
 		return 0
 	fi
 
@@ -90,6 +92,8 @@ stop() {
 	fi
 
 	rm -f "${pidfile}" 2>/dev/null
-	/usr/sbin/sysctl -w vm.nr_hugepages=4096 >/dev/null
+	if [ -e /proc/sys/vm/nr_hugepages ]; then
+		/usr/sbin/sysctl -w vm.nr_hugepages="${XMRIG_HUGEPAGES_STOP:-4096}" >/dev/null
+	fi
 	eend 0
 }
