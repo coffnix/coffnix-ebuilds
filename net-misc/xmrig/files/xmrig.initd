@@ -42,21 +42,22 @@ depend() {
 }
 
 start_pre() {
-	#/usr/sbin/sysctl -w vm.nr_hugepages=5120 >/dev/null
-	/usr/sbin/sysctl -w vm.nr_hugepages=3027 >/dev/null
-	if [ $? -ne 0 ]; then
-		eerror "Falha ao ajustar vm.nr_hugepages=6144"
-		return 1
+	if [ -e /proc/sys/vm/nr_hugepages ]; then
+		/usr/sbin/sysctl -w vm.nr_hugepages="${XMRIG_HUGEPAGES_START:-3027}" >/dev/null
+		if [ $? -ne 0 ]; then
+			eerror "Falha ao ajustar vm.nr_hugepages=${XMRIG_HUGEPAGES_START:-3027}"
+			return 1
+		fi
 	fi
 
-	rm -f ${XMRIG_LOG}
+	rm -f "${XMRIG_LOG}"
 	if [ $? -ne 0 ]; then
 		eerror "Falha ao remover ${XMRIG_LOG}"
 		return 1
 	fi
 
-	checkpath --directory --owner ${command_user} --mode 0755 /run
-	checkpath --file --owner ${command_user} --mode 0644 ${XMRIG_LOG}
+	checkpath --directory --owner "${command_user}" --mode 0755 /run
+	checkpath --file --owner "${command_user}" --mode 0644 "${XMRIG_LOG}"
 }
 
 status() {
