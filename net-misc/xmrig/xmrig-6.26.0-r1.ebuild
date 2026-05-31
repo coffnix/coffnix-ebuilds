@@ -51,6 +51,8 @@ src_install() {
 	dobin "${BUILD_DIR}/xmrig"
 	dodoc -r doc/*.md
 	einstalldocs
+	newinitd "${FILESDIR}/xmrig.initd" xmrig
+	newconfd "${FILESDIR}/xmrig.confd" xmrig
 }
 
 pkg_postinst() {

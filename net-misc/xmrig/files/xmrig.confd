@@ -1,0 +1,7 @@
+# /etc/conf.d/xmrig: config file for /etc/init.d/xmrig
+
+XMRIG_WALLET="lalalalala"
+XMRIG_LOG="/var/log/xmr.log"
+XMRIG_POOL="192.168.200.145:4444"
+XMRIG_RIGID="$(hostname)"
+XMRIG_THREADS="4"

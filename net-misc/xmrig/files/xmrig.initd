@@ -10,9 +10,6 @@ depend() {
 description="XMRig miner (stratum to p2pool)"
 name="XMRig daemon"
 
-# wallet em variável no começo do init
-XMRIG_WALLET="45X3VFtKhNUekHGTNfaPpqeNQ2foNY4WG4w9PG8rg1CwJL4KsCUpqf32dpdJbUTifEePPYP3Xx8H3QvhKD5JR5PCCGoUnGf"
-
 command="/usr/bin/xmrig"
 command_background=1
 command_progress=1
@@ -21,11 +18,6 @@ retry="SIGTERM/15/SIGKILL/5"
 
 command_user="root:root"
 umask="007"
-
-XMRIG_LOG="/root/xmr.log"
-XMRIG_POOL="192.168.200.145:4444"
-XMRIG_RIGID="opi5"
-XMRIG_THREADS="8"
 
 start_stop_daemon_args="--make-pidfile --pidfile ${pidfile}"
 command_args="\
@@ -39,9 +31,9 @@ command_args="\
 	--randomx-1gb-pages \
 	--threads=${XMRIG_THREADS} \
 	--cpu-affinity=0xff \
-	--cpu-priority=5 \
+	--cpu-priority=${XMRIG_THREADS} \
 	--cpu-no-yield \
-	--randomx-init=8 \
+	--randomx-init=${XMRIG_THREADS} \
 	--randomx-cache-qos \
 "
 
@@ -57,9 +49,9 @@ start_pre() {
 		return 1
 	fi
 
-	rm -f /root/xmr.log
+	rm -f ${XMRIG_LOG}
 	if [ $? -ne 0 ]; then
-		eerror "Falha ao remover /root/xmr.log"
+		eerror "Falha ao remover ${XMRIG_LOG}"
 		return 1
 	fi
 
@@ -78,10 +70,25 @@ status() {
 		return 3
 	fi
 }
+
 stop() {
-	ebegin "Stopping XMRig daemon (forced)"
-	killall -9 xmrig 2>/dev/null
+	if ! pidof xmrig >/dev/null 2>&1; then
+		einfo "XMRig já está parado"
+		rm -f "${pidfile}" 2>/dev/null
+		/usr/sbin/sysctl -w vm.nr_hugepages=4096 >/dev/null
+		return 0
+	fi
+
+	ebegin "Stopping XMRig daemon"
+	start-stop-daemon --stop --exec "${command}" --retry "${retry}" 2>/dev/null
+	sleep 1
+
+	if pidof xmrig >/dev/null 2>&1; then
+		ewarn "XMRig ainda está rodando, forçando kill"
+		killall -9 xmrig 2>/dev/null
+	fi
+
 	rm -f "${pidfile}" 2>/dev/null
 	/usr/sbin/sysctl -w vm.nr_hugepages=4096 >/dev/null
-	eend $?
+	eend 0
 }
