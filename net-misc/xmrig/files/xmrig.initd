@@ -77,7 +77,7 @@ stop() {
 		einfo "XMRig já está parado"
 		rm -f "${pidfile}" 2>/dev/null
 		if [ -e /proc/sys/vm/nr_hugepages ]; then
-			/usr/sbin/sysctl -w vm.nr_hugepages="${XMRIG_HUGEPAGES_STOP:-4096}" >/dev/null
+			/usr/sbin/sysctl -w vm.nr_hugepages=0 >/dev/null
 		fi
 		return 0
 	fi
@@ -93,7 +93,7 @@ stop() {
 
 	rm -f "${pidfile}" 2>/dev/null
 	if [ -e /proc/sys/vm/nr_hugepages ]; then
-		/usr/sbin/sysctl -w vm.nr_hugepages="${XMRIG_HUGEPAGES_STOP:-4096}" >/dev/null
+		/usr/sbin/sysctl -w vm.nr_hugepages=0 >/dev/null
 	fi
 	eend 0
 }
