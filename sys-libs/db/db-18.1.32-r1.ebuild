@@ -98,9 +98,11 @@ src_prepare() {
 }
 
 multilib_src_configure() {
+	multilib_src_configure() {
 	if [[ ${CHOST} == i?86-* ]]; then
-		append-cxxflags -DTLS_DECL='__thread'
+		append-cxxflags -DTLS_DECL_MODIFIER=__thread -DTLS_DEFN_MODIFIER=__thread
 	fi
+	local myeconfargs=(
 	# sql_compat will cause a collision with sqlite3
 	# --enable-sql_compat
 	# Don't --enable-sql* because we don't want to use bundled sqlite.
