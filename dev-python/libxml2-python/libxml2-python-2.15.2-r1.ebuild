@@ -21,7 +21,6 @@ DEPEND="${RDEPEND}
 S="${WORKDIR}/libxml2-2.15.2"
 src_prepare() {
 	default
-	sed -i "/subdir('doc')/d" meson.build || die
 	sed -e "/^dir_doc/ s/meson.project_name()$/\'${PF}\'/" -i meson.build || die
 	# Permit to compile libxml2 on stage3 without git installed.
 	# Hack git command with echo in order to print an empty string.
