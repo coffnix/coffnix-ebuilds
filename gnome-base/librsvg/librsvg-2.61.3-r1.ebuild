@@ -62,6 +62,7 @@ src_configure() {
 }
 
 src_compile() {
+	export CARGO_NET_OFFLINE=false
 	meson_src_compile
 }
 
