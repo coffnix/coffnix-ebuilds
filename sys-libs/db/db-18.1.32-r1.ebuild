@@ -98,25 +98,24 @@ src_prepare() {
 }
 
 multilib_src_configure() {
-	if [[ ${CHOST} == i?86-* ]]; then
-		append-cxxflags -DTLS_DECL_MODIFIER=__thread -DTLS_DEFN_MODIFIER=__thread
-	fi
-	local myeconfargs=(
 	# sql_compat will cause a collision with sqlite3
 	# --enable-sql_compat
 	# Don't --enable-sql* because we don't want to use bundled sqlite.
 	# See Gentoo bug #605688
+
+	if [[ ${CHOST} == i?86-* ]]; then
+		append-cxxflags -DTLS_DECL_MODIFIER=__thread -DTLS_DEFN_MODIFIER=__thread
+	fi
+
 	local myeconfargs=(
 		--enable-compat185
 		--enable-dbm
 		--enable-o_direct
-		# Requires openssl-1.0
 		--with-repmgr-ssl=no
 		--without-uniquename
 		--disable-sql
 		--disable-sql_codegen
 		--disable-sql_compat
-		# ASM used in arm assembly requires armv7+:
 		$([[ ${ABI} == arm ]] && use cpu_flags_arm_v7 && echo --with-mutex=ARM/gcc-assembly)
 		$([[ ${ABI} == amd64 ]] && echo --with-mutex=x86/gcc-assembly)
 		$(use_enable cxx)
@@ -125,37 +124,32 @@ multilib_src_configure() {
 		$(use_enable test)
 	)
 
-	tc-ld-disable-gold #470634
+	tc-ld-disable-gold
 
-	# compilation with -O0 fails on amd64, see bug #171231
 	if [[ ${ABI} == amd64 ]]; then
 		local CFLAGS=${CFLAGS} CXXFLAGS=${CXXFLAGS}
 		replace-flags -O0 -O2
 		is-flagq -O[s123] || append-flags -O2
 	fi
 
-	# Add linker versions to the symbols. Easier to do, and safer than header file
-	# mumbo jumbo.
 	if use userland_GNU ; then
 		append-ldflags -Wl,--default-symver
 	fi
 
-	# use `set` here since the java opts will contain whitespace
 	if multilib_is_native_abi && use java ; then
-		myconf+=(
+		myeconfargs+=(
 			--with-java-prefix="${JAVA_HOME}"
 			--with-javac-flags="$(java-pkg_javac-args)"
 		)
 	fi
 
-	# Bug #270851: test needs TCL support
 	if use tcl || use test ; then
 		myeconfargs+=(
 			--enable-tcl
 			--with-tcl="${EPREFIX}/usr/$(get_libdir)"
 		)
 	else
-		myeconfargs+=(--disable-tcl )
+		myeconfargs+=( --disable-tcl )
 	fi
 
 	ECONF_SOURCE="${S_BASE}"/dist \
