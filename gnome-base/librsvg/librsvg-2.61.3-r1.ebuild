@@ -5,10 +5,10 @@ EAPI=7
 VALA_USE_DEPEND="vapigen"
 ECARGO_BUNDLE_POSTFIX="mark-rust-bundle"
 
-inherit meson eutils gnome3 vala ltprune cargo multilib
+inherit cargo meson eutils gnome3 vala ltprune multilib
 
 DESCRIPTION="Scalable Vector Graphics (SVG) rendering library"
-HOMEPAGE="https://wiki.gnome.org/Projects/LibRsvg"
+HOMEPAGE="https://wiki.gnome.org/Projects/LibRsvg https://gitlab.gnome.org/GNOME/librsvg"
 SRC_URI="
 https://download.gnome.org/sources/librsvg/2.61/librsvg-2.61.3.tar.xz -> librsvg-2.61.3.tar.xz
 mirror://macaroni/librsvg-2.61.3-mark-rust-bundle.tar.xz -> librsvg-2.61.3-mark-rust-bundle.tar.xz"
@@ -42,11 +42,6 @@ src_unpack() {
 src_prepare() {
 	gnome3_src_prepare
 	use vala && vala_src_prepare
-
-	sed -i \
-		-e '/"ci",/d' \
-		Cargo.toml || die
-
 	default
 }
 
@@ -60,15 +55,16 @@ src_configure() {
 		$(meson_feature gtk-doc docs)
 		$(meson_feature vala)
 	)
-	meson_src_configure
+
+	cargo_env meson_src_configure
 }
 
 src_compile() {
-	meson_src_compile
+	cargo_env meson_src_compile
 }
 
 src_install() {
-	meson_src_install
+	cargo_env meson_src_install
 
 	local loaderdir="/usr/$(get_libdir)/gdk-pixbuf-2.0/2.10.0/loaders"
 
@@ -77,6 +73,11 @@ src_install() {
 }
 
 pkg_postinst() {
+	unset __GL_NO_DSO_FINALIZER
+	gnome3_pkg_postinst
+}
+
+pkg_postrm() {
 	unset __GL_NO_DSO_FINALIZER
 	gnome3_pkg_postrm
 }
