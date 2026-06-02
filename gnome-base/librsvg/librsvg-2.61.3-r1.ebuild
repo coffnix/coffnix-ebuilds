@@ -9,9 +9,12 @@ inherit meson eutils gnome3 vala ltprune cargo multilib
 
 DESCRIPTION="Scalable Vector Graphics (SVG) rendering library"
 HOMEPAGE="https://wiki.gnome.org/Projects/LibRsvg"
+#SRC_URI="
+#https://download.gnome.org/sources/librsvg/2.61/librsvg-2.61.3.tar.xz -> librsvg-2.61.3.tar.xz
+#mirror://macaroni/librsvg-2.61.3-mark-rust-bundle.tar.xz -> librsvg-2.61.3-mark-rust-bundle.tar.xz"
 SRC_URI="
 https://download.gnome.org/sources/librsvg/2.61/librsvg-2.61.3.tar.xz -> librsvg-2.61.3.tar.xz
-mirror://macaroni/librsvg-2.61.3-mark-rust-bundle.tar.xz -> librsvg-2.61.3-mark-rust-bundle.tar.xz"
+https://distfiles.macaronios.org/XX/XX/XX/HASH_DO_BUNDLE_CORRETO -> librsvg-2.61.3-mark-rust-bundle.tar.xz"
 LICENSE="LGPL+2"
 SLOT="2"
 KEYWORDS="*"
