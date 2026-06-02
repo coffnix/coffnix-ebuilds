@@ -56,6 +56,7 @@ src_configure() {
 		-Davif=disabled
 		$(meson_feature introspection)
 		-Dpixbuf=enabled
+		-Dpixbuf-loader-cache=false
 		-Dpixbuf-loader=enabled
 		$(meson_feature gtk-doc docs)
 		$(meson_feature vala)
