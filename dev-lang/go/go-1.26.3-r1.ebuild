@@ -16,6 +16,7 @@ HOMEPAGE="https://golang.org"
 SRC_URI="
 https://go.dev/dl/go1.26.3.src.tar.gz -> go1.26.3.src.tar.gz
 amd64? ( https://go.dev/dl/go1.26.3.linux-amd64.tar.gz -> go1.26.3-bootstrap.linux-amd64.tar.gz )
+x86? ( https://go.dev/dl/go1.26.3.linux-386.tar.gz -> go1.26.3-bootstrap.linux-386.tar.gz )
 arm64? ( https://go.dev/dl/go1.26.3.linux-arm64.tar.gz -> go1.26.3-bootstrap.linux-arm64.tar.gz )
 armv6? ( https://go.dev/dl/go1.26.3.linux-armv6l.tar.gz -> go1.26.3-bootstrap.linux-armv6l.tar.gz )"
 LICENSE="BSD"
@@ -30,22 +31,27 @@ DOCS=(
 	README.md
 	SECURITY.md
 )
-IUSE="amd64 arm64 armv6"
+IUSE="amd64 x86 arm64 armv6"
 S="${WORKDIR}/go"
-src_unpack() {
-	  for i in amd64 arm64 armv6 ; do
-	      if use $i ; then
-	          if [ $i = "armv6" ] ; then
-	              i=${i}l
-	          fi
-	          unpack go1.26.3-bootstrap.linux-${i}.tar.gz || die
-	          mv ${WORKDIR}/go ${WORKDIR}/go-bootstrap
-	          break
-	      fi
-	  done
-	  unpack go1.26.3.src.tar.gz || die
-}
 
+src_unpack() {
+	for i in amd64 x86 arm64 armv6 ; do
+		if use $i ; then
+			case "$i" in
+				amd64) bootarch="amd64" ;;
+				x86) bootarch="386" ;;
+				arm64) bootarch="arm64" ;;
+				armv6) bootarch="armv6l" ;;
+			esac
+
+			unpack go1.26.3-bootstrap.linux-${bootarch}.tar.gz || die
+			mv "${WORKDIR}"/go "${WORKDIR}"/go-bootstrap || die
+			break
+		fi
+	done
+
+	unpack go1.26.3.src.tar.gz || die
+}
 src_compile() {
 	if has_version -b dev-lang/go; then
 	  export GOROOT_BOOTSTRAP="${BROOT}/usr/lib/go"
@@ -60,7 +66,7 @@ src_compile() {
 	  armhf)   export GOARCH="arm" GOARM=6 ;;
 	  armv7*)   export GOARCH="arm" GOARM=7 ;;
 	  s390x)   export GOARCH="s390x" ;;
-	  x86)     export GOARCH="386" ;;
+	  i?86|x86)     export GOARCH="386" ;;
 	  x86_64)  export GOARCH="amd64" ;;
 	  ppc64)   export GOARCH="ppc64" ;;
 	  ppc64le) export GOARCH="ppc64le" ;;
