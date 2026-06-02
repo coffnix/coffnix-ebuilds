@@ -10,8 +10,8 @@ inherit cargo meson eutils gnome3 vala ltprune multilib
 DESCRIPTION="Scalable Vector Graphics (SVG) rendering library"
 HOMEPAGE="https://wiki.gnome.org/Projects/LibRsvg https://gitlab.gnome.org/GNOME/librsvg"
 SRC_URI="
-https://download.gnome.org/sources/librsvg/2.61/librsvg-2.61.3.tar.xz -> librsvg-2.61.3.tar.xz
-https://github.com/gentoo-crate-dist/librsvg/releases/download/2.61.3/librsvg-2.61.3-crates.tar.xz -> librsvg-2.61.3-mark-rust-bundle.tar.xz"
+https://download.gnome.org/sources/librsvg/2.62/librsvg-2.62.2.tar.xz -> librsvg-2.62.2.tar.xz
+https://github.com/gentoo-crate-dist/librsvg/releases/download/2.62.2/librsvg-2.62.2-crates.tar.xz -> librsvg-2.62.2-mark-rust-bundle.tar.xz"
 LICENSE="LGPL+2"
 SLOT="2"
 KEYWORDS="*"
