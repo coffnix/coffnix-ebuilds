@@ -56,7 +56,6 @@ src_configure() {
 		-Davif=disabled
 		$(meson_feature introspection)
 		-Dpixbuf=enabled
-		-Dpixbuf-loader-cache=false
 		-Dpixbuf-loader=enabled
 		$(meson_feature gtk-doc docs)
 		$(meson_feature vala)
@@ -70,14 +69,17 @@ src_compile() {
 }
 
 src_install() {
-	meson_src_install || die
+	meson_src_install
 
 	local loaderdir="/usr/$(get_libdir)/gdk-pixbuf-2.0/2.10.0/loaders"
 
-	if [[ -e "${ED}${loaderdir}/libpixbufloader_svg.so" && ! -e "${ED}${loaderdir}/libpixbufloader-svg.so" ]]; then
-		dosym "${loaderdir}/libpixbufloader_svg.so" \
-			"${loaderdir}/libpixbufloader-svg.so"
-	fi
+	dosym "${loaderdir}/libpixbufloader_svg.so" \
+		"${loaderdir}/libpixbufloader-svg.so"
+}
+
+pkg_preinst() {
+	unset __GL_NO_DSO_FINALIZER
+	gnome3_pkg_preinst
 }
 
 pkg_postinst() {
@@ -89,5 +91,3 @@ pkg_postrm() {
 	unset __GL_NO_DSO_FINALIZER
 	gnome3_pkg_postrm
 }
-
-# vim: filetype=ebuild
