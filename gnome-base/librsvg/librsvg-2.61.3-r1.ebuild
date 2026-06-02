@@ -11,7 +11,7 @@ DESCRIPTION="Scalable Vector Graphics (SVG) rendering library"
 HOMEPAGE="https://wiki.gnome.org/Projects/LibRsvg https://gitlab.gnome.org/GNOME/librsvg"
 SRC_URI="
 https://download.gnome.org/sources/librsvg/2.61/librsvg-2.61.3.tar.xz -> librsvg-2.61.3.tar.xz
-mirror://macaroni/librsvg-2.61.3-mark-rust-bundle.tar.xz -> librsvg-2.61.3-mark-rust-bundle.tar.xz"
+https://github.com/gentoo-crate-dist/librsvg/releases/download/2.61.3/librsvg-2.61.3-crates.tar.xz -> librsvg-2.61.3-mark-rust-bundle.tar.xz"
 LICENSE="LGPL+2"
 SLOT="2"
 KEYWORDS="*"
