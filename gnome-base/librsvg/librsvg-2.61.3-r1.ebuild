@@ -42,6 +42,11 @@ src_unpack() {
 src_prepare() {
 	gnome3_src_prepare
 	use vala && vala_src_prepare
+
+	sed -i \
+		-e '/"ci",/d' \
+		Cargo.toml || die
+
 	default
 }
 
@@ -56,20 +61,22 @@ src_configure() {
 		$(meson_feature vala)
 	)
 
-	cargo_env meson_src_configure
+	meson_src_configure || die
 }
 
 src_compile() {
-	cargo_env meson_src_compile
+	meson_src_compile || die
 }
 
 src_install() {
-	cargo_env meson_src_install
+	meson_src_install || die
 
 	local loaderdir="/usr/$(get_libdir)/gdk-pixbuf-2.0/2.10.0/loaders"
 
-	dosym "${loaderdir}/libpixbufloader_svg.so" \
-		"${loaderdir}/libpixbufloader-svg.so"
+	if [[ -e "${ED}${loaderdir}/libpixbufloader_svg.so" && ! -e "${ED}${loaderdir}/libpixbufloader-svg.so" ]]; then
+		dosym "${loaderdir}/libpixbufloader_svg.so" \
+			"${loaderdir}/libpixbufloader-svg.so"
+	fi
 }
 
 pkg_postinst() {
