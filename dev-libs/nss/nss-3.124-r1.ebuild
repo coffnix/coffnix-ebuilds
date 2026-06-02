@@ -59,8 +59,14 @@ src_prepare() {
 src_compile() {
 	# Take care of nspr settings #436216
 	local myCPPFLAGS="${CPPFLAGS} $($(tc-getPKG_CONFIG) nspr --cflags)"
+
+	if [[ ${CHOST} == i?86-* ]]; then
+		myCPPFLAGS="${myCPPFLAGS} -UNSS_USE_64 -UNSS_X64 -UHAVE_INT128_SUPPORT"
+	fi
+
 	unset NSPR_INCLUDE_DIR
-	 export NSS_ALLOW_SSLKEYLOGFILE=1
+
+	export NSS_ALLOW_SSLKEYLOGFILE=1
 	export NSS_ENABLE_WERROR=0 #567158
 	export BUILD_OPT=1
 	export NSS_USE_SYSTEM_SQLITE=1
@@ -71,32 +77,42 @@ src_compile() {
 	export USE_SYSTEM_ZLIB=1
 	export ZLIB_LIBS=-lz
 	export ASFLAGS=""
-	# Fix build failure on arm64
 	export NS_USE_GCC=1
-	# Detect compiler type and set proper environment value
+
 	if tc-is-gcc; then
-	    export CC_IS_GCC=1
+		export CC_IS_GCC=1
 	elif tc-is-clang; then
-	    export CC_IS_CLANG=1
+		export CC_IS_CLANG=1
 	fi
-	 local d
+
+	local d
 	local ostest="$(nssarch)"
-	if use arm ; then
-	  ostest=$(tc-arch ${CHOST})
-	  export USE_N32=1
-	else
-	  export USE_64=1
-	fi
-	 # Build the host tools first.
+
+	case "${CHOST}" in
+		x86_64*|aarch64*|ppc64*|s390x*|riscv64*)
+			export USE_64=1
+			;;
+		i?86*)
+			unset USE_64
+			export USE_64=0
+			export NSS_USE_64=0
+			;;
+		arm*)
+			ostest=$(tc-arch ${CHOST})
+			export USE_N32=1
+			;;
+	esac
+
 	NSPR_LIB_DIR="${T}/fakedir" \
 	emake -j1 -C coreconf
+
 	makeargs+=( NSINSTALL="${PWD}/$(find -type f -name nsinstall)" )
-	 # Then build the target tools.
+
 	for d in . lib/dbm ; do
-	  CPPFLAGS="${myCPPFLAGS}" \
-	  XCFLAGS="${CFLAGS} ${CPPFLAGS}" \
-	  NSPR_LIB_DIR="${T}/fakedir" \
-	  emake -j1 "${makeargs[@]}" -C ${d} OS_TEST="${ostest}"
+		CPPFLAGS="${myCPPFLAGS}" \
+		XCFLAGS="${CFLAGS} ${myCPPFLAGS}" \
+		NSPR_LIB_DIR="${T}/fakedir" \
+		emake -j1 "${makeargs[@]}" -C ${d} OS_TEST="${ostest}"
 	done
 }
 src_install() {
