@@ -83,7 +83,7 @@ src_configure() {
 		ppc)        _target="linux-ppc" ;;
 		ppc64)      _target="linux-ppc64" ;;
 		ppc64le)    _target="linux-ppc64le" ;;
- 		x86|i686)        _target="linux-elf" ;;
+ 		i?86)        _target="linux-elf" ;;
 		x86_64)     _target="linux-x86_64"; _optflags="enable-ec_nistp_64_gcc_128" ;;
 		s390x)      _target="linux64-s390x";;
 		riscv64)    _target="linux64-riscv64";;
