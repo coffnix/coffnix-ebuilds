@@ -64,7 +64,6 @@ src_compile() {
 	meson_src_compile
 	# causes segfault if set, see bug #411765
 	unset __GL_NO_DSO_FINALIZER
-	gnome3_src_compile
 }
 
 src_install() {
