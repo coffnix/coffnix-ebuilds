@@ -23,9 +23,6 @@ RDEPEND="
 	latex? ( dev-texlive/texlive-formatsextra )
 "
 DEPEND="${RDEPEND}"
-# We only depend on lex when we patch the input lexer.
-# We touch it in fix-warnings.patch.
-BDEPEND="app-alternatives/lex"
 
 DOCS=( AUTHORS ChangeLog FAQ NEWS README THANKS )
 
