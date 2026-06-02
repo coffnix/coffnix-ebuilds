@@ -98,7 +98,6 @@ src_prepare() {
 }
 
 multilib_src_configure() {
-	multilib_src_configure() {
 	if [[ ${CHOST} == i?86-* ]]; then
 		append-cxxflags -DTLS_DECL_MODIFIER=__thread -DTLS_DEFN_MODIFIER=__thread
 	fi
