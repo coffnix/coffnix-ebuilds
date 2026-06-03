@@ -33,7 +33,15 @@ fbecho(){
 }
 
 VERSION="8.0"
-BITS=$(getconf LONG_BIT 2>/dev/null || uname -m | grep -q 64 && echo 64 || echo 32)
+BITS="$(getconf LONG_BIT 2>/dev/null)"
+
+if [ -z "$BITS" ]; then
+	if uname -m | grep -q 64; then
+		BITS=64
+	else
+		BITS=32
+	fi
+fi
 OS_LOGO="/etc/vipnix/logo.ascii"
 OS_LOGO_SMALL="/etc/vipnix/logo.ascii"
 LOCAL_RESOLUTION="$(fbset -s | grep mode -w | awk '{print $2}' | sed s,'\"',,g | cut -dx -f1)"
