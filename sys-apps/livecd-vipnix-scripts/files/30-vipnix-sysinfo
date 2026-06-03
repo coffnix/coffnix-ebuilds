@@ -12,7 +12,7 @@
 
 . /etc/os-release
 
-KERNELID=$(uname -r)
+KERNELID=$(uname -r | sed 's/-.*//')
 VERSION="${NAME}"
 DISTRIBUTION_CODENAME="${VERSION_ID}"
 
