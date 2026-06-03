@@ -33,8 +33,7 @@ DEPEND="
 	)
 "
 
-BDEPEND="
-	virtual/awk
+BDEPEND="virtual/awk
 	virtual/pkgconfig
 	nls? ( sys-devel/gettext )
 	python? (
@@ -109,7 +108,6 @@ src_prepare() {
 	fi
 
 	sed -i "/^ZFS_UNMOUNT=/ s/yes/no/" "etc/default/zfs.in" || die
-
 	eautoreconf
 }
 
@@ -123,7 +121,7 @@ src_configure() {
 		--disable-systemd
 		--enable-sysvinit
 		--localstatedir="${EPREFIX}/var"
-		--sbindir="${EPREFIX}/usr/sbin"
+		--sbindir="${EPREFIX}/sbin"
 		--with-config=user
 		--with-dracutdir="${EPREFIX}/usr/lib/dracut"
 		--with-linux="${KV_DIR}"
@@ -144,17 +142,17 @@ src_configure() {
 }
 
 src_compile() {
-	default
+	MAKEOPTS="-j1" MAKEFLAGS="-j1" MAKELEVEL=0 default
 
 	if use python; then
 		pushd contrib/pyzfs >/dev/null || die
-		distutils-r1_src_compile
+		MAKEOPTS="-j1" MAKEFLAGS="-j1" MAKELEVEL=0 distutils-r1_src_compile
 		popd >/dev/null || die
 	fi
 }
 
 src_install() {
-	emake -j1 DESTDIR="${D}" install
+	MAKEOPTS="-j1" MAKEFLAGS="-j1" MAKELEVEL=0 default
 
 	gen_usr_ldscript -a nvpair uutil zfsbootenv zfs zfs_core zpool
 
@@ -173,13 +171,12 @@ src_install() {
 
 	if use python; then
 		pushd contrib/pyzfs >/dev/null || die
-		distutils-r1_src_install
+		MAKEOPTS="-j1" MAKEFLAGS="-j1" MAKELEVEL=0 distutils-r1_src_install
 		popd >/dev/null || die
 	fi
 
 	use minimal || python_fix_shebang "${ED}/bin"
 }
-
 
 pkg_postinst() {
 	if [[ -e "${EROOT}/etc/runlevels/boot/zfs" ]]; then
