@@ -154,19 +154,7 @@ src_compile() {
 }
 
 src_install() {
-	default
-
-	dodir /sbin
-	for f in zdb zfs zhack zinject zpool zstream; do
-		if [[ -x "${ED}/usr/sbin/${f}" ]]; then
-			dosym ../usr/sbin/${f} /sbin/${f}
-		fi
-	done
-
-	if [[ -x "${ED}/usr/sbin/zstream" ]]; then
-		dosym zstream /usr/sbin/zstreamdump
-		dosym ../usr/sbin/zstreamdump /sbin/zstreamdump
-	fi
+	emake -j1 DESTDIR="${D}" install
 
 	gen_usr_ldscript -a nvpair uutil zfsbootenv zfs zfs_core zpool
 
@@ -191,6 +179,7 @@ src_install() {
 
 	use minimal || python_fix_shebang "${ED}/bin"
 }
+
 
 pkg_postinst() {
 	if [[ -e "${EROOT}/etc/runlevels/boot/zfs" ]]; then
