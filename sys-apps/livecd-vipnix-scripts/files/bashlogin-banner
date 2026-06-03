@@ -32,7 +32,8 @@ fbecho(){
   [ $LINES -ge 28 ] && echo
 }
 
-VERSION="7.0"
+VERSION="8.0"
+BITS=$(getconf LONG_BIT 2>/dev/null || uname -m | grep -q 64 && echo 64 || echo 32)
 OS_LOGO="/etc/vipnix/logo.ascii"
 OS_LOGO_SMALL="/etc/vipnix/logo.ascii"
 LOCAL_RESOLUTION="$(fbset -s | grep mode -w | awk '{print $2}' | sed s,'\"',,g | cut -dx -f1)"
@@ -54,7 +55,7 @@ fi
 
 fbecho
 cat <<BANNER
-${BLUE} =============== ${RED}Vipnix LiveCD (64bit)${BLUE} ========= ${RED} Boot ${MODE_HEADER} Mode ${BLUE} =========== ${WHITE}$(basename $(tty))${GREY}/6 ${BLUE}==${OFF}
+${BLUE} =============== ${RED}Vipnix LiveCD (${BITS}bit)${BLUE} ========= ${RED} Boot ${MODE_HEADER} Mode ${BLUE} =========== ${WHITE}$(basename $(tty))${GREY}/6 ${BLUE}==${OFF}
                  ${WHITE}Created using Macaroni OS${OFF}
                  ${RED}https://vipnix.com.br${OFF}
 $(cat $OS_LOGO_SET)
