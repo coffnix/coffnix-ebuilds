@@ -11,8 +11,10 @@ LICENSE="Apache-2.0"
 SLOT="0"
 KEYWORDS="*"
 IUSE="+foomatic"
-RDEPEND=">=net-print/cups-1.7.3
-	
+RDEPEND="
+	net-print/libcupsfilters
+	net-print/libppd
+	>=net-print/cups-1.7.3
 "
 DEPEND="${RDEPEND}
 	>=sys-devel/gettext-0.18.3
