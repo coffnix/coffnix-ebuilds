@@ -28,13 +28,16 @@ src_unpack() {
 	default
 
 	local d
-	d="$(find "${WORKDIR}" -maxdepth 1 -type d -name 'upx-5.1.1-*linux' | head -n 1)"
+	d="$(find "${WORKDIR}" -mindepth 1 -maxdepth 1 -type d -name "upx-${PV}-*linux" | head -n 1)"
 
 	if [[ -z "${d}" ]]; then
 		die "UPX source directory not found"
 	fi
 
-	mv "${d}" "${S}" || die
+	if [[ "${d}" != "${S}" ]]; then
+		rm -rf "${S}" || die
+		mv "${d}" "${S}" || die
+	fi
 }
 
 src_install() {
