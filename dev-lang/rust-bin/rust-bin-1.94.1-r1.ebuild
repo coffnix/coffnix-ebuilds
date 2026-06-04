@@ -46,14 +46,38 @@ DEPEND="${RDEPEND}
 "
 rust_abi() {
 	local CTARGET=${1:-${CHOST}}
+
 	case ${CTARGET%%-*} in
-	  i?86) echo i686-unknown-linux-gnu;;
-	  x86_64*) echo x86_64-unknown-linux-gnu;;
-	  armv6j*s*) echo arm-unknown-linux-gnueabi;;
-	  armv6j*h*) echo arm-unknown-linux-gnueabihf;;
-	  armv7a*h*) echo armv7-unknown-linux-gnueabihf;;
-	  aarch64*) echo aarch64-unknown-linux-gnu;;
-	  riscv64*) echo riscv64gc-unknown-linux-gnu;;
+		i?86)
+			echo i686-unknown-linux-gnu
+			;;
+		x86_64*)
+			echo x86_64-unknown-linux-gnu
+			;;
+		armv6j*s*)
+			echo arm-unknown-linux-gnueabi
+			;;
+		armv6j*h*)
+			echo arm-unknown-linux-gnueabihf
+			;;
+		armv7a*h*|armv7*h*)
+			echo armv7-unknown-linux-gnueabihf
+			;;
+		arm*h*)
+			echo arm-unknown-linux-gnueabihf
+			;;
+		arm*)
+			echo arm-unknown-linux-gnueabi
+			;;
+		aarch64*)
+			echo aarch64-unknown-linux-gnu
+			;;
+		riscv64*)
+			echo riscv64gc-unknown-linux-gnu
+			;;
+		*)
+			die "Unsupported target: ${CTARGET}"
+			;;
 	esac
 }
 src_unpack() {
