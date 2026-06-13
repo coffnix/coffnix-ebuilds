@@ -49,12 +49,6 @@ pkg_setup() {
 	fi
 }
 
-#src_unpack() {
-#	git-r3_src_unpack
-#
-#	cd "${S}/external/src/grpc" || die
-#	git submodule update --init third_party/boringssl-with-bazel || die
-#}
 src_configure() {
 	local build_shared_libs="ON"
 
