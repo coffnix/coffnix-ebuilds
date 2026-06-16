@@ -34,38 +34,38 @@ DEPEND="
 #	mv ${WORKDIR}/xmrig-xmrig-* ${S} || die
 #}
 
-src_prepare() {
-	cmake_src_prepare
-
-	sed -i '/notls/d' cmake/OpenSSL.cmake || die
-	sed -i 's/1;/0;/g' src/donate.h || die
-
-	if [[ ${ARCH} == arm64 ]]; then
-		local march_flag mtune_flag xmrig_arm_flags
-
-		march_flag=$(echo "${CXXFLAGS}" | tr ' ' '\n' | grep '^[-]march=' | tail -n1)
-		mtune_flag=$(echo "${CXXFLAGS}" | tr ' ' '\n' | grep '^[-]mtune=' | tail -n1)
-
-		xmrig_arm_flags="${march_flag}"
-
-		if [[ "${xmrig_arm_flags}" != *"+crypto"* ]]; then
-			xmrig_arm_flags="${xmrig_arm_flags}+crypto"
-		fi
-
-		if [[ -n "${mtune_flag}" ]]; then
-			xmrig_arm_flags="${xmrig_arm_flags} ${mtune_flag}"
-		fi
-
-		sed -i "s|-march=armv8-a+crypto|${xmrig_arm_flags}|g" cmake/cpu.cmake || die
-	fi
-}
-
 #src_prepare() {
 #	cmake_src_prepare
 #
 #	sed -i '/notls/d' cmake/OpenSSL.cmake || die
 #	sed -i 's/1;/0;/g' src/donate.h || die
+#
+#	if [[ ${ARCH} == arm64 ]]; then
+#		local march_flag mtune_flag xmrig_arm_flags
+#
+#		march_flag=$(echo "${CXXFLAGS}" | tr ' ' '\n' | grep '^[-]march=' | tail -n1)
+#		mtune_flag=$(echo "${CXXFLAGS}" | tr ' ' '\n' | grep '^[-]mtune=' | tail -n1)
+#
+#		xmrig_arm_flags="${march_flag}"
+#
+#		if [[ "${xmrig_arm_flags}" != *"+crypto"* ]]; then
+#			xmrig_arm_flags="${xmrig_arm_flags}+crypto"
+#		fi
+#
+#		if [[ -n "${mtune_flag}" ]]; then
+#			xmrig_arm_flags="${xmrig_arm_flags} ${mtune_flag}"
+#		fi
+#
+#		sed -i "s|-march=armv8-a+crypto|${xmrig_arm_flags}|g" cmake/cpu.cmake || die
+#	fi
 #}
+
+src_prepare() {
+	cmake_src_prepare
+
+	sed -i '/notls/d' cmake/OpenSSL.cmake || die
+	sed -i 's/1;/0;/g' src/donate.h || die
+}
 
 src_configure() {
 	local mycmakeargs=(
