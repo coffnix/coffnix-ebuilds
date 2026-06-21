@@ -71,12 +71,21 @@ src_configure() {
 	BUILD_DIR=${WORKDIR}/compiler-rt_build
 	local extra_cflags=""
 	if use clang; then
-	  extra_cflags="-I/usr/lib/clang/20/include/"
-	  export CPPFLAGS="-I/usr/lib/clang/20/include/"
-	  local -x CC=${CHOST}-clang
-	  local -x CXX=${CHOST}-clang++
-	  strip-unsupported-flags
-	fi
+	extra_cflags="-I/usr/lib/clang/20/include/"
+	export CPPFLAGS="-I/usr/lib/clang/20/include/"
+
+	local clang_path="$(command -v clang)"
+	local clangxx_path="$(command -v clang++)"
+
+	[[ -n "${clang_path}" ]] || die "clang not found in PATH"
+	[[ -n "${clangxx_path}" ]] || die "clang++ not found in PATH"
+
+	local -x CC="${clang_path}"
+	local -x CXX="${clangxx_path}"
+	local -x ASM="${clang_path}"
+
+	strip-unsupported-flags
+fi
 	local flag want_sanitizer=OFF
 	for flag in "${SANITIZER_FLAGS[@]}"; do
 	  if use "${flag}"; then
@@ -85,26 +94,34 @@ src_configure() {
 	  fi
 	done
 	local mycmakeargs=(
-	  -DLLVM_CONFIG_PATH="/usr/lib/llvm/20/bin/llvm-config"
-	  -DLLVM_ENABLE_RUNTIMES="compiler-rt"
-	  -DCOMPILER_RT_INSTALL_PATH="${EPREFIX}/usr/lib/clang/20"
-	  -DCOMPILER_RT_OUTPUT_DIR="${BUILD_DIR}/lib/clang/20"
-	  -DCOMPILER_RT_INCLUDE_TESTS=OFF
-	  -DCOMPILER_RT_BUILD_BUILTINS=OFF
-	  -DCOMPILER_RT_BUILD_CRT=OFF
-	  -DCOMPILER_RT_COMMON_CFLAGS="${extra_cflags}"
-	  -DCOMPILER_RT_CXX_CFLAGS="${extra_cflags}"
-	  -DCMAKE_CXX_FLAGS="${extra_cflags}"
-	  -DLIBCXX_ADDITIONAL_COMPILE_FLAGS="${extra_cflags}"
-	  -DCOMPILER_RT_BUILD_LIBFUZZER=$(usex libfuzzer)
-	  -DCOMPILER_RT_BUILD_MEMPROF=$(usex memprof)
-	  -DCOMPILER_RT_BUILD_ORC=$(usex orc)
-	  -DCOMPILER_RT_BUILD_PROFILE=$(usex profile)
-	  -DCOMPILER_RT_BUILD_SANITIZERS="${want_sanitizer}"
-	  -DCOMPILER_RT_BUILD_XRAY=$(usex xray)
-	  -DPython3_EXECUTABLE="${PYTHON}"
-	  -DCAN_TARGET_${CHOST/-pc-*/}=yes
+	-DLLVM_CONFIG_PATH="/usr/lib/llvm/20/bin/llvm-config"
+	-DLLVM_ENABLE_RUNTIMES="compiler-rt"
+	-DCOMPILER_RT_INSTALL_PATH="${EPREFIX}/usr/lib/clang/20"
+	-DCOMPILER_RT_OUTPUT_DIR="${BUILD_DIR}/lib/clang/20"
+	-DCOMPILER_RT_INCLUDE_TESTS=OFF
+	-DCOMPILER_RT_BUILD_BUILTINS=OFF
+	-DCOMPILER_RT_BUILD_CRT=OFF
+	-DCOMPILER_RT_COMMON_CFLAGS="${extra_cflags}"
+	-DCOMPILER_RT_CXX_CFLAGS="${extra_cflags}"
+	-DCMAKE_CXX_FLAGS="${extra_cflags}"
+	-DLIBCXX_ADDITIONAL_COMPILE_FLAGS="${extra_cflags}"
+	-DCOMPILER_RT_BUILD_LIBFUZZER=$(usex libfuzzer)
+	-DCOMPILER_RT_BUILD_MEMPROF=$(usex memprof)
+	-DCOMPILER_RT_BUILD_ORC=$(usex orc)
+	-DCOMPILER_RT_BUILD_PROFILE=$(usex profile)
+	-DCOMPILER_RT_BUILD_SANITIZERS="${want_sanitizer}"
+	-DCOMPILER_RT_BUILD_XRAY=$(usex xray)
+	-DPython3_EXECUTABLE="${PYTHON}"
+	-DCAN_TARGET_${CHOST/-pc-*/}=yes
+)
+
+if use clang; then
+	mycmakeargs+=(
+		-DCMAKE_C_COMPILER="${CC}"
+		-DCMAKE_CXX_COMPILER="${CXX}"
+		-DCMAKE_ASM_COMPILER="${CC}"
 	)
+fi
 	cmake_src_configure
 }
 src_install() {
