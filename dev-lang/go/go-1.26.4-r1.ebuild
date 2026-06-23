@@ -45,14 +45,15 @@ src_unpack() {
 				armv6) bootarch="armv6l" ;;
 			esac
 
-			unpack go1.26.3-bootstrap.linux-${bootarch}.tar.gz || die
+			unpack go${PV}-bootstrap.linux-${bootarch}.tar.gz || die
 			mv "${WORKDIR}"/go "${WORKDIR}"/go-bootstrap || die
 			break
 		fi
 	done
 
-	unpack go1.26.3.src.tar.gz || die
+	unpack go${PV}.src.tar.gz || die
 }
+
 src_compile() {
 	if has_version -b dev-lang/go; then
 	  export GOROOT_BOOTSTRAP="${BROOT}/usr/lib/go"
