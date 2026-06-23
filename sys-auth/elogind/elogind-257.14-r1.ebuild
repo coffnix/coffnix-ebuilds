@@ -70,7 +70,7 @@ src_configure() {
 	  -Ddocdir="${EPREFIX}/usr/share/doc/${PF}"
 	  -Dhtmldir="${EPREFIX}/usr/share/doc/${PF}/html"
 	  -Dudevrulesdir="${EPREFIX}$(get_udevdir)"/rules.d
-	  --libexecdir="$(get_libdir)/elogind"
+	  --libexecdir="lib/elogind"
 	  --localstatedir="${EPREFIX}"/var
 	  -Dbashcompletiondir="${EPREFIX}/usr/share/bash-completion/completions"
 	  -Dman=auto
