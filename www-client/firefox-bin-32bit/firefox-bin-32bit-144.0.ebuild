@@ -306,8 +306,8 @@ src_install() {
 	fperms 0755 /usr/bin/firefox-bin
 	 # revdep-rebuild entry
 	insinto /etc/revdep-rebuild
-	echo "SEARCH_DIRS_MASK=${MOZILLA_FIVE_HOME}" >> ${T}/10firefox-bin
-doins "${T}"/10firefox-bin
+	echo "SEARCH_DIRS_MASK=${MOZILLA_FIVE_HOME}" >> "${T}/10firefox-bin"
+doins "${T}/10firefox-bin"
 	doins "${T}"/10${PN}
 }
 pkg_postinst() {
