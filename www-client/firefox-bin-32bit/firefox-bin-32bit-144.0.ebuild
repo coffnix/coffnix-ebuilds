@@ -276,9 +276,8 @@ src_install() {
 	 # Install menu
 	local app_name="Mozilla Firefox (bin)"
 	local desktop_file="${FILESDIR}/firefox-bin.desktop"
-	local desktop_filename="${PN}.desktop"
-	local exec_command="${PN}"
-	local icon="${PN}"
+	local exec_command="firefox-bin"
+	local icon="firefox-bin"
 	local use_wayland="false"
 	 if use wayland ; then
 	  use_wayland="true"
@@ -296,7 +295,7 @@ src_install() {
 	[[ -f "${ED}/usr/bin/${PN}" ]] && rm "${ED}/usr/bin/${PN}"
 	 dodir /usr/bin/
 	local apulselib=$(usex pulseaudio "" $(usex alsa "/usr/$(get_libdir)/apulse:" ""))
-	cat <<-EOF >"${ED}/"usr/bin/${PN}
+	cat <<-EOF >"${ED}/usr/bin/firefox-bin"
 	#!/bin/sh
 	unset LD_PRELOAD
 	LD_LIBRARY_PATH="${apulselib}${MOZILLA_FIVE_HOME}/" \\
