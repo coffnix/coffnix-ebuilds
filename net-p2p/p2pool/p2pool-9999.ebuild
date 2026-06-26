@@ -11,21 +11,22 @@ inherit cmake user git-r3
 DESCRIPTION="Decentralized pool for Monero mining"
 HOMEPAGE="https://p2pool.io"
 EGIT_REPO_URI="https://github.com/SChernykh/p2pool.git"
-EGIT_OVERRIDE_REPO_SCHERNYKH_RANDOMX="https://github.com/tevador/RandomX.git"
 EGIT_SUBMODULES=(
 	external/src/RandomX
 	external/src/miniupnp
 	external/src/rapidjson
 	external/src/robin-hood-hashing
 	external/src/cppzmq
+	external/src/grpc
+	third_party/boringssl-with-bazel
 )
-
-EGIT_BRANCH="master"
+EGIT_CLONE_TYPE="shallow"
+EGIT_CLONE_DEPTH="1"
+EGIT_SUBMODULES_DEPTH="1"
 
 LICENSE="BSD GPL-3+ ISC LGPL-3+ MIT"
 SLOT="0"
 KEYWORDS="*"
-#IUSE="grpc tls"
 IUSE="+daemon"
 
 DEPEND="
@@ -39,6 +40,7 @@ RDEPEND="${DEPEND}"
 BDEPEND="
 	dev-util/patchelf
 "
+
 
 pkg_setup() {
 	if use daemon; then

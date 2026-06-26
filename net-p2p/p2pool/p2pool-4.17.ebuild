@@ -20,9 +20,10 @@ EGIT_SUBMODULES=(
 	external/src/grpc
 	third_party/boringssl-with-bazel
 )
-EGIT_CLONE_TYPE="shallow"
-EGIT_CLONE_DEPTH="1"
-EGIT_SUBMODULES_DEPTH="1"
+#EGIT_CLONE_TYPE="shallow"
+#EGIT_CLONE_DEPTH="1"
+#EGIT_SUBMODULES_DEPTH="1"
+EGIT_COMMIT="v${PV}"
 
 LICENSE="BSD GPL-3+ ISC LGPL-3+ MIT"
 SLOT="0"
@@ -41,6 +42,12 @@ BDEPEND="
 	dev-util/patchelf
 "
 
+
+src_unpack() {
+	rm -rf "${DISTDIR}/git3-src/SChernykh_p2pool.git"
+
+	git-r3_src_unpack
+}
 
 pkg_setup() {
 	if use daemon; then
