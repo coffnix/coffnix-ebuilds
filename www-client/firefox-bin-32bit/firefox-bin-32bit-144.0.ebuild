@@ -307,8 +307,7 @@ src_install() {
 	 # revdep-rebuild entry
 	insinto /etc/revdep-rebuild
 	echo "SEARCH_DIRS_MASK=${MOZILLA_FIVE_HOME}" >> "${T}/10firefox-bin"
-doins "${T}/10firefox-bin"
-	doins "${T}"/10${PN}
+	doins "${T}/10firefox-bin"
 }
 pkg_postinst() {
 	# Update mimedb for the new .desktop file
