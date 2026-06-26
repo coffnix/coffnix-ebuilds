@@ -269,13 +269,14 @@ src_install() {
 	  size=${icon%.png}
 	  size=${size##*/default}
 	   if [[ ${size} -eq 48 ]] ; then
-	    newicon "${icon}" ${PN}.png
+		newicon "${icon}" firefox-bin.png
 	  fi
-	   newicon -s ${size} "${icon}" ${PN}.png
+	   newicon -s ${size} "${icon}" firefox-bin.png
 	done
 	 # Install menu
 	local app_name="Mozilla Firefox (bin)"
 	local desktop_file="${FILESDIR}/firefox-bin.desktop"
+	local desktop_filename="firefox-bin.desktop"
 	local exec_command="firefox-bin"
 	local icon="firefox-bin"
 	local use_wayland="false"
@@ -302,10 +303,11 @@ src_install() {
 	GTK_PATH=/usr/$(get_libdir)/gtk-3.0/ \\
 	exec ${MOZILLA_FIVE_HOME}/firefox "\$@"
 	EOF
-	fperms 0755 /usr/bin/${PN}
+	fperms 0755 /usr/bin/firefox-bin
 	 # revdep-rebuild entry
 	insinto /etc/revdep-rebuild
-	echo "SEARCH_DIRS_MASK=${MOZILLA_FIVE_HOME}" >> ${T}/10${PN}
+	echo "SEARCH_DIRS_MASK=${MOZILLA_FIVE_HOME}" >> ${T}/10firefox-bin
+doins "${T}"/10firefox-bin
 	doins "${T}"/10${PN}
 }
 pkg_postinst() {
