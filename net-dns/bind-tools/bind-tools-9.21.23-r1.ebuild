@@ -6,7 +6,7 @@ inherit meson flag-o-matic toolchain-funcs
 
 DESCRIPTION="bind tools: dig, nslookup, host, nsupdate, dnssec-keygen"
 HOMEPAGE="https://www.isc.org/software/bind"
-SRC_URI="https://downloads.isc.org/isc/bind9/9.21.21/bind-9.21.21.tar.xz -> bind-9.21.21.tar.xz"
+SRC_URI="https://downloads.isc.org/isc/bind9/9.21.23/bind-9.21.23.tar.xz -> bind-9.21.23.tar.xz"
 
 LICENSE="Apache-2.0 BSD BSD-2 GPL-2 HPND ISC MPL-2.0"
 SLOT="0"
@@ -15,11 +15,11 @@ IUSE="gssapi idn ipv6 libedit readline xml"
 # no PKCS11 currently as it requires OpenSSL to be patched, also see bug 409687
 
 COMMON_DEPEND="
-	dev-db/lmdb
 	dev-libs/libuv:=
 	dev-libs/openssl
 	dev-libs/userspace-rcu
 	sys-libs/libcap
+	dev-db/lmdb
 	xml? ( dev-libs/libxml2 )
 	idn? ( net-dns/libidn2:= )
 	gssapi? ( virtual/krb5 )
@@ -32,7 +32,7 @@ DEPEND="${COMMON_DEPEND}"
 RDEPEND="${COMMON_DEPEND}
 	!<=net-dns/bind-9.18.1-r2
 "
-S="${WORKDIR}/bind-9.21.21"
+S="${WORKDIR}/bind-9.21.23"
 
 # sphinx required for man-page and html creation
 BDEPEND="
@@ -58,6 +58,13 @@ src_install() {
 
 	rm -r "${D}"/usr/bin/{arpaname,named*,nsec3hash} || die
 	rm -r "${D}"/usr/sbin || die
+
+	dodoc -r doc/arm doc/changelog doc/notes
+
+	rm -f "${D}"/usr/share/doc/${PF}/{ChangeLog,NEWS} || die
+
+	dosym arm/changelog.rst.bz2 /usr/share/doc/${PF}/ChangeLog
+	dosym arm/changelog.rst.bz2 /usr/share/doc/${PF}/NEWS
 }
 
 # vim: filetype=ebuild
