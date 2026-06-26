@@ -8,18 +8,31 @@ command_background="yes"
 command_user="root"
 
 export XDG_RUNTIME_DIR="/run/pipewire"
+export PULSE_RUNTIME_PATH="/run/pipewire/pulse"
+export PULSE_SERVER="unix:/run/pipewire/pulse/native"
 export DBUS_SESSION_BUS_ADDRESS="unix:path=/run/pipewire/dbus-session-bus"
 
 start_pre() {
 	checkpath -d -m 0700 -o root:root /run/pipewire
+	checkpath -d -m 0700 -o root:root /run/pipewire/pulse
+
 	if [ ! -S /run/pipewire/dbus-session-bus ]; then
 		dbus-daemon --session --fork --address="${DBUS_SESSION_BUS_ADDRESS}"
 	fi
 }
 
 start_post() {
-	start-stop-daemon --start --background --exec /usr/bin/wireplumber --env XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR}" --env DBUS_SESSION_BUS_ADDRESS="${DBUS_SESSION_BUS_ADDRESS}"
-	start-stop-daemon --start --background --exec /usr/bin/pipewire-pulse --env XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR}" --env DBUS_SESSION_BUS_ADDRESS="${DBUS_SESSION_BUS_ADDRESS}"
+	start-stop-daemon --start --background --exec /usr/bin/wireplumber \
+		--env XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR}" \
+		--env PULSE_RUNTIME_PATH="${PULSE_RUNTIME_PATH}" \
+		--env PULSE_SERVER="${PULSE_SERVER}" \
+		--env DBUS_SESSION_BUS_ADDRESS="${DBUS_SESSION_BUS_ADDRESS}"
+
+	start-stop-daemon --start --background --exec /usr/bin/pipewire-pulse \
+		--env XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR}" \
+		--env PULSE_RUNTIME_PATH="${PULSE_RUNTIME_PATH}" \
+		--env PULSE_SERVER="${PULSE_SERVER}" \
+		--env DBUS_SESSION_BUS_ADDRESS="${DBUS_SESSION_BUS_ADDRESS}"
 }
 
 stop() {
