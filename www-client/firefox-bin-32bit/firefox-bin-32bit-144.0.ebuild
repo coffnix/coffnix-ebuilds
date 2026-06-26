@@ -127,7 +127,7 @@ l10n_zh-TW? ( https://ftp.mozilla.org/pub/firefox/releases/144.0/linux-i686/xpi/
 LICENSE="MPL-2.0 GPL-2 LGPL-2.1"
 SLOT="0"
 KEYWORDS="*"
-IUSE="i686 amd64 +alsa +ffmpeg geckodriver +pulseaudio selinux wayland startup-notification
+IUSE="+i686 amd64 +alsa +ffmpeg geckodriver +pulseaudio selinux wayland startup-notification
 l10n_ach l10n_af l10n_an l10n_ar l10n_ast l10n_az l10n_be l10n_bg l10n_bn l10n_br
 l10n_bs l10n_ca-valencia l10n_ca l10n_cak l10n_cs l10n_cy l10n_da l10n_de l10n_dsb
 l10n_el l10n_en-CA l10n_en-GB l10n_en-US l10n_eo l10n_es-AR l10n_es-CL l10n_es-ES
