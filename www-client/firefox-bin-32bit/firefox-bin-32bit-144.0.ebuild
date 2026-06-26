@@ -20,7 +20,7 @@ inherit desktop pax-utils xdg
 DESCRIPTION="Firefox Web Browser (stable)"
 HOMEPAGE="https://www.mozilla.org/en-US/firefox/"
 SRC_URI="
-amd64? ( https://ftp.mozilla.org/pub/firefox/releases/144.0/linux-i686/en-US/firefox-144.0.tar.xz -> firefox-bin_i686-144.0.tar.xz )
+i686? ( https://ftp.mozilla.org/pub/firefox/releases/144.0/linux-i686/en-US/firefox-144.0.tar.xz -> firefox-bin_i686-144.0.tar.xz )
 l10n_ach? ( https://ftp.mozilla.org/pub/firefox/releases/144.0/linux-i686/xpi/ach.xpi -> firefox_i686-144.0-ach.xpi )
 l10n_af? ( https://ftp.mozilla.org/pub/firefox/releases/144.0/linux-i686/xpi/af.xpi -> firefox_i686-144.0-af.xpi )
 l10n_an? ( https://ftp.mozilla.org/pub/firefox/releases/144.0/linux-i686/xpi/an.xpi -> firefox_i686-144.0-an.xpi )
