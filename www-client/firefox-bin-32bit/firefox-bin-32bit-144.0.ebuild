@@ -275,7 +275,7 @@ src_install() {
 	done
 	 # Install menu
 	local app_name="Mozilla Firefox (bin)"
-	local desktop_file="${FILESDIR}/${PN}.desktop"
+	local desktop_file="${FILESDIR}/firefox-bin.desktop"
 	local desktop_filename="${PN}.desktop"
 	local exec_command="${PN}"
 	local icon="${PN}"
