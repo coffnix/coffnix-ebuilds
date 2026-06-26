@@ -1,0 +1,34 @@
+#!/sbin/openrc-run
+
+description="PipeWire, WirePlumber and PulseAudio compatibility server"
+
+pidfile="/run/${RC_SVCNAME}.pid"
+command="/usr/bin/pipewire"
+command_background="yes"
+command_user="root"
+
+export XDG_RUNTIME_DIR="/run/pipewire"
+export DBUS_SESSION_BUS_ADDRESS="unix:path=/run/pipewire/dbus-session-bus"
+
+start_pre() {
+	checkpath -d -m 0700 -o root:root /run/pipewire
+	if [ ! -S /run/pipewire/dbus-session-bus ]; then
+		dbus-daemon --session --fork --address="${DBUS_SESSION_BUS_ADDRESS}"
+	fi
+}
+
+start_post() {
+	start-stop-daemon --start --background --exec /usr/bin/wireplumber --env XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR}" --env DBUS_SESSION_BUS_ADDRESS="${DBUS_SESSION_BUS_ADDRESS}"
+	start-stop-daemon --start --background --exec /usr/bin/pipewire-pulse --env XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR}" --env DBUS_SESSION_BUS_ADDRESS="${DBUS_SESSION_BUS_ADDRESS}"
+}
+
+stop() {
+	start-stop-daemon --stop --exec /usr/bin/pipewire-pulse
+	start-stop-daemon --stop --exec /usr/bin/wireplumber
+	start-stop-daemon --stop --exec /usr/bin/pipewire
+}
+
+depend() {
+	need dbus
+	after elogind
+}
