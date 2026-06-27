@@ -30,6 +30,7 @@ RDEPEND="media-libs/alsa-lib
 	sys-apps/dbus
 	sys-libs/readline:=
 	sys-libs/ncurses:=
+	media-video/wireplumber
 	virtual/libintl
 	virtual/libudev
 	bluetooth? (
