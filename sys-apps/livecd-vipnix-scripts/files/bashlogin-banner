@@ -44,12 +44,16 @@ if [ -z "$BITS" ]; then
 fi
 OS_LOGO="/etc/vipnix/logo.ascii"
 OS_LOGO_SMALL="/etc/vipnix/logo.ascii"
-LOCAL_RESOLUTION="$(fbset -s | grep mode -w | awk '{print $2}' | sed s,'\"',,g | cut -dx -f1)"
+if [ -c /dev/fb0 ]; then
+    LOCAL_RESOLUTION="$(fbset -s 2>/dev/null | awk '/^mode/ {gsub(/"/,"",$2); split($2,a,"x"); print a[1]}')"
 
-if [ ${LOCAL_RESOLUTION} -le 1440 ];then
-	OS_LOGO_SET="${OS_LOGO_SMALL}"
+    if [ -n "${LOCAL_RESOLUTION}" ] && [ "${LOCAL_RESOLUTION}" -le 1440 ]; then
+        OS_LOGO_SET="${OS_LOGO_SMALL}"
+    else
+        OS_LOGO_SET="${OS_LOGO}"
+    fi
 else
-	OS_LOGO_SET="${OS_LOGO}"
+    OS_LOGO_SET="${OS_LOGO_SMALL}"
 fi
 
 sbctl status &> /dev/null

@@ -4,11 +4,11 @@ EAPI=7
 
 inherit linux-info
 
-DESCRIPTION="Gentoo LiveCD tools for autoconfiguration of hardware"
-HOMEPAGE="https://gitweb.gentoo.org/proj/livecd-tools.git/"
+DESCRIPTION="Vipnix LiveCD tools for autoconfiguration of hardware"
+HOMEPAGE="https://vipnix.com.br"
 
-SRC_URI="https://gitweb.gentoo.org/proj/livecd-tools.git/snapshot/${P}.tar.bz2"
-KEYWORDS="amd64"
+SRC_URI=""
+KEYWORDS="*"
 
 SLOT="0"
 LICENSE="GPL-2"
@@ -21,6 +21,8 @@ RDEPEND="
 	sys-apps/pciutils
 "
 
+S="${WORKDIR}"
+
 pkg_setup() {
 	ewarn "This package is designed for use on the LiveCD only and will do"
 	ewarn "unspeakably horrible and unexpected things on a normal system."
@@ -31,9 +33,9 @@ pkg_setup() {
 }
 
 src_install() {
-	doconfd conf.d/*
-	doinitd init.d/*
-	dosbin net-setup
+	doconfd "${FILESDIR}"/conf.d/*
+	doinitd "${FILESDIR}"/init.d/*
+	dosbin "${FILESDIR}"/net-setup
 	into /
-	dosbin livecd-functions.sh
+	dosbin "${FILESDIR}"/livecd-functions.sh
 }
