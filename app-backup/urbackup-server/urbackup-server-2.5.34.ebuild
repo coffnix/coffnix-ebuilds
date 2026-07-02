@@ -28,7 +28,7 @@ Default web-gui URL is http://localhost:55414/\\n\\n"
 
 pkg_setup() {
 	enewgroup urbackup
-	enewuser urbackup -1 -1 /var/lib/urbackup urbackup -s /sbin/nologin
+	enewuser urbackup -1 -1 /var/lib/urbackup urbackup
 }
 
 src_prepare() {

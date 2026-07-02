@@ -16,7 +16,7 @@ S="${WORKDIR}/${P}.0"
 LICENSE="AGPL-3+"
 SLOT="0"
 KEYWORDS="*"
-IUSE="debug hardened nls X zlib zstd"
+IUSE="debug hardened nls X zlib +zstd"
 
 RDEPEND="app-arch/zstd:=
 	dev-db/sqlite:3
@@ -32,7 +32,7 @@ PATCHES=( "${FILESDIR}/${PN}"-2.5.25-gcc13.patch )
 
 pkg_setup() {
 	enewgroup urbackup
-	enewuser urbackup -1 -1 /var/lib/urbackup urbackup -s /sbin/nologin
+	enewuser urbackup -1 -1 /var/lib/urbackup urbackup
 }
 
 src_configure() {
