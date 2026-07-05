@@ -10,7 +10,7 @@ HOMEPAGE="https://github.com/openzfs/zfs"
 MY_PV="${PV/_rc/-rc}"
 SRC_URI="https://github.com/openzfs/zfs/releases/download/zfs-${MY_PV}/zfs-${MY_PV}.tar.gz"
 KEYWORDS="*"
-ZFS_KERNEL_COMPAT="7.0"
+ZFS_KERNEL_COMPAT="7.1"
 
 LICENSE="CDDL MIT debug? ( GPL-2+ )"
 SLOT="0"
@@ -30,6 +30,10 @@ BDEPEND="
 RESTRICT="debug? ( strip ) test"
 
 DOCS=( AUTHORS COPYRIGHT META README.md )
+
+PATCHES=(
+	"${FILESDIR}"/maximum-7-1-kernel.patch
+)
 
 pkg_setup() {
 	linux-info_pkg_setup

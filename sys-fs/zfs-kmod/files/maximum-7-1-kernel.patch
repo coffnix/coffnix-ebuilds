@@ -1,0 +1,9 @@
+--- a/META
++++ b/META
+@@ -5,5 +5,5 @@
+ Release-Tags:  relext
+ License:       CDDL
+ Author:        OpenZFS
+-Linux-Maximum: 7.0
++Linux-Maximum: 7.1
+ Linux-Minimum: 4.18
