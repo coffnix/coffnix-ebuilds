@@ -166,7 +166,7 @@ src_prepare() {
 	epatch "${FILESDIR}"/latest/mcelog.patch || die
 
 	# patches for this particular branch
-	epatch "${FILESDIR}"/6.16+/more-ISA-levels-and-uarches-for-kernel-6.16+.patch || die
+	#epatch "${FILESDIR}"/6.16+/more-ISA-levels-and-uarches-for-kernel-6.16+.patch || die
 
 	if use savedconfig; then
 		einfo Restoring saved .config ...
