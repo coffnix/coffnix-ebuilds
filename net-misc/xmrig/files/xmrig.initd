@@ -19,6 +19,7 @@ retry="SIGTERM/15/SIGKILL/5"
 command_user="root:root"
 umask="007"
 
+#	--cpu-affinity=0xff \
 start_stop_daemon_args="--make-pidfile --pidfile ${pidfile}"
 command_args="\
 	-l ${XMRIG_LOG} \
@@ -30,7 +31,6 @@ command_args="\
 	--rig-id=${XMRIG_RIGID} \
 	--randomx-1gb-pages \
 	--threads=${XMRIG_THREADS} \
-	--cpu-affinity=0xff \
 	--cpu-priority=${XMRIG_THREADS} \
 	--cpu-no-yield \
 	--randomx-init=${XMRIG_THREADS} \
