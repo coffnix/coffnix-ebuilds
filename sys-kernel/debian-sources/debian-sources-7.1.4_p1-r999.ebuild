@@ -5,12 +5,13 @@ EAPI=6
 
 inherit check-reqs eutils ego savedconfig
 
-SLOT=sid/7.0.3_p1
+SLOT="sid/${PV}"
 
 # NOTE: When updating: use the version from Debian testing (sid)
 # https://packages.debian.org/sid/linux-source
-DEB_PATCHLEVEL="1"
-KERNEL_TRIPLET="7.0.3"
+DEB_PATCHLEVEL="${PV##*_p}"
+KERNEL_TRIPLET="${PV%%_p*}"
+
 
 # like "_p1-r1"
 #VERSION_SUFFIX="_p${DEB_PATCHLEVEL}"
@@ -165,7 +166,7 @@ src_prepare() {
 	epatch "${FILESDIR}"/latest/mcelog.patch || die
 
 	# patches for this particular branch
-	epatch "${FILESDIR}"/6.16+/more-ISA-levels-and-uarches-for-kernel-6.16+.patch || die
+	epatch "${FILESDIR}"/7.1.x+/more-ISA-levels-and-uarches-for-kernel-7.1.x+.patch || die
 
 	if use savedconfig; then
 		einfo Restoring saved .config ...
@@ -344,47 +345,51 @@ pkg_postinst() {
 
 	# Prevent kernel and modules erasure during upgrade.
 	if use binary; then
-		# first rename the initramfs
+		INITRAMFS_GRUB_NAME="initramfs-${KERN_ARCH}-${MACARONI_KVER}-${MACARONI_KSUFFIX}.img"
+
 		if use savedconfig; then
-			if [[ -f "/boot/initramfs-${KERN_SUFFIX}" ]]; then
-				mv /boot/initramfs-${KERN_SUFFIX}{,.old} || die
+			if [[ -f "/boot/${INITRAMFS_GRUB_NAME}" ]]; then
+				if [[ -f "/boot/${INITRAMFS_GRUB_NAME}.old" ]]; then
+					rm "/boot/${INITRAMFS_GRUB_NAME}.old" || die
+				fi
+				einfo "Preserving: mv /boot/${INITRAMFS_GRUB_NAME} /boot/${INITRAMFS_GRUB_NAME}.old"
+				mv "/boot/${INITRAMFS_GRUB_NAME}" "/boot/${INITRAMFS_GRUB_NAME}.old" || die
+			fi
+		else
+			if [[ -f "/boot/${INITRAMFS_GRUB_NAME}" ]]; then
+				rm "/boot/${INITRAMFS_GRUB_NAME}" || die
 			fi
 		fi
-		# then rename everything else, and copy the new files into place
-		for i in {vmlinuz,System.map,config}; do
+
+		for i in vmlinuz System.map config; do
 			if [[ -f "/boot/$i-${KERN_SUFFIX}" ]]; then
-				# USE=savedconfig means the config might have changed!
-				# In that case, keep the old kernel around, for safety.
 				if use savedconfig; then
-					if [[ -f /boot/$i-${KERN_SUFFIX}.old ]]; then
-						rm /boot/$i-${KERN_SUFFIX}.old
+					if [[ -f "/boot/$i-${KERN_SUFFIX}.old" ]]; then
+						rm "/boot/$i-${KERN_SUFFIX}.old" || die
 					fi
-					einfo "Preserving: mv /boot/$i-${KERN_SUFFIX}{,.old}"
-					mv /boot/$i-${KERN_SUFFIX}{,.old} || die
+					einfo "Preserving: mv /boot/$i-${KERN_SUFFIX} /boot/$i-${KERN_SUFFIX}.old"
+					mv "/boot/$i-${KERN_SUFFIX}" "/boot/$i-${KERN_SUFFIX}.old" || die
 				else
-					rm /boot/$i-${KERN_SUFFIX} || die
+					rm "/boot/$i-${KERN_SUFFIX}" || die
 				fi
 			fi
-			mv /boot/$i-${KERN_SUFFIX}{.tmp,} || die
+			mv "/boot/$i-${KERN_SUFFIX}.tmp" "/boot/$i-${KERN_SUFFIX}" || die
 		done
+
 		if [[ -d "/lib/modules/${MOD_DIR_NAME}" ]]; then
-			# USE=savedconfig means the config might have changed!
-			# In that case, keep the old modules around, for safety.
 			if use savedconfig; then
 				if [[ -d "/lib/modules/${MOD_DIR_NAME}.old" ]]; then
-					rm -r /lib/modules/${MOD_DIR_NAME}.old
+					rm -r "/lib/modules/${MOD_DIR_NAME}.old" || die
 				fi
-				einfo "Preserving: mv /lib/modules/${MOD_DIR_NAME}{,.old}"
-				mv /lib/modules/${MOD_DIR_NAME}{,.old} || die
+				einfo "Preserving: mv /lib/modules/${MOD_DIR_NAME} /lib/modules/${MOD_DIR_NAME}.old"
+				mv "/lib/modules/${MOD_DIR_NAME}" "/lib/modules/${MOD_DIR_NAME}.old" || die
 			else
-				rm -r /lib/modules/${MOD_DIR_NAME} || die
+				rm -r "/lib/modules/${MOD_DIR_NAME}" || die
 			fi
 		fi
-		mv /lib/modules/${MOD_DIR_NAME}{.tmp,} || die
+		mv "/lib/modules/${MOD_DIR_NAME}.tmp" "/lib/modules/${MOD_DIR_NAME}" || die
 	fi
 
-	# Finally, generate a new initramfs with dracut, via whip
-	# NOTE: For now, the initramfs is generic.
 	if use binary && use dracut; then
 		dracut_modules_pre="
 			$(use lvm && echo lvm)
@@ -396,13 +401,29 @@ pkg_postinst() {
 		dracut_drivers_pre="
 			$(use luks && echo dm-crypt)
 		"
+
+		INITRAMFS_WHIP_NAME="initramfs-${KERN_SUFFIX}"
+		INITRAMFS_GRUB_NAME="initramfs-${KERN_ARCH}-${MACARONI_KVER}-${MACARONI_KSUFFIX}.img"
+
 		DRACUT_ADD_MODULES="$(echo ${dracut_modules_pre} | xargs)" \
 		DRACUT_ADD_DRIVERS="$(echo ${dracut_drivers_pre} | xargs)" \
 		KVER="${KERN_ARCH}-${MACARONI_KVER}" \
 		KTYPE="${MACARONI_KTYPE}" \
 		KSUFFIX="${MACARONI_KSUFFIX}" \
-		KMODDIR="/lib/modules/$MOD_DIR_NAME" \
+		KMODDIR="/lib/modules/${MOD_DIR_NAME}" \
 		whip h initramfs.generate_with_dracut || die
+
+		if [[ -f "/boot/${INITRAMFS_WHIP_NAME}" ]]; then
+			mv "/boot/${INITRAMFS_WHIP_NAME}" "/boot/${INITRAMFS_GRUB_NAME}" || die
+		elif [[ -f "/boot/${INITRAMFS_GRUB_NAME}" ]]; then
+			:
+		else
+			eerror "Initramfs not found: /boot/${INITRAMFS_WHIP_NAME}"
+			eerror "Expected final path: /boot/${INITRAMFS_GRUB_NAME}"
+			die "initramfs generation failed"
+		fi
+
+		chmod 644 "/boot/${INITRAMFS_GRUB_NAME}" || die
 	fi
 
 	if use binary && [[ -h "${ROOT}"usr/src/linux ]]; then
@@ -420,10 +441,9 @@ pkg_postinst() {
 	fi
 
 	if [ -e ${ROOT}lib/modules ]; then
-		depmod -a $MOD_DIR_NAME || die
+		depmod -a ${MOD_DIR_NAME} || die
 	fi
 
-	# Update bootloader and unmount /boot
 	ego_pkg_postinst
 }
 
