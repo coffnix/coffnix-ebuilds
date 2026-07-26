@@ -9,8 +9,8 @@ LICENSE="Apache-2.0"
 SLOT="0"
 KEYWORDS="*"
 RDEPEND="|| (
-	  ~dev-lang/rust-bin-1.96.0
-	  ~dev-lang/rust-1.96.0
+	  ~dev-lang/rust-bin-${PV}
+	  ~dev-lang/rust-${PV}
 	)
 	
 "
