@@ -404,17 +404,18 @@ pkg_postinst() {
 	ego_pkg_preinst
 
 	# Back up existing initramfs as .old before generating a new one
-	# (matches kernel backup pattern: vmlinuz, System.map, config)
 	if use binary && use dracut; then
-		if [[ -f "/boot/initramfs-${KERN_SUFFIX}" ]]; then
-			rm -f "/boot/initramfs-${KERN_SUFFIX}.old"
-			einfo "Preserving: mv /boot/initramfs-${KERN_SUFFIX}{,.old}"
-			mv /boot/initramfs-${KERN_SUFFIX}{,.old} || die
+		INITRAMFS_GRUB_NAME="initramfs-${KERN_ARCH}-${MACARONI_KVER}-${MACARONI_KSUFFIX}.img"
+
+		if [[ -f "/boot/${INITRAMFS_GRUB_NAME}" ]]; then
+			rm -f "/boot/${INITRAMFS_GRUB_NAME}.old"
+			einfo "Preserving: mv /boot/${INITRAMFS_GRUB_NAME} /boot/${INITRAMFS_GRUB_NAME}.old"
+			mv "/boot/${INITRAMFS_GRUB_NAME}" "/boot/${INITRAMFS_GRUB_NAME}.old" || die
 		fi
 	fi
 
 	# Pattern: install everything as .tmp in src_install, move to real names here.
-		# Portage tracks .tmp files; on uninstall it removes them, but the real
+	# Portage tracks .tmp files; on uninstall it removes them, but the real
 	# files (moved into place by postinst) are not tracked by portage.
 	# If the destination already exists, erase stale .old first, then back up as .old.
 	if use binary; then
@@ -429,6 +430,7 @@ pkg_postinst() {
 				mv "/boot/${i}-${KERN_SUFFIX}.tmp" "/boot/${i}-${KERN_SUFFIX}" || die
 			fi
 		done
+
 		# Move modules from .tmp to real name (back up existing as .old)
 		local tmp_moddir
 		tmp_moddir="$(ls -d /lib/modules/*.tmp 2>/dev/null | head -1)"
@@ -455,13 +457,29 @@ pkg_postinst() {
 		dracut_drivers_pre="
 			$(use luks && echo dm-crypt)
 		"
+
+		INITRAMFS_WHIP_NAME="initramfs-${KERN_SUFFIX}"
+		INITRAMFS_GRUB_NAME="initramfs-${KERN_ARCH}-${MACARONI_KVER}-${MACARONI_KSUFFIX}.img"
+
 		DRACUT_ADD_MODULES="$(echo ${dracut_modules_pre} | xargs)" \
 		DRACUT_ADD_DRIVERS="$(echo ${dracut_drivers_pre} | xargs)" \
 		KVER="${KERN_ARCH}-${MACARONI_KVER}" \
 		KTYPE="${MACARONI_KTYPE}" \
 		KSUFFIX="${MACARONI_KSUFFIX}" \
-		KMODDIR="/lib/modules/$MOD_DIR_NAME" \
-		whip h initramfs.generate_with_dracut || ewarn "whip initramfs generation failed (non-fatal)"
+		KMODDIR="/lib/modules/${MOD_DIR_NAME}" \
+		whip h initramfs.generate_with_dracut || die
+
+		if [[ -f "/boot/${INITRAMFS_WHIP_NAME}" ]]; then
+			mv "/boot/${INITRAMFS_WHIP_NAME}" "/boot/${INITRAMFS_GRUB_NAME}" || die
+		elif [[ -f "/boot/${INITRAMFS_GRUB_NAME}" ]]; then
+			:
+		else
+			eerror "Initramfs not found: /boot/${INITRAMFS_WHIP_NAME}"
+			eerror "Expected final path: /boot/${INITRAMFS_GRUB_NAME}"
+			die "initramfs generation failed"
+		fi
+
+		chmod 644 "/boot/${INITRAMFS_GRUB_NAME}" || die
 	fi
 
 	if use binary && [[ -h /usr/src/linux ]]; then
@@ -479,12 +497,11 @@ pkg_postinst() {
 	fi
 
 	if [ -e /lib/modules ]; then
-		depmod -a $MOD_DIR_NAME || die
+		depmod -a "${MOD_DIR_NAME}" || die
 	fi
 
 	# Update bootloader and unmount /boot
 	ego_pkg_postinst
 }
-
 
 # vim: filetype=ebuild
