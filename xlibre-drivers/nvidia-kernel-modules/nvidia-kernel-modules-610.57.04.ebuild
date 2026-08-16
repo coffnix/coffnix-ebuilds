@@ -17,6 +17,7 @@ IUSE="+kms +uvm videogroup open-kernel"
 DEPEND="
 	~xlibre-drivers/nvidia-drivers-${PV}
 	virtual/linux-sources
+	dev-util/pahole
 "
 NVDRIVERS_DIR="${EPREFIX}/opt/nvidia/nvidia-drivers-${PV}"
 S="${WORKDIR}/kernel"
