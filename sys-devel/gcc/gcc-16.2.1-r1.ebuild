@@ -1,99 +1,67 @@
 # Distributed under the terms of the GNU General Public License v2
+# Autogen by MARK Devkit
 
-# See README.txt for usage notes.
+EAPI=7
+inherit eutils pax-utils toolchain-enable git-r3
 
-EAPI=6
-
-inherit multilib-build eutils pax-utils toolchain-enable git-r3
-
-RESTRICT="strip"
-FEATURES=${FEATURES/multilib-strict/}
-
-GCC_MAJOR="${PV%%.*}"
-
-IUSE="+cxx d go +fortran objc objc++ objc-gc " # Languages
-IUSE="$IUSE test" # Run tests
-IUSE="$IUSE doc nls vanilla multilib" # docs/i18n/system flags
-IUSE="$IUSE openmp altivec pch generic_host jit" # Optimizations/features flags
-IUSE="$IUSE bootstrap bootstrap-lean bootstrap-profiled bootstrap-lto bootstrap-O3" # Bootstrap flags
-IUSE="$IUSE libssp +ssp" # Base hardening flags
-IUSE="$IUSE +pie +vtv link_now ssp_all" # Extra hardening flags
-[ ${GCC_MAJOR} -ge 8 ] && IUSE="$IUSE +stack_clash_protection" # Stack clash protector added in gcc-8
-IUSE="$IUSE sanitize dev_extra_warnings" # Dev flags
-REQUIRED_USE="
-bootstrap-profiled? ( bootstrap )
+DESCRIPTION="The GNU Compiler Collection"
+HOMEPAGE="https://gcc.gnu.org"
+SRC_URI="
+https://ftp.icm.edu.pl/pub/unix/languages/programming/gcc/snapshots/LATEST-16/gcc-16-20260815.tar.xz -> gcc-16-20260815.tar.xz
+https://mirrors.kernel.org/gnu/gmp/gmp-6.3.0.tar.xz -> gmp-6.3.0.tar.xz
+https://www.mpfr.org/mpfr-4.2.2/mpfr-4.2.2.tar.xz -> mpfr-4.2.2.tar.xz
+https://mirrors.kernel.org/gnu/mpc/mpc-1.3.1.tar.gz -> mpc-1.3.1.tar.gz"
+LICENSE="GPL-3+ LGPL-3+ || ( GPL-3+ libgcc libstdc++ gcc-runtime-library-exception-3.1 ) FDL-1.3+"
+SLOT="16"
+KEYWORDS="*"
+IUSE="+cxx d go +fortran objc objc++ objc-gc test doc nls vanilla openmp altivec pch generic_host jit bootstrap bootstrap-lean bootstrap-profiled bootstrap-lto bootstrap-O3 libssp +ssp +pie +vtv link_now ssp_all sanitize dev_extra_warnings +stack_clash_protection checking_no checking_all checking_yes checking_release stage1_checking_no stage1_checking_all stage1_checking_yes stage1_checking_release checking_assert checking_runtime checking_misc checking_tree checking_gc checking_rtlflag checking_df checking_fold checking_gcac checking_rtl checking_valgrind checking_extra stage1_checking_assert stage1_checking_runtime stage1_checking_misc stage1_checking_tree stage1_checking_gc stage1_checking_rtlflag stage1_checking_df stage1_checking_fold stage1_checking_gcac stage1_checking_rtl stage1_checking_valgrind stage1_checking_extra"
+REQUIRED_USE="bootstrap-profiled? ( bootstrap )
 bootstrap-lean? ( bootstrap )
 bootstrap-lto? ( bootstrap )
 bootstrap-O3? ( bootstrap )
-!bootstrap? ( !bootstrap-lean !bootstrap-profiled !bootstrap-lto !bootstrap-O3 )"
-# Handle internal self checking options
-CHECKS_RELEASE="assert runtime"
-CHECKS_YES="${CHECKS_RELEASE} misc tree gc rtlflag"
-CHECKS_EXTRA="$( [ ${GCC_MAJOR} -ge 8 ] && printf -- "extra" )"
-CHECKS_VALGRIND="valgrind"
-CHECKS_ALL="${CHECKS_YES} df fold gcac rtl ${CHECKS_EXTRA}"
-
-for _check in no release yes all ${CHECKS_ALL} ${CHECKS_VALGRIND}; do
-	IUSE="${IUSE} checking_${_check} stage1_checking_${_check}"
-done
-
-SLOT="${PV}"
-
-# GCC release archive
-GCC_A="gcc-${PV}.tar.xz"
-SRC_URI="https://ftpmirror.gnu.org/gnu/gcc/${P}/${GCC_A}"
-
-# Math libraries:
-GMP_VER="6.2.1"
-GMP_EXTRAVER=""
-SRC_URI="$SRC_URI mirror://gnu/gmp/gmp-${GMP_VER}${GMP_EXTRAVER}.tar.xz"
-
-MPFR_VER="4.2.0"
-MPFR_PATCH_VER=""
-SRC_URI="$SRC_URI http://www.mpfr.org/mpfr-${MPFR_VER}/mpfr-${MPFR_VER}.tar.xz"
-MPFR_PATCH_FILE="${MPFR_PATCH_VER:+${FILESDIR}/mpfr/mpfr-${MPFR_VER}_to_${MPFR_VER}-p${MPFR_PATCH_VER}.patch}"
-
-MPC_VER="1.3.1"
-SRC_URI="$SRC_URI http://ftp.gnu.org/gnu/mpc/mpc-${MPC_VER}.tar.gz"
-
-DESCRIPTION="The GNU Compiler Collection"
-
-LICENSE="GPL-3+ LGPL-3+ || ( GPL-3+ libgcc libstdc++ gcc-runtime-library-exception-3.1 ) FDL-1.3+"
-KEYWORDS="*"
-
-RDEPEND="
-	sys-libs/zlib[static-libs]
+!bootstrap? ( !bootstrap-lean !bootstrap-profiled !bootstrap-lto !bootstrap-O3 )
+"
+RESTRICT="strip"
+# Commons depends
+CDEPEND="sys-libs/zlib[static-libs]
 	nls? ( sys-devel/gettext[static-libs] )
 	virtual/libiconv
 	objc-gc? ( >=dev-libs/boehm-gc-7.6[static-libs] )
+	
 "
-DEPEND="${RDEPEND}
+DEPEND="${CDEPEND}
 	>=sys-devel/bison-1.875
 	>=sys-devel/flex-2.5.4
 	>=sys-devel/binutils-2.36.1_p3
 	elibc_glibc? ( >=sys-libs/glibc-2.8 )
-	test? ( dev-util/dejagnu sys-devel/autogen )"
-
-PDEPEND="
-	>=sys-devel/gcc-config-1.5
+	test? ( dev-util/dejagnu sys-devel/autogen )
+	
+"
+PDEPEND=">=sys-devel/gcc-config-1.5
 	>=sys-devel/libtool-2.4.3
 	dev-cpp/tbb
+	elibc_glibc? ( >=sys-libs/glibc-2.8 )
+	
 "
-# dev-cpp/tbb is required for C++17 support. See FL-6566.
-
-PDEPEND="${PDEPEND} elibc_glibc? ( >=sys-libs/glibc-2.8 )"
-
-tc-is-cross-compiler() {
-	[[ ${CBUILD:-${CHOST}} != ${CHOST} ]]
-}
-
-is_crosscompile() {
-	[[ ${CHOST} != ${CTARGET} ]]
-}
+#S="${WORKDIR}/gcc-${PV}"
+S="${WORKDIR}/gcc-16-20260815"
+CHECKS_ALL="all"
+CHECKS_YES="yes"
+CHECKS_RELEASE="release"
+CHECKS_EXTRA="extra"
+CHECKS_VALGRIND="valgrind"
+GCC_SVN_PATCH=""
+GMP_VER="6.3.0"
+GMP_EXTRAVER=""
+MPFR_VER="4.2.2"
+MPFR_PATCH_VER=""
+MPC_VER="1.3.1"
+#GCC_A="gcc-${PV%%-r*}.tar.xz"
+GCC_A="gcc-16-20260815.tar.xz"
 
 pkg_setup() {
 	# Capture -march -mcpu and -mtune options to pass to build later.
-	MARCH="${MARCH:-$(printf -- "${CFLAGS}" | sed -rne 's/.*-march="?([-_[:alnum:]]+).*/\1/p')}"
+	MARCH="${MARCH:-$(printf -- "${CFLAGS}" | sed -rne 's/.*-march="?([._[:alnum:]-]+).*/\1/p')}"
 	MCPU="${MCPU:-$(printf -- "${CFLAGS}" | sed -rne 's/.*-mcpu="?([-_[:alnum:]]+).*/\1/p')}"
 	MTUNE="${MTUNE:-$(printf -- "${CFLAGS}" | sed -rne 's/.*-mtune="?([-_[:alnum:]]+).*/\1/p')}"
 	MFPU="${MFPU:-$(printf -- "${CFLAGS}" | sed -rne 's/.*-mfpu="?([-_[:alnum:]]+).*/\1/p')}"
@@ -113,15 +81,10 @@ pkg_setup() {
 	unset LANGUAGES #265283
 	export PREFIX=/usr
 	CTARGET=${CTARGET:-${CHOST}}
-	[[ ${CATEGORY} == cross-* ]] && CTARGET=${CATEGORY/cross-}
 	GCC_BRANCH_VER=${SLOT}
 	GCC_CONFIG_VER=${PV}
 	DATAPATH=${PREFIX}/share/gcc-data/${CTARGET}/${GCC_CONFIG_VER}
-	if is_crosscompile; then
-		BINPATH=${PREFIX}/${CHOST}/${CTARGET}/gcc-bin/${GCC_CONFIG_VER}
-	else
-		BINPATH=${PREFIX}/${CTARGET}/gcc-bin/${GCC_CONFIG_VER}
-	fi
+	BINPATH=${PREFIX}/${CTARGET}/gcc-bin/${GCC_CONFIG_VER}
 
 	export CFLAGS="${GCC_BUILD_CFLAGS:--O2 -pipe}"
 	export FFLAGS="$CFLAGS"
@@ -143,7 +106,7 @@ pkg_setup() {
 
 	if [ -n "${GCC_TARGET}" ] ; then
 		:
-	elif ! is_crosscompile && use bootstrap ; then
+	elif use bootstrap ; then
 		if use bootstrap-profiled ; then
 			GCC_TARGET="profiledbootstrap"
 		else
@@ -164,11 +127,11 @@ pkg_setup() {
 
 src_unpack() {
 	unpack $GCC_A
-	( unpack mpc-${MPC_VER}.tar.gz && mv ${WORKDIR}/mpc-${MPC_VER} ${S}/mpc ) || die "mpc setup fail"
-	( unpack mpfr-${MPFR_VER}.tar.xz && mv ${WORKDIR}/mpfr-${MPFR_VER} ${S}/mpfr ) || die "mpfr setup fail"
-	( unpack gmp-${GMP_VER}${GMP_EXTRAVER}.tar.xz && mv ${WORKDIR}/gmp-${GMP_VER} ${S}/gmp ) || die "gmp setup fail"
+	( unpack mpc-1.3.1.tar.gz && mv ${WORKDIR}/mpc-1.3.1 ${S}/mpc ) || die "mpc setup fail"
+	( unpack mpfr-4.2.2.tar.xz && mv ${WORKDIR}/mpfr-4.2.2 ${S}/mpfr ) || die "mpfr setup fail"
+	( unpack gmp-6.3.0.tar.xz && mv ${WORKDIR}/gmp-6.3.0 ${S}/gmp ) || die "gmp setup fail"
 
-	cd $S
+	cd "${S}"
 	mkdir ${WORKDIR}/objdir
 
 	if use jit; then
@@ -178,9 +141,6 @@ src_unpack() {
 
 
 src_prepare() {
-	# Run preparations for dependencies first
-	_gcc_prepare_mpfr
-
 	# Patch from release to svn branch tip for backports
 	if [ -n "${GCC_SVN_PATCH}" ]; then
 		eapply "${GCC_SVN_PATCH}" || die "gcc svn patch fail"
@@ -198,6 +158,7 @@ src_prepare() {
 		sed -i -e 's/\(install.*:\) install-.*recursive/\1/' "${S}"/libffi/Makefile.in || die
 		sed -i -e 's/\(install-data-am:\).*/\1/' "${S}"/libffi/include/Makefile.in || die
 
+
 		# We use --enable-version-specific-libs with ./configure. This
 		# option is designed to place all our libraries into a sub-directory
 		# rather than /usr/lib*.  However, this option, even through 4.8.0,
@@ -207,31 +168,52 @@ src_prepare() {
 
 		eapply "${FILESDIR}/gcc-4.6.4-fix-libgcc-s-path-with-vsrl.patch" || die "patch fail"
 
+		# Apply Gentoo patches when vanilla is not set
+		eapply "${FILESDIR}/gentoo-patches/gcc-16.2.0/01_all_default-fortify-source.patch" || die "gentoo patch 01_all_default-fortify-source.patch failed"
+		eapply "${FILESDIR}/gentoo-patches/gcc-16.2.0/02_all_default-warn-format-security.patch" || die "gentoo patch 02_all_default-warn-format-security.patch failed"
+		eapply "${FILESDIR}/gentoo-patches/gcc-16.2.0/03_all_default-warn-trampolines.patch" || die "gentoo patch 03_all_default-warn-trampolines.patch failed"
+		eapply "${FILESDIR}/gentoo-patches/gcc-16.2.0/04_all_nossp-on-nostdlib.patch" || die "gentoo patch 04_all_nossp-on-nostdlib.patch failed"
+		eapply "${FILESDIR}/gentoo-patches/gcc-16.2.0/05_all_alpha-mieee-default.patch" || die "gentoo patch 05_all_alpha-mieee-default.patch failed"
+		eapply "${FILESDIR}/gentoo-patches/gcc-16.2.0/06_all_ia64_note.GNU-stack.patch" || die "gentoo patch 06_all_ia64_note.GNU-stack.patch failed"
+		eapply "${FILESDIR}/gentoo-patches/gcc-16.2.0/08_all_libiberty-pic.patch" || die "gentoo patch 08_all_libiberty-pic.patch failed"
+		eapply "${FILESDIR}/gentoo-patches/gcc-16.2.0/09_all_esysroot.patch" || die "gentoo patch 09_all_esysroot.patch failed"
+		eapply "${FILESDIR}/gentoo-patches/gcc-16.2.0/10_all_sh-drop-sysroot-suffix.patch" || die "gentoo patch 10_all_sh-drop-sysroot-suffix.patch failed"
+		eapply "${FILESDIR}/gentoo-patches/gcc-16.2.0/11_all_ia64-TEXTREL.patch" || die "gentoo patch 11_all_ia64-TEXTREL.patch failed"
+		eapply "${FILESDIR}/gentoo-patches/gcc-16.2.0/14_all_respect-build-cxxflags.patch" || die "gentoo patch 14_all_respect-build-cxxflags.patch failed"
+		eapply "${FILESDIR}/gentoo-patches/gcc-16.2.0/15_all_DEF_GENTOO_GLIBCXX_ASSERTIONS.patch" || die "gentoo patch 15_all_DEF_GENTOO_GLIBCXX_ASSERTIONS.patch failed"
+		eapply "${FILESDIR}/gentoo-patches/gcc-16.2.0/20_all_libstdcxx-no-vtv.patch" || die "gentoo patch 20_all_libstdcxx-no-vtv.patch failed"
+		eapply "${FILESDIR}/gentoo-patches/gcc-16.2.0/22_all_default_ssp-buffer-size.patch" || die "gentoo patch 22_all_default_ssp-buffer-size.patch failed"
+		eapply "${FILESDIR}/gentoo-patches/gcc-16.2.0/23_all_DEF_GENTOO_ZNOW-z-now.patch" || die "gentoo patch 23_all_DEF_GENTOO_ZNOW-z-now.patch failed"
+		eapply "${FILESDIR}/gentoo-patches/gcc-16.2.0/24_all_DEF_GENTOO_SCP-fstack-clash-protection.patch" || die "gentoo patch 24_all_DEF_GENTOO_SCP-fstack-clash-protection.patch failed"
+		eapply "${FILESDIR}/gentoo-patches/gcc-16.2.0/26_all_enable-cet.patch" || die "gentoo patch 26_all_enable-cet.patch failed"
+		eapply "${FILESDIR}/gentoo-patches/gcc-16.2.0/28_all_drop_CFLAGS_sed.patch" || die "gentoo patch 28_all_drop_CFLAGS_sed.patch failed"
+		eapply "${FILESDIR}/gentoo-patches/gcc-16.2.0/29_all_msgfmt-libstdc++-link.patch" || die "gentoo patch 29_all_msgfmt-libstdc++-link.patch failed"
+		eapply "${FILESDIR}/gentoo-patches/gcc-16.2.0/30_all_tar_libstdc++-link.patch" || die "gentoo patch 30_all_tar_libstdc++-link.patch failed"
+		eapply "${FILESDIR}/gentoo-patches/gcc-16.2.0/32_all_time64.patch" || die "gentoo patch 32_all_time64.patch failed"
+		eapply "${FILESDIR}/gentoo-patches/gcc-16.2.0/33_all_PR80677-cross-limits.patch" || die "gentoo patch 33_all_PR80677-cross-limits.patch failed"
+		eapply "${FILESDIR}/gentoo-patches/gcc-16.2.0/34_all_time64_ssemath.patch" || die "gentoo patch 34_all_time64_ssemath.patch failed"
+		eapply "${FILESDIR}/gentoo-patches/gcc-16.2.0/35_all_checking-gc-use-heuristics.patch" || die "gentoo patch 35_all_checking-gc-use-heuristics.patch failed"
+		eapply "${FILESDIR}/gentoo-patches/gcc-16.2.0/36_all_no-afdo-testing.patch" || die "gentoo patch 36_all_no-afdo-testing.patch failed"
+		eapply "${FILESDIR}/gentoo-patches/gcc-16.2.0/37_all_PR66487-object-lifetime-instrumentation-for-Valgrind.patch" || die "gentoo patch 37_all_PR66487-object-lifetime-instrumentation-for-Valgrind.patch failed"
+		eapply "${FILESDIR}/gentoo-patches/gcc-16.2.0/38_all_hurd_linker_path.patch" || die "gentoo patch 38_all_hurd_linker_path.patch failed"
+		eapply "${FILESDIR}/gentoo-patches/gcc-16.2.0/76_all_PR117854-config-nvptx-fix-bashisms-with-gen-copyright.sh-use.patch" || die "gentoo patch 76_all_PR117854-config-nvptx-fix-bashisms-with-gen-copyright.sh-use.patch failed"
+		eapply "${FILESDIR}/gentoo-patches/gcc-16.2.0/86_all_PR122794-libtool.patch" || die "gentoo patch 86_all_PR122794-libtool.patch failed"
+
 		# Harden things up:
 		_gcc_prepare_harden
 	fi
 
-	is_crosscompile && _gcc_prepare_cross
-
-	# Must be called in src_prepare by EAPI6
+	# Must be called in src_prepare by EAPI6; applies PATCHES array
 	eapply_user
-}
-
-_gcc_prepare_mpfr() {
-	if [ -n "${MPFR_PATCH_VER}" ];  then
-		[ -f "${MPFR_PATCH_FILE}" ] || die "Couldn't find mpfr patch '${MPFR_PATCH_FILE}"
-		pushd "${S}/mpfr" > /dev/null || die "Couldn't change to mpfr source directory."
-		patch -N -Z -p1 < "${MPFR_PATCH_FILE}" || die "Failed to apply mpfr patch '${MPFR_PATCH_FILE}'."
-		popd > /dev/null
-	fi
 }
 
 _gcc_prepare_harden() {
 	local gcc_hard_flags=""
 
-	# Selectively enable features from hardening patches
+	# Selectively enable features from hardening patches
 	use ssp_all && gcc_hard_flags+=" -DENABLE_DEFAULT_SSP_ALL"
 	use link_now && gcc_hard_flags+=" -DENABLE_DEFAULT_LINK_NOW"
+	use stack_clash_protection && gcc_hard_flags+=" -DENABLE_DEFAULT_SCP"
 
 	sed -e '/^ALL_CFLAGS/iHARD_CFLAGS = ' \
 		-e 's|^ALL_CFLAGS = |ALL_CFLAGS = $(HARD_CFLAGS) |' \
@@ -242,29 +224,6 @@ _gcc_prepare_harden() {
 		-i "${S}"/gcc/Makefile.in
 
 	sed -i -e "/^HARD_CFLAGS = /s|=|= ${gcc_hard_flags} |" "${S}"/gcc/Makefile.in || die
-}
-
-_gcc_prepare_cross() {
-	case ${CTARGET} in
-		*-linux) TARGET_LIBC=no-idea;;
-		*-dietlibc) TARGET_LIBC=dietlibc;;
-		*-elf|*-eabi) TARGET_LIBC=newlib;;
-		*-freebsd*) TARGET_LIBC=freebsd-lib;;
-		*-gnu*) TARGET_LIBC=glibc;;
-		*-klibc) TARGET_LIBC=klibc;;
-		*-musl*) TARGET_LIBC=musl;;
-		*-uclibc*) TARGET_LIBC=uclibc;;
-		avr*) TARGET_LIBC=avr-libc;;
-	esac
-	export TARGET_LIBC
-
-	# if we don't tell it where to go, libcc1 stuff ends up in ${ROOT}/usr/lib (or rather dies colliding)
-	sed -e 's%cc1libdir = .*%cc1libdir = '"${ROOT}${PREFIX}"'/$(host_noncanonical)/$(target_noncanonical)/lib/$(gcc_version)%' \
-		-e 's%plugindir = .*%plugindir = '"${ROOT}${PREFIX}"'/lib/gcc/$(target_noncanonical)/$(gcc_version)/plugin%' \
-		-i "${WORKDIR}/${P}/libcc1"/Makefile.{am,in}
-	if [[ ${CTARGET} == avr* ]]; then
-		sed -e 's%native_system_header_dir=/usr/include%native_system_header_dir=/include%' -i "${WORKDIR}/${P}/gcc/config.gcc"
-	fi
 }
 
 gcc_conf_lang_opts() {
@@ -326,51 +285,19 @@ gcc_conf_arm_opts() {
 		armv7*) default_fpu="vfpv3-d16" ;;
 		amrv8*) default_fpu="fp-armv8" ;;
 	esac
-	
+
 	conf_gcc_arm+=" --with-float=$float"
 	[ -z "${MFPU}" ] && [ -n "${default_fpu}" ] && conf_gcc_arm+=" --with-fpu=${default_fpu}"
 
 	printf -- "${conf_gcc_arm}"
 }
 
-gcc_conf_cross_options() {
-	local conf_gcc_cross
-	conf_gcc_cross+=" --disable-libgomp --disable-bootstrap --enable-poison-system-directories"
-
-	if [[ ${CTARGET} == avr* ]]; then
-		conf_gcc_cross+=" --disable-__cxa_atexit"
-	else
-		conf_gcc_cross+=" --enable-__cxa_atexit"
-	fi
-
-	# Handle bootstrapping cross-compiler and libc in lock-step
-	if ! has_version ${CATEGORY}/${TARGET_LIBC}; then
-		# we are building with libc that is not installed:
-		conf_gcc_cross+=" --disable-shared --disable-libatomic --disable-threads --without-headers --disable-libstdcxx"
-	elif has_version "${CATEGORY}/${TARGET_LIBC}[headers-only]"; then
-		# libc installed, but has USE="crosscompile_opts_headers-only" to only install headers:
-		conf_gcc_cross+=" --disable-shared --disable-libatomic --with-sysroot=${PREFIX}/${CTARGET} --disable-libstdcxx"
-	else
-		# libc is installed:
-		conf_gcc_cross+=" --with-sysroot=${PREFIX}/${CTARGET} --enable-libstdcxx-time"
-	fi
-
-	printf -- "${conf_gcc_cross}"
-}
-
 src_configure() {
 
 	local confgcc
-	if is_crosscompile || tc-is-cross-compiler; then
-		confgcc+=" --target=${CTARGET}"
-	fi
-	if is_crosscompile; then
-		confgcc+="$(gcc_conf_cross_options)"
-	else
-		confgcc+=" --enable-threads=posix --enable-__cxa_atexit --enable-libstdcxx-time"
-		confgcc+=" $(use_enable openmp libgomp)"
-		confgcc+=" $(use_enable bootstrap) --enable-shared"
-	fi
+	confgcc+=" --enable-threads=posix --enable-__cxa_atexit --enable-libstdcxx-time"
+	confgcc+=" $(use_enable openmp libgomp)"
+	confgcc+=" $(use_enable bootstrap) --enable-shared"
 
 	[[ -n ${CBUILD} ]] && confgcc+=" --build=${CBUILD}"
 
@@ -389,10 +316,10 @@ src_configure() {
 	use nls && confgcc+=" --enable-nls --with-included-gettext" || confgcc+=" --disable-nls"
 
 	use generic_host || confgcc+="${MARCH:+ --with-arch=${MARCH}}${MCPU:+ --with-cpu=${MCPU}}${MTUNE:+ --with-tune=${MTUNE}}${MFPU:+ --with-fpu=${MFPU}}"
-	P= cd ${WORKDIR}/objdir && ../gcc-${PV}/configure \
+	P= cd ${WORKDIR}/objdir && "${S}"/configure \
 		${BUILD_CONFIG:+--with-build-config="${BUILD_CONFIG}"} \
 		$(use_enable libssp) \
-		$(use_enable multilib) \
+		--disable-multilib \
 		--enable-version-specific-runtime-libs \
 		--prefix=${PREFIX} \
 		--bindir=${BINPATH} \
@@ -409,17 +336,17 @@ src_configure() {
 		--enable-secureplt \
 		--enable-lto \
 		--with-system-zlib \
-		--with-bugurl=http://bugs.funtoo.org \
+		--with-bugurl=https://github.com/macaroni-os/mark-issues/issues \
 		--with-pkgversion="$branding" \
 		$(gcc_checking_opts stage1) $(gcc_checking_opts) \
 		$(gcc_conf_lang_opts) $(gcc_conf_arm_opts) $confgcc \
 		|| die "configure fail"
 
 	if use jit; then
-		P= cd ${WORKDIR}/objdir-jit && ../gcc-${PV}/configure \
+		P= cd ${WORKDIR}/objdir-jit && "${S}"/configure \
 				${BUILD_CONFIG:+--with-build-config="${BUILD_CONFIG}"} \
 				$(use_enable libssp) \
-				$(use_enable multilib) \
+				--disable-multilib \
 				--enable-version-specific-runtime-libs \
 				--prefix=${PREFIX} \
 				--bindir=${BINPATH} \
@@ -436,24 +363,12 @@ src_configure() {
 				--enable-secureplt \
 				--enable-lto \
 				--with-system-zlib \
-				--with-bugurl=http://bugs.funtoo.org \
+				--with-bugurl=https://github.com/macaroni-os/mark-issues/issues \
 				--with-pkgversion="$branding" \
 				$(gcc_checking_opts stage1) $(gcc_checking_opts) \
 				--enable-languages=jit --enable-host-shared --with-pic \
 				$(gcc_conf_arm_opts) $confgcc \
 				|| die "configure fail"
-	fi
-
-	is_crosscompile && gcc_conf_cross_post
-}
-
-gcc_conf_cross_post() {
-	if use arm ; then		
-		sed -i "s/none-/${CHOST%%-*}-/g" ${WORKDIR}/objdir/Makefile || die
-
-		if use jit; then
-			sed -i "s/none-/${CHOST%%-*}-/g" ${WORKDIR}/objdir-jit/Makefile || die
-		fi
 	fi
 }
 
@@ -476,20 +391,16 @@ src_test() {
 	cd "${WORKDIR}/objdir"
 	unset ABI
 	local tests_failed=0
-	if is_crosscompile || tc-is-cross-compiler; then
-		ewarn "Running tests on simulator for cross-compiler not yet supported by this ebuild."
-	else
-		( ulimit -s 65536 && ${MAKE:-make} ${MAKEOPTS} LIBPATH="${ED%/}/${LIBPATH}" -k check RUNTESTFLAGS="-v -v -v" 2>&1 | tee ${T}/make-check-log ) || tests_failed=1
-		"../${S##*/}/contrib/test_summary" 2>&1 | tee "${T}/gcc-test-summary.out"
-		[ ${tests_failed} -eq 0 ] || die "make -k check failed"
-	fi
+	( ulimit -s 65536 && ${MAKE:-make} ${MAKEOPTS} LIBPATH="${ED%/}/${LIBPATH}" -k check RUNTESTFLAGS="-v -v -v" 2>&1 | tee ${T}/make-check-log ) || tests_failed=1
+	"../${S##*/}/contrib/test_summary" 2>&1 | tee "${T}/gcc-test-summary.out"
+	[ ${tests_failed} -eq 0 ] || die "make -k check failed"
 }
 
 create_gcc_env_entry() {
 	dodir /etc/env.d/gcc
 	local gcc_envd_base="/etc/env.d/gcc/${CTARGET}-${GCC_CONFIG_VER}"
 	local gcc_envd_file="${D}${gcc_envd_base}"
-	if [ -z $1 ]; then
+	if [ -z "$1" ]; then
 		gcc_specs_file=""
 	else
 		gcc_envd_file="$gcc_envd_file-$1"
@@ -503,17 +414,13 @@ create_gcc_env_entry() {
 	STDCXX_INCDIR="${STDCXX_INCDIR##*/}"
 	GCC_SPECS="${gcc_specs_file}"
 	EOF
-
-	if is_crosscompile; then
-		echo "CTARGET=\"${CTARGET}\"" >> ${gcc_envd_file}
-	fi
 }
 
 linkify_compiler_binaries() {
 	dodir ${PREFIX}/bin
 	cd "${D}"${BINPATH}
 	# Ugh: we really need to auto-detect this list.
-	#	   It's constantly out of date.
+	#       It's constantly out of date.
 
 	local binary_languages="cpp gcc g++ c++ gcov"
 	local gnat_bins="gnat gnatbind gnatchop gnatclean gnatfind gnatkr gnatlink gnatls gnatmake gnatname gnatprep gnatxref"
@@ -526,10 +433,8 @@ linkify_compiler_binaries() {
 		[[ -f ${x} ]] && mv ${x} ${CTARGET}-${x}
 
 		if [[ -f ${CTARGET}-${x} ]] ; then
-			if ! is_crosscompile; then
-				ln -sf ${CTARGET}-${x} ${x}
-				dosym ${BINPATH}/${CTARGET}-${x} ${PREFIX}/bin/${x}-${GCC_CONFIG_VER}
-			fi
+			ln -sf ${CTARGET}-${x} ${x}
+			dosym ${BINPATH}/${CTARGET}-${x} ${PREFIX}/bin/${x}-${GCC_CONFIG_VER}
 			# Create version-ed symlinks
 			dosym ${BINPATH}/${CTARGET}-${x} ${PREFIX}/bin/${CTARGET}-${x}-${GCC_CONFIG_VER}
 		fi
@@ -543,12 +448,11 @@ linkify_compiler_binaries() {
 
 tasteful_stripping() {
 	# Now do the fun stripping stuff
-	[[ ! is_crosscompile ]] && \
-		env RESTRICT="" CHOST=${CHOST} prepstrip "${D}${BINPATH}" ; \
-		env RESTRICT="" CHOST=${CTARGET} prepstrip "${D}${LIBPATH}"
+	env RESTRICT="" CHOST=${CHOST} dostrip "${D}${BINPATH}" ; \
+	env RESTRICT="" CHOST=${CTARGET} dostrip "${D}${LIBPATH}"
 	# gcc used to install helper binaries in lib/ but then moved to libexec/
 	[[ -d ${D}${PREFIX}/libexec/gcc ]] && \
-		env RESTRICT="" CHOST=${CHOST} prepstrip "${D}${PREFIX}/libexec/gcc/${CTARGET}/${GCC_CONFIG_VER}"
+		env RESTRICT="" CHOST=${CHOST} dostrip "${D}${PREFIX}/libexec/gcc/${CTARGET}/${GCC_CONFIG_VER}"
 }
 
 doc_cleanups() {
@@ -560,53 +464,28 @@ doc_cleanups() {
 	fi
 
 	# Remove info files if we don't want them.
-	if is_crosscompile || ! use doc || has noinfo ${FEATURES} ; then
+	if ! use doc || has noinfo ${FEATURES} ; then
 		rm -r "${D}/${DATAPATH}"/info
 	else
 		prepinfo "${DATAPATH}"
 	fi
 
 	# Strip man files too if 'noman' feature is set.
-	if is_crosscompile || has noman ${FEATURES} ; then
+	if has noman ${FEATURES} ; then
 		rm -r "${D}/${DATAPATH}"/man
 	else
 		prepman "${DATAPATH}"
 	fi
 }
 
-cross_toolchain_env_setup() {
-
-	# old xcompile bashrc stuff here
-	dosym /etc/localtime /usr/${CTARGET}/etc/localtime
-	for file in /usr/lib/gcc/${CTARGET}/${GCC_CONFIG_VER}/libstdc*; do
-		dosym "$file" "/usr/${CTARGET}/lib/$(basename $file)"
-	done
-	mkdir -p /etc/revdep-rebuild
-	insinto "/etc/revdep-rebuild"
-	string="SEARCH_DIRS_MASK=\"/usr/${CTARGET} "
-	for dir in /usr/lib/gcc/${CTARGET}/*; do
-		string+="$dir "
-	done
-	for dir in /usr/lib64/gcc/${CTARGET}/*; do
-		string+="$dir "
-	done
-	string="${string%?}"
-	string+='"' 
-	if [[ -e /etc/revdep-rebuild/05cross-${CTARGET} ]] ; then
-		string+=" $(cat /etc/revdep-rebuild/05cross-${CTARGET}|sed -e 's/SEARCH_DIRS_MASK=//')"
-	fi
-	printf "$string">05cross-${CTARGET}
-	doins 05cross-${CTARGET}
-}
-				
 src_install() {
 	if use jit; then
-		S=$WORKDIR/objdir-jit; cd $S
+		S=$WORKDIR/objdir-jit; cd "${S}"
 		make -j1 DESTDIR="${D}" install || die
 		mv ${D}${PREFIX}/lib/libgccjit.so* ${D}${LIBPATH}/
 	fi
 
-	S=$WORKDIR/objdir; cd $S
+	S=$WORKDIR/objdir; cd "${S}"
 
 # PRE-MAKE INSTALL SECTION:
 
@@ -626,20 +505,16 @@ src_install() {
 	make -j1 DESTDIR="${D}" install || die
 
 # POST MAKE INSTALL SECTION:
-	if is_crosscompile; then
-		cross_toolchain_env_setup
-	else
-		# Basic sanity check
-		local EXEEXT
-		eval $(grep ^EXEEXT= "${WORKDIR}"/objdir/gcc/config.log)
-		[[ -r ${D}${BINPATH}/gcc${EXEEXT} ]] || die "gcc not found in ${D}"
+	# Basic sanity check
+	local EXEEXT
+	eval $(grep ^EXEEXT= "${WORKDIR}"/objdir/gcc/config.log)
+	[[ -r ${D}${BINPATH}/gcc${EXEEXT} ]] || die "gcc not found in ${D}"
 
-		# Install compat wrappers
-		exeinto "${DATAPATH}"
-		( set +f ; doexe "${FILESDIR}"/c{89,99} || die )	
-	fi
-	
-	# Setup env.d entry 
+	# Install compat wrappers
+	exeinto "${DATAPATH}"
+	( set +f ; doexe "${FILESDIR}"/c{89,99} || die )
+
+	# Setup env.d entry
 	dodir /etc/env.d/gcc
 	create_gcc_env_entry
 
@@ -656,13 +531,13 @@ src_install() {
 
 	linkify_compiler_binaries
 	tasteful_stripping
-	
+
 	# Remove python files in the lib path
 	find "${D}/${LIBPATH}" -name "*.py" -type f -exec rm "{}" \; 2>/dev/null
-	
+
 	# Remove unwanted docs and prepare the rest for installation
 	doc_cleanups
-	
+
 	# Cleanup undesired libtool archives
 	find "${D}" \
 		'(' \
@@ -676,7 +551,7 @@ src_install() {
 
 	# replace gcc_movelibs - currently handles only libcc1:
 	( set +f
-		einfo -- "Removing extraneous libtool '.la' files from '${PREFIX}/lib*}'."
+		einfo -- "Removing extraneous libtool '.la' files from '${PREFIX}/lib*'."
 		rm ${D%/}${PREFIX}/lib{,32,64}/*.la 2>/dev/null
 		einfo -- "Relocating libs to '${LIBPATH}':"
 		for l in "${D%/}${PREFIX}"/lib{,32,64}/* ; do
@@ -706,34 +581,11 @@ src_install() {
 	fi
 
 	# Disable RANDMMAP so PCH works.
-	[[ ! is_crosscompile ]] && \
-		pax-mark -r "${D}${PREFIX}/libexec/gcc/${CTARGET}/${GCC_CONFIG_VER}/cc1" ; \
-		pax-mark -r "${D}${PREFIX}/libexec/gcc/${CTARGET}/${GCC_CONFIG_VER}/cc1plus"
-}
-
-pkg_postrm() {
-	# clean up the cruft left behind by cross-compilers
-	if is_crosscompile ; then
-		if [[ -z $(ls "${ROOT}etc/env.d/gcc"/${CTARGET}* 2>/dev/null) ]] ; then
-			( set +f
-				rm -f "${ROOT}etc/env.d/gcc"/config-${CTARGET} 2>/dev/null
-				rm -f "${ROOT}etc/env.d"/??gcc-${CTARGET} 2>/dev/null
-				rm -f "${ROOT}usr/bin"/${CTARGET}-{gcc,{g,c}++}{,32,64} 2>/dev/null
-			)
-		fi
-		return 0
-	fi
+	pax-mark -r "${D}${PREFIX}/libexec/gcc/${CTARGET}/${GCC_CONFIG_VER}/cc1" ; \
+	pax-mark -r "${D}${PREFIX}/libexec/gcc/${CTARGET}/${GCC_CONFIG_VER}/cc1plus"
 }
 
 pkg_postinst() {
-	if is_crosscompile; then
-			mkdir -p "${ROOT}etc/env.d"
-			cat > "${ROOT}etc/env.d/05gcc-${CTARGET}" <<- EOF
-				PATH=${BINPATH}
-				ROOTPATH=${BINPATH}
-			EOF
-	fi
-
 	# hack from gentoo - should probably be handled better:
 	( set +f ; cp "${ROOT}${DATAPATH}"/c{89,99} "${ROOT}${PREFIX}/bin/" 2>/dev/null )
 
@@ -741,7 +593,6 @@ pkg_postinst() {
 	export PATH
 	compiler_auto_enable ${PV} ${CTARGET}
 }
-
 
 
 # GCC internal self checking options
@@ -789,3 +640,6 @@ gcc_checking_opts() {
 
 	printf -- "--enable-${stage1:+${stage1%_}-}checking=${opts}"
 }
+
+
+# vim: filetype=ebuild
