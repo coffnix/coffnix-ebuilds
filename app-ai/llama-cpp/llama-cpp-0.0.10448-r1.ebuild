@@ -132,7 +132,13 @@ src_configure() {
 
 src_install() {
 	cmake_src_install
+
 	dodoc README.md SECURITY.md CONTRIBUTING.md
+
+	newinitd "${FILESDIR}/llama-server.initd" llama-server
+	newconfd "${FILESDIR}/llama-server.confd" llama-server
+
+	keepdir /var/lib/llama/models
 }
 
 # vim: filetype=ebuild

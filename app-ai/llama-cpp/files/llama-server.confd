@@ -1,0 +1,10 @@
+# llama.cpp server configuration
+
+# Models should be stored in /var/lib/llama/models/
+LLAMA_MODEL="/var/lib/llama/models/xxxxxxxxxxxxxx.gguf"
+
+# Server log file
+LLAMA_LOG="/var/log/llama-server.log"
+
+# Additional llama-server arguments
+LLAMA_ARGS="--host 0.0.0.0 --port 9931 -ngl all -c 4096 --webui --log-file ${LLAMA_LOG} --log-timestamps --log-prefix --log-verbosity 4"
