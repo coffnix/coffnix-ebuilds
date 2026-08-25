@@ -2,62 +2,75 @@
 # Autogen by MARK Devkit
 
 EAPI=7
-inherit eutils pax-utils toolchain-enable git-r3
+inherit eutils pax-utils toolchain-enable
+
+GCC_RELEASE_VER="${PV%%_p*}"
+SNAPSHOT_DATE="${PV##*_p}"
+GCC_MAJOR="${GCC_RELEASE_VER%%.*}"
+SNAPSHOT="${GCC_MAJOR}-${SNAPSHOT_DATE}"
 
 DESCRIPTION="The GNU Compiler Collection"
 HOMEPAGE="https://gcc.gnu.org"
 SRC_URI="
-https://ftp.icm.edu.pl/pub/unix/languages/programming/gcc/snapshots/LATEST-16/gcc-16-20260822.tar.xz -> gcc-16-20260822.tar.xz
-https://mirrors.kernel.org/gnu/gmp/gmp-6.3.0.tar.xz -> gmp-6.3.0.tar.xz
-https://www.mpfr.org/mpfr-4.2.2/mpfr-4.2.2.tar.xz -> mpfr-4.2.2.tar.xz
-https://mirrors.kernel.org/gnu/mpc/mpc-1.3.1.tar.gz -> mpc-1.3.1.tar.gz"
+mirror://gcc/snapshots/${SNAPSHOT}/gcc-${SNAPSHOT}.tar.xz
+https://mirrors.kernel.org/gnu/gmp/gmp-6.3.0.tar.xz
+https://www.mpfr.org/mpfr-4.2.2/mpfr-4.2.2.tar.xz
+https://mirrors.kernel.org/gnu/mpc/mpc-1.3.1.tar.gz
+"
+
 LICENSE="GPL-3+ LGPL-3+ || ( GPL-3+ libgcc libstdc++ gcc-runtime-library-exception-3.1 ) FDL-1.3+"
-SLOT="16"
+SLOT="${GCC_MAJOR}"
 KEYWORDS="*"
 IUSE="+cxx d go +fortran objc objc++ objc-gc test doc nls vanilla openmp altivec pch generic_host jit bootstrap bootstrap-lean bootstrap-profiled bootstrap-lto bootstrap-O3 libssp +ssp +pie +vtv link_now ssp_all sanitize dev_extra_warnings +stack_clash_protection checking_no checking_all checking_yes checking_release stage1_checking_no stage1_checking_all stage1_checking_yes stage1_checking_release checking_assert checking_runtime checking_misc checking_tree checking_gc checking_rtlflag checking_df checking_fold checking_gcac checking_rtl checking_valgrind checking_extra stage1_checking_assert stage1_checking_runtime stage1_checking_misc stage1_checking_tree stage1_checking_gc stage1_checking_rtlflag stage1_checking_df stage1_checking_fold stage1_checking_gcac stage1_checking_rtl stage1_checking_valgrind stage1_checking_extra"
-REQUIRED_USE="bootstrap-profiled? ( bootstrap )
-bootstrap-lean? ( bootstrap )
-bootstrap-lto? ( bootstrap )
-bootstrap-O3? ( bootstrap )
-!bootstrap? ( !bootstrap-lean !bootstrap-profiled !bootstrap-lto !bootstrap-O3 )
+
+REQUIRED_USE="
+	bootstrap-profiled? ( bootstrap )
+	bootstrap-lean? ( bootstrap )
+	bootstrap-lto? ( bootstrap )
+	bootstrap-O3? ( bootstrap )
+	!bootstrap? ( !bootstrap-lean !bootstrap-profiled !bootstrap-lto !bootstrap-O3 )
 "
+
 RESTRICT="strip"
+
 # Commons depends
-CDEPEND="sys-libs/zlib[static-libs]
+CDEPEND="
+	sys-libs/zlib[static-libs]
 	nls? ( sys-devel/gettext[static-libs] )
 	virtual/libiconv
 	objc-gc? ( >=dev-libs/boehm-gc-7.6[static-libs] )
-	
 "
+
 DEPEND="${CDEPEND}
 	>=sys-devel/bison-1.875
 	>=sys-devel/flex-2.5.4
 	>=sys-devel/binutils-2.36.1_p3
 	elibc_glibc? ( >=sys-libs/glibc-2.8 )
 	test? ( dev-util/dejagnu sys-devel/autogen )
-	
 "
-PDEPEND=">=sys-devel/gcc-config-1.5
+
+PDEPEND="
+	>=sys-devel/gcc-config-1.5
 	>=sys-devel/libtool-2.4.3
 	dev-cpp/tbb
 	elibc_glibc? ( >=sys-libs/glibc-2.8 )
-	
 "
-#S="${WORKDIR}/gcc-${PV}"
-S="${WORKDIR}/gcc-16-20260822"
+
+S="${WORKDIR}/gcc-${SNAPSHOT}"
+
 CHECKS_ALL="all"
 CHECKS_YES="yes"
 CHECKS_RELEASE="release"
 CHECKS_EXTRA="extra"
 CHECKS_VALGRIND="valgrind"
+
 GCC_SVN_PATCH=""
 GMP_VER="6.3.0"
 GMP_EXTRAVER=""
 MPFR_VER="4.2.2"
 MPFR_PATCH_VER=""
 MPC_VER="1.3.1"
-#GCC_A="gcc-${PV%%-r*}.tar.xz"
-GCC_A="gcc-16-20260822.tar.xz"
+GCC_A="gcc-${SNAPSHOT}.tar.xz"
 
 pkg_setup() {
 	# Capture -march -mcpu and -mtune options to pass to build later.
@@ -65,6 +78,7 @@ pkg_setup() {
 	MCPU="${MCPU:-$(printf -- "${CFLAGS}" | sed -rne 's/.*-mcpu="?([-_[:alnum:]]+).*/\1/p')}"
 	MTUNE="${MTUNE:-$(printf -- "${CFLAGS}" | sed -rne 's/.*-mtune="?([-_[:alnum:]]+).*/\1/p')}"
 	MFPU="${MFPU:-$(printf -- "${CFLAGS}" | sed -rne 's/.*-mfpu="?([-_[:alnum:]]+).*/\1/p')}"
+
 	einfo "Got CFLAGS: ${CFLAGS}"
 	einfo "Got GCC_BUILD_CFLAGS: ${GCC_BUILD_CFLAGS}"
 	einfo "MARCH: ${MARCH}"
@@ -77,12 +91,15 @@ pkg_setup() {
 	unset CXXFLAGS
 	unset CPPFLAGS
 	unset LDFLAGS
-	unset GCC_SPECS # we don't want to use the installed compiler's specs to build gcc!
-	unset LANGUAGES #265283
+	unset GCC_SPECS
+	unset LANGUAGES
+
 	export PREFIX=/usr
 	CTARGET=${CTARGET:-${CHOST}}
-	GCC_BRANCH_VER=${SLOT}
-	GCC_CONFIG_VER=${PV}
+
+	GCC_BRANCH_VER=${GCC_MAJOR}
+	GCC_CONFIG_VER=${GCC_MAJOR}
+
 	DATAPATH=${PREFIX}/share/gcc-data/${CTARGET}/${GCC_CONFIG_VER}
 	BINPATH=${PREFIX}/${CTARGET}/gcc-bin/${GCC_CONFIG_VER}
 
@@ -97,76 +114,91 @@ pkg_setup() {
 	# Add bootstrap configs to BUILD_CONFIG based on use flags
 	if use bootstrap-lto && use bootstrap-lean; then
 		BUILD_CONFIG="${BUILD_CONFIG:+${BUILD_CONFIG} }bootstrap-lto-lean"
-	elif use bootstrap-lto ; then
+	elif use bootstrap-lto; then
 		BUILD_CONFIG="${BUILD_CONFIG:+${BUILD_CONFIG} }bootstrap-lto"
 	fi
+
 	use bootstrap-O3 && BUILD_CONFIG="${BUILD_CONFIG:+${BUILD_CONFIG} }bootstrap-O3"
 
 	export BUILD_CONFIG
 
-	if [ -n "${GCC_TARGET}" ] ; then
+	if [ -n "${GCC_TARGET}" ]; then
 		:
-	elif use bootstrap ; then
-		if use bootstrap-profiled ; then
+	elif use bootstrap; then
+		if use bootstrap-profiled; then
 			GCC_TARGET="profiledbootstrap"
 		else
 			GCC_TARGET="bootstrap"
 		fi
+
 		# Handle lean bootstrap target suffix (see Makefile.tpl)
-		if use bootstrap-lean ; then
+		if use bootstrap-lean; then
 			GCC_TARGET="${GCC_TARGET}-lean"
 		fi
 	else
 		GCC_TARGET="all"
 	fi
-	export GCC_TARGET
 
+	export GCC_TARGET
 
 	use doc || export MAKEINFO="/dev/null"
 }
 
 src_unpack() {
-	unpack $GCC_A
-	( unpack mpc-1.3.1.tar.gz && mv ${WORKDIR}/mpc-1.3.1 ${S}/mpc ) || die "mpc setup fail"
-	( unpack mpfr-4.2.2.tar.xz && mv ${WORKDIR}/mpfr-4.2.2 ${S}/mpfr ) || die "mpfr setup fail"
-	( unpack gmp-6.3.0.tar.xz && mv ${WORKDIR}/gmp-6.3.0 ${S}/gmp ) || die "gmp setup fail"
+	unpack "${GCC_A}"
 
-	cd "${S}"
-	mkdir ${WORKDIR}/objdir
+	(
+		unpack "mpc-${MPC_VER}.tar.gz" &&
+		mv "${WORKDIR}/mpc-${MPC_VER}" "${S}/mpc"
+	) || die "mpc setup fail"
+
+	(
+		unpack "mpfr-${MPFR_VER}.tar.xz" &&
+		mv "${WORKDIR}/mpfr-${MPFR_VER}" "${S}/mpfr"
+	) || die "mpfr setup fail"
+
+	(
+		unpack "gmp-${GMP_VER}.tar.xz" &&
+		mv "${WORKDIR}/gmp-${GMP_VER}" "${S}/gmp"
+	) || die "gmp setup fail"
+
+	cd "${S}" || die
+
+	mkdir "${WORKDIR}/objdir" || die
 
 	if use jit; then
-		mkdir ${WORKDIR}/objdir-jit
+		mkdir "${WORKDIR}/objdir-jit" || die
 	fi
 }
-
 
 src_prepare() {
 	# Patch from release to svn branch tip for backports
 	if [ -n "${GCC_SVN_PATCH}" ]; then
 		eapply "${GCC_SVN_PATCH}" || die "gcc svn patch fail"
 	fi
+
 	# For some reason, when upgrading gcc, the gcc Makefile will install stuff
-
 	# like crtbegin.o into a subdirectory based on the name of the currently-installed
-	# gcc version, rather than *our* gcc version. Manually fix this:
-
-	sed -i -e "s/^version :=.*/version := ${GCC_CONFIG_VER}/" ${S}/libgcc/Makefile.in || die
+	# gcc version, rather than our gcc version. Manually fix this.
+	sed -i \
+		-e "s/^version :=.*/version := ${GCC_RELEASE_VER}/" \
+		"${S}/libgcc/Makefile.in" || die
 
 	if ! use vanilla; then
 
 		# Prevent libffi from being installed
-		sed -i -e 's/\(install.*:\) install-.*recursive/\1/' "${S}"/libffi/Makefile.in || die
-		sed -i -e 's/\(install-data-am:\).*/\1/' "${S}"/libffi/include/Makefile.in || die
+		sed -i \
+			-e 's/\(install.*:\) install-.*recursive/\1/' \
+			"${S}/libffi/Makefile.in" || die
 
+		sed -i \
+			-e 's/\(install-data-am:\).*/\1/' \
+			"${S}/libffi/include/Makefile.in" || die
 
-		# We use --enable-version-specific-libs with ./configure. This
-		# option is designed to place all our libraries into a sub-directory
-		# rather than /usr/lib*.  However, this option, even through 4.8.0,
-		# does not work 100% correctly without a small fix for
-		# libgcc_s.so. See: http://gcc.gnu.org/bugzilla/show_bug.cgi?id=32415.
-		# So, we apply a small patch to get this working:
-
-		eapply "${FILESDIR}/gcc-4.6.4-fix-libgcc-s-path-with-vsrl.patch" || die "patch fail"
+		# We use --enable-version-specific-libs with ./configure.
+		# Apply the fix required for libgcc_s.so.
+		eapply "${FILESDIR}/gcc-4.6.4-fix-libgcc-s-path-with-vsrl.patch" \
+			|| die "patch fail"
 
 		# Apply Gentoo patches when vanilla is not set
 		eapply "${FILESDIR}/gentoo-patches/gcc-16.2.0/01_all_default-fortify-source.patch" || die "gentoo patch 01_all_default-fortify-source.patch failed"
@@ -199,7 +231,7 @@ src_prepare() {
 		eapply "${FILESDIR}/gentoo-patches/gcc-16.2.0/76_all_PR117854-config-nvptx-fix-bashisms-with-gen-copyright.sh-use.patch" || die "gentoo patch 76_all_PR117854-config-nvptx-fix-bashisms-with-gen-copyright.sh-use.patch failed"
 		eapply "${FILESDIR}/gentoo-patches/gcc-16.2.0/86_all_PR122794-libtool.patch" || die "gentoo patch 86_all_PR122794-libtool.patch failed"
 
-		# Harden things up:
+		# Harden things up
 		_gcc_prepare_harden
 	fi
 
@@ -215,21 +247,26 @@ _gcc_prepare_harden() {
 	use link_now && gcc_hard_flags+=" -DENABLE_DEFAULT_LINK_NOW"
 	use stack_clash_protection && gcc_hard_flags+=" -DENABLE_DEFAULT_SCP"
 
-	sed -e '/^ALL_CFLAGS/iHARD_CFLAGS = ' \
+	sed \
+		-e '/^ALL_CFLAGS/iHARD_CFLAGS = ' \
 		-e 's|^ALL_CFLAGS = |ALL_CFLAGS = $(HARD_CFLAGS) |' \
-		-i "${S}"/gcc/Makefile.in
+		-i "${S}/gcc/Makefile.in"
 
-	sed -e '/^ALL_CXXFLAGS/iHARD_CFLAGS = ' \
+	sed \
+		-e '/^ALL_CXXFLAGS/iHARD_CFLAGS = ' \
 		-e 's|^ALL_CXXFLAGS = |ALL_CXXFLAGS = $(HARD_CFLAGS) |' \
-		-i "${S}"/gcc/Makefile.in
+		-i "${S}/gcc/Makefile.in"
 
-	sed -i -e "/^HARD_CFLAGS = /s|=|= ${gcc_hard_flags} |" "${S}"/gcc/Makefile.in || die
+	sed -i \
+		-e "/^HARD_CFLAGS = /s|=|= ${gcc_hard_flags} |" \
+		"${S}/gcc/Makefile.in" || die
 }
 
 gcc_conf_lang_opts() {
-	# Determine language support:
+	# Determine language support
 	local conf_gcc_lang=""
 	local GCC_LANG="c,c++"
+
 	if use objc; then
 		GCC_LANG+=",objc"
 		use objc-gc && conf_gcc_lang+=" --enable-objc-gc"
@@ -237,9 +274,7 @@ gcc_conf_lang_opts() {
 	fi
 
 	use fortran && GCC_LANG+=",fortran" || conf_gcc_lang+=" --disable-libquadmath"
-
 	use go && GCC_LANG+=",go"
-
 	use d && GCC_LANG+=",d"
 
 	conf_gcc_lang+=" --enable-languages=${GCC_LANG} --disable-libgcj"
@@ -255,9 +290,10 @@ gcc_conf_arm_opts() {
 	local conf_gcc_arm=""
 	local arm_arch=${CTARGET%%-*}
 	local a
+
 	# Remove trailing endian variations first: eb el be bl b l
-	for a in e{b,l} {b,l}e b l ; do
-		if [[ ${arm_arch} == *${a} ]] ; then
+	for a in e{b,l} {b,l}e b l; do
+		if [[ ${arm_arch} == *${a} ]]; then
 			arm_arch=${arm_arch%${a}}
 			break
 		fi
@@ -267,9 +303,12 @@ gcc_conf_arm_opts() {
 	[[ ${arm_arch} == armv7? ]] && arm_arch=${arm_arch/7/7-}
 
 	# See if this is a valid --with-arch flag
-	if (srcdir=${S}/gcc target=${CTARGET} with_arch=${arm_arch};
-		. "${srcdir}"/config.gcc) &>/dev/null
-	then
+	if (
+		srcdir=${S}/gcc
+		target=${CTARGET}
+		with_arch=${arm_arch}
+		. "${srcdir}/config.gcc"
+	) &>/dev/null; then
 		conf_gcc_arm+=" --with-arch=${arm_arch}"
 	fi
 
@@ -283,18 +322,21 @@ gcc_conf_arm_opts() {
 		armv[56]*) default_fpu="vfpv2" ;;
 		armv7ve*) default_fpu="vfpv4-d16" ;;
 		armv7*) default_fpu="vfpv3-d16" ;;
-		amrv8*) default_fpu="fp-armv8" ;;
+		armv8*) default_fpu="fp-armv8" ;;
 	esac
 
 	conf_gcc_arm+=" --with-float=$float"
-	[ -z "${MFPU}" ] && [ -n "${default_fpu}" ] && conf_gcc_arm+=" --with-fpu=${default_fpu}"
+
+	[ -z "${MFPU}" ] &&
+		[ -n "${default_fpu}" ] &&
+		conf_gcc_arm+=" --with-fpu=${default_fpu}"
 
 	printf -- "${conf_gcc_arm}"
 }
 
 src_configure() {
-
 	local confgcc
+
 	confgcc+=" --enable-threads=posix --enable-__cxa_atexit --enable-libstdcxx-time"
 	confgcc+=" $(use_enable openmp libgomp)"
 	confgcc+=" $(use_enable bootstrap) --enable-shared"
@@ -304,19 +346,29 @@ src_configure() {
 	confgcc+=" $(use_enable sanitize libsanitizer)"
 	confgcc+=" $(use_enable pie default-pie)"
 	confgcc+=" $(use_enable ssp default-ssp)"
+
 	! use pch && confgcc+=" --disable-libstdcxx-pch"
-	use vtv && confgcc+=" --enable-vtable-verify --enable-libvtv"
-	! use vtv && confgcc+=" --disable-vtable-verify --disable-libvtv"
+
+	use vtv &&
+		confgcc+=" --enable-vtable-verify --enable-libvtv"
+
+	! use vtv &&
+		confgcc+=" --disable-vtable-verify --disable-libvtv"
 
 	use libssp || export gcc_cv_libc_provides_ssp=yes
 
 	local branding="MacaroniOS ${PVR}"
 
 	confgcc+=" --with-python-dir=${DATAPATH/$PREFIX/}/python"
-	use nls && confgcc+=" --enable-nls --with-included-gettext" || confgcc+=" --disable-nls"
 
-	use generic_host || confgcc+="${MARCH:+ --with-arch=${MARCH}}${MCPU:+ --with-cpu=${MCPU}}${MTUNE:+ --with-tune=${MTUNE}}${MFPU:+ --with-fpu=${MFPU}}"
-	P= cd ${WORKDIR}/objdir && "${S}"/configure \
+	use nls &&
+		confgcc+=" --enable-nls --with-included-gettext" ||
+		confgcc+=" --disable-nls"
+
+	use generic_host ||
+		confgcc+="${MARCH:+ --with-arch=${MARCH}}${MCPU:+ --with-cpu=${MCPU}}${MTUNE:+ --with-tune=${MTUNE}}${MFPU:+ --with-fpu=${MFPU}}"
+
+	P= cd "${WORKDIR}/objdir" && "${S}/configure" \
 		${BUILD_CONFIG:+--with-build-config="${BUILD_CONFIG}"} \
 		$(use_enable libssp) \
 		--disable-multilib \
@@ -329,7 +381,7 @@ src_configure() {
 		--infodir=${DATAPATH}/info \
 		--with-gxx-include-dir=${STDCXX_INCDIR} \
 		--enable-clocale=gnu \
-		--host=$CHOST \
+		--host=${CHOST} \
 		--enable-obsolete \
 		--disable-werror \
 		--enable-libmudflap \
@@ -337,76 +389,114 @@ src_configure() {
 		--enable-lto \
 		--with-system-zlib \
 		--with-bugurl=https://github.com/macaroni-os/mark-issues/issues \
-		--with-pkgversion="$branding" \
-		$(gcc_checking_opts stage1) $(gcc_checking_opts) \
-		$(gcc_conf_lang_opts) $(gcc_conf_arm_opts) $confgcc \
+		--with-pkgversion="${branding}" \
+		$(gcc_checking_opts stage1) \
+		$(gcc_checking_opts) \
+		$(gcc_conf_lang_opts) \
+		$(gcc_conf_arm_opts) \
+		${confgcc} \
 		|| die "configure fail"
 
 	if use jit; then
-		P= cd ${WORKDIR}/objdir-jit && "${S}"/configure \
-				${BUILD_CONFIG:+--with-build-config="${BUILD_CONFIG}"} \
-				$(use_enable libssp) \
-				--disable-multilib \
-				--enable-version-specific-runtime-libs \
-				--prefix=${PREFIX} \
-				--bindir=${BINPATH} \
-				--includedir=${LIBPATH}/include \
-				--datadir=${DATAPATH} \
-				--mandir=${DATAPATH}/man \
-				--infodir=${DATAPATH}/info \
-				--with-gxx-include-dir=${STDCXX_INCDIR} \
-				--enable-clocale=gnu \
-				--host=$CHOST \
-				--enable-obsolete \
-				--disable-werror \
-				--enable-libmudflap \
-				--enable-secureplt \
-				--enable-lto \
-				--with-system-zlib \
-				--with-bugurl=https://github.com/macaroni-os/mark-issues/issues \
-				--with-pkgversion="$branding" \
-				$(gcc_checking_opts stage1) $(gcc_checking_opts) \
-				--enable-languages=jit --enable-host-shared --with-pic \
-				$(gcc_conf_arm_opts) $confgcc \
-				|| die "configure fail"
+		P= cd "${WORKDIR}/objdir-jit" && "${S}/configure" \
+			${BUILD_CONFIG:+--with-build-config="${BUILD_CONFIG}"} \
+			$(use_enable libssp) \
+			--disable-multilib \
+			--enable-version-specific-runtime-libs \
+			--prefix=${PREFIX} \
+			--bindir=${BINPATH} \
+			--includedir=${LIBPATH}/include \
+			--datadir=${DATAPATH} \
+			--mandir=${DATAPATH}/man \
+			--infodir=${DATAPATH}/info \
+			--with-gxx-include-dir=${STDCXX_INCDIR} \
+			--enable-clocale=gnu \
+			--host=${CHOST} \
+			--enable-obsolete \
+			--disable-werror \
+			--enable-libmudflap \
+			--enable-secureplt \
+			--enable-lto \
+			--with-system-zlib \
+			--with-bugurl=https://github.com/macaroni-os/mark-issues/issues \
+			--with-pkgversion="${branding}" \
+			$(gcc_checking_opts stage1) \
+			$(gcc_checking_opts) \
+			--enable-languages=jit \
+			--enable-host-shared \
+			--with-pic \
+			$(gcc_conf_arm_opts) \
+			${confgcc} \
+			|| die "configure fail"
 	fi
 }
 
 src_compile() {
-	cd $WORKDIR/objdir
+	cd "${WORKDIR}/objdir" || die
+
 	unset ABI
+
 	if use bootstrap || use bootstrap-profiled || use bootstrap-lean; then
-		emake BOOT_CFLAGS="${CFLAGS}" P= LIBPATH="${LIBPATH}" ${GCC_TARGET} || die "compile fail"
+		emake \
+			BOOT_CFLAGS="${CFLAGS}" \
+			P= \
+			LIBPATH="${LIBPATH}" \
+			${GCC_TARGET} || die "compile fail"
 	else
-		emake P= LIBPATH="${LIBPATH}" ${GCC_TARGET} || die "compile fail"
+		emake \
+			P= \
+			LIBPATH="${LIBPATH}" \
+			${GCC_TARGET} || die "compile fail"
 	fi
+
 	if use jit; then
-		cd $WORKDIR/objdir-jit
+		cd "${WORKDIR}/objdir-jit" || die
+
 		unset ABI
-		emake P= LIBPATH="${LIBPATH}" ${GCC_TARGET} || die "compile fail"
+
+		emake \
+			P= \
+			LIBPATH="${LIBPATH}" \
+			${GCC_TARGET} || die "compile fail"
 	fi
 }
 
 src_test() {
-	cd "${WORKDIR}/objdir"
+	cd "${WORKDIR}/objdir" || die
+
 	unset ABI
+
 	local tests_failed=0
-	( ulimit -s 65536 && ${MAKE:-make} ${MAKEOPTS} LIBPATH="${ED%/}/${LIBPATH}" -k check RUNTESTFLAGS="-v -v -v" 2>&1 | tee ${T}/make-check-log ) || tests_failed=1
-	"../${S##*/}/contrib/test_summary" 2>&1 | tee "${T}/gcc-test-summary.out"
+
+	(
+		ulimit -s 65536 &&
+		${MAKE:-make} ${MAKEOPTS} \
+			LIBPATH="${ED%/}/${LIBPATH}" \
+			-k check \
+			RUNTESTFLAGS="-v -v -v" \
+			2>&1 | tee "${T}/make-check-log"
+	) || tests_failed=1
+
+	"../${S##*/}/contrib/test_summary" \
+		2>&1 | tee "${T}/gcc-test-summary.out"
+
 	[ ${tests_failed} -eq 0 ] || die "make -k check failed"
 }
 
 create_gcc_env_entry() {
 	dodir /etc/env.d/gcc
+
 	local gcc_envd_base="/etc/env.d/gcc/${CTARGET}-${GCC_CONFIG_VER}"
 	local gcc_envd_file="${D}${gcc_envd_base}"
+
 	if [ -z "$1" ]; then
 		gcc_specs_file=""
 	else
-		gcc_envd_file="$gcc_envd_file-$1"
+		gcc_envd_file="${gcc_envd_file}-$1"
 		gcc_specs_file="${LIBPATH}/$1.specs"
 	fi
-	cat <<-EOF > ${gcc_envd_file}
+
+	cat <<-EOF > "${gcc_envd_file}"
 	GCC_PATH="${BINPATH}"
 	LDPATH="${LIBPATH}:${LIBPATH}/32"
 	MANPATH="${DATAPATH}/man"
@@ -417,11 +507,12 @@ create_gcc_env_entry() {
 }
 
 linkify_compiler_binaries() {
-	dodir ${PREFIX}/bin
-	cd "${D}"${BINPATH}
-	# Ugh: we really need to auto-detect this list.
-	#       It's constantly out of date.
+	dodir "${PREFIX}/bin"
 
+	cd "${D}${BINPATH}" || die
+
+	# Ugh: we really need to auto-detect this list.
+	# It's constantly out of date.
 	local binary_languages="cpp gcc g++ c++ gcov"
 	local gnat_bins="gnat gnatbind gnatchop gnatclean gnatfind gnatkr gnatlink gnatls gnatmake gnatname gnatprep gnatxref"
 
@@ -429,50 +520,73 @@ linkify_compiler_binaries() {
 	use fortran && binary_languages="${binary_languages} gfortran"
 	use d && binary_languages="${binary_languages} gdc"
 
-	for x in ${binary_languages} ; do
-		[[ -f ${x} ]] && mv ${x} ${CTARGET}-${x}
+	for x in ${binary_languages}; do
+		[[ -f ${x} ]] && mv "${x}" "${CTARGET}-${x}"
 
-		if [[ -f ${CTARGET}-${x} ]] ; then
-			ln -sf ${CTARGET}-${x} ${x}
-			dosym ${BINPATH}/${CTARGET}-${x} ${PREFIX}/bin/${x}-${GCC_CONFIG_VER}
-			# Create version-ed symlinks
-			dosym ${BINPATH}/${CTARGET}-${x} ${PREFIX}/bin/${CTARGET}-${x}-${GCC_CONFIG_VER}
+		if [[ -f ${CTARGET}-${x} ]]; then
+			ln -sf "${CTARGET}-${x}" "${x}"
+
+			dosym \
+				"${BINPATH}/${CTARGET}-${x}" \
+				"${PREFIX}/bin/${x}-${GCC_CONFIG_VER}"
+
+			# Create versioned symlinks
+			dosym \
+				"${BINPATH}/${CTARGET}-${x}" \
+				"${PREFIX}/bin/${CTARGET}-${x}-${GCC_CONFIG_VER}"
 		fi
 
-		if [[ -f ${CTARGET}-${x}-${GCC_CONFIG_VER} ]] ; then
-			rm -f ${CTARGET}-${x}-${GCC_CONFIG_VER}
-			ln -sf ${CTARGET}-${x} ${CTARGET}-${x}-${GCC_CONFIG_VER}
+		if [[ -f ${CTARGET}-${x}-${GCC_CONFIG_VER} ]]; then
+			rm -f "${CTARGET}-${x}-${GCC_CONFIG_VER}"
+			ln -sf \
+				"${CTARGET}-${x}" \
+				"${CTARGET}-${x}-${GCC_CONFIG_VER}"
 		fi
 	done
 }
 
 tasteful_stripping() {
 	# Now do the fun stripping stuff
-	env RESTRICT="" CHOST=${CHOST} dostrip "${D}${BINPATH}" ; \
-	env RESTRICT="" CHOST=${CTARGET} dostrip "${D}${LIBPATH}"
+	env RESTRICT="" CHOST=${CHOST} \
+		dostrip "${D}${BINPATH}"
+
+	env RESTRICT="" CHOST=${CTARGET} \
+		dostrip "${D}${LIBPATH}"
+
 	# gcc used to install helper binaries in lib/ but then moved to libexec/
-	[[ -d ${D}${PREFIX}/libexec/gcc ]] && \
-		env RESTRICT="" CHOST=${CHOST} dostrip "${D}${PREFIX}/libexec/gcc/${CTARGET}/${GCC_CONFIG_VER}"
+	[[ -d ${D}${PREFIX}/libexec/gcc ]] &&
+		env RESTRICT="" CHOST=${CHOST} \
+			dostrip "${D}${PREFIX}/libexec/gcc/${CTARGET}/${GCC_CONFIG_VER}"
 }
 
 doc_cleanups() {
-	local cxx_mandir=$(find "${WORKDIR}/objdir/${CTARGET}/libstdc++-v3" -name man)
-	if [[ -d ${cxx_mandir} ]] ; then
+	local cxx_mandir
+	cxx_mandir=$(find "${WORKDIR}/objdir/${CTARGET}/libstdc++-v3" -name man)
+
+	if [[ -d ${cxx_mandir} ]]; then
 		# clean bogus manpages #113902
-		find "${cxx_mandir}" -name '*_build_*' -exec rm {} \;
-		( set +f ; cp -r "${cxx_mandir}"/man? "${D}/${DATAPATH}"/man/ )
+		find "${cxx_mandir}" \
+			-name '*_build_*' \
+			-exec rm {} \;
+
+		(
+			set +f
+			cp -r \
+				"${cxx_mandir}"/man? \
+				"${D}/${DATAPATH}/man/"
+		)
 	fi
 
 	# Remove info files if we don't want them.
-	if ! use doc || has noinfo ${FEATURES} ; then
-		rm -r "${D}/${DATAPATH}"/info
+	if ! use doc || has noinfo ${FEATURES}; then
+		rm -r "${D}/${DATAPATH}/info"
 	else
 		prepinfo "${DATAPATH}"
 	fi
 
 	# Strip man files too if 'noman' feature is set.
-	if has noman ${FEATURES} ; then
-		rm -r "${D}/${DATAPATH}"/man
+	if has noman ${FEATURES}; then
+		rm -r "${D}/${DATAPATH}/man"
 	else
 		prepman "${DATAPATH}"
 	fi
@@ -480,60 +594,98 @@ doc_cleanups() {
 
 src_install() {
 	if use jit; then
-		S=$WORKDIR/objdir-jit; cd "${S}"
+		S="${WORKDIR}/objdir-jit"
+		cd "${S}" || die
+
 		make -j1 DESTDIR="${D}" install || die
-		mv ${D}${PREFIX}/lib/libgccjit.so* ${D}${LIBPATH}/
+
+		mv \
+			"${D}${PREFIX}"/lib/libgccjit.so* \
+			"${D}${LIBPATH}/"
 	fi
 
-	S=$WORKDIR/objdir; cd "${S}"
+	S="${WORKDIR}/objdir"
+	cd "${S}" || die
 
-# PRE-MAKE INSTALL SECTION:
+	# PRE-MAKE INSTALL SECTION
 
 	# Don't allow symlinks in private gcc include dir as this can break the build
-	( set +f ; find gcc/include*/ -type l -delete 2>/dev/null )
+	(
+		set +f
+		find gcc/include*/ -type l -delete 2>/dev/null
+	)
 
 	# Remove generated headers, as they can cause things to break
-	# (ncurses, openssl, etc).
-	while read x; do
-		grep -q 'It has been auto-edited by fixincludes from' "${x}" \
-			&& echo "Removing auto-generated header: $x" \
-			&& rm -f "${x}"
+	# ncurses, openssl, etc.
+	while read -r x; do
+		grep -q \
+			'It has been auto-edited by fixincludes from' \
+			"${x}" &&
+			echo "Removing auto-generated header: $x" &&
+			rm -f "${x}"
 	done < <(find gcc/include*/ -name '*.h')
 
-# MAKE INSTALL SECTION:
+	# MAKE INSTALL SECTION
 
 	make -j1 DESTDIR="${D}" install || die
 
-# POST MAKE INSTALL SECTION:
+	# POST MAKE INSTALL SECTION
+
 	# Basic sanity check
 	local EXEEXT
-	eval $(grep ^EXEEXT= "${WORKDIR}"/objdir/gcc/config.log)
-	[[ -r ${D}${BINPATH}/gcc${EXEEXT} ]] || die "gcc not found in ${D}"
+
+	eval "$(grep '^EXEEXT=' "${WORKDIR}/objdir/gcc/config.log")"
+
+	[[ -r ${D}${BINPATH}/gcc${EXEEXT} ]] ||
+		die "gcc not found in ${D}"
 
 	# Install compat wrappers
 	exeinto "${DATAPATH}"
-	( set +f ; doexe "${FILESDIR}"/c{89,99} || die )
+
+	(
+		set +f
+		doexe "${FILESDIR}"/c{89,99} || die
+	)
 
 	# Setup env.d entry
 	dodir /etc/env.d/gcc
 	create_gcc_env_entry
 
-# CLEANUPS:
+	# CLEANUPS
 
 	# Punt some tools which are really only useful while building gcc
-	find "${D}" -name install-tools -prune -type d -exec rm -rf "{}" \; 2>/dev/null
+	find "${D}" \
+		-name install-tools \
+		-prune \
+		-type d \
+		-exec rm -rf "{}" \; \
+		2>/dev/null
+
 	# This one comes with binutils
-	find "${D}" -name libiberty.a -delete 2>/dev/null
+	find "${D}" \
+		-name libiberty.a \
+		-delete \
+		2>/dev/null
+
 	# prune empty dirs left behind
-	find "${D}" -depth -type d -delete 2>/dev/null
-	# ownership fix:
-	chown -R root:0 "${D}"${LIBPATH} 2>/dev/null
+	find "${D}" \
+		-depth \
+		-type d \
+		-delete \
+		2>/dev/null
+
+	# ownership fix
+	chown -R root:0 "${D}${LIBPATH}" 2>/dev/null
 
 	linkify_compiler_binaries
 	tasteful_stripping
 
 	# Remove python files in the lib path
-	find "${D}/${LIBPATH}" -name "*.py" -type f -exec rm "{}" \; 2>/dev/null
+	find "${D}/${LIBPATH}" \
+		-name "*.py" \
+		-type f \
+		-exec rm "{}" \; \
+		2>/dev/null
 
 	# Remove unwanted docs and prepare the rest for installation
 	doc_cleanups
@@ -541,90 +693,140 @@ src_install() {
 	# Cleanup undesired libtool archives
 	find "${D}" \
 		'(' \
-			-name 'libstdc++.la' -o -name 'libstdc++fs.la' -o -name 'libsupc++.la' -o \
-			-name 'libcc1.la' -o -name 'libcc1plugin.la' -o -name 'libcp1plugin.la' -o \
-			-name 'libgomp.la' -o -name 'libgomp-plugin-*.la' -o \
-			-name 'libgfortran.la' -o -name 'libgfortranbegin.la' -o \
-			-name 'libmpx.la' -o -name 'libmpxwrappers.la' -o \
-			-name 'libitm.la' -o -name 'libvtv.la' -o -name 'lib*san.la' \
-		')' -type f -delete 2>/dev/null
+			-name 'libstdc++.la' -o \
+			-name 'libstdc++fs.la' -o \
+			-name 'libsupc++.la' -o \
+			-name 'libcc1.la' -o \
+			-name 'libcc1plugin.la' -o \
+			-name 'libcp1plugin.la' -o \
+			-name 'libgomp.la' -o \
+			-name 'libgomp-plugin-*.la' -o \
+			-name 'libgfortran.la' -o \
+			-name 'libgfortranbegin.la' -o \
+			-name 'libmpx.la' -o \
+			-name 'libmpxwrappers.la' -o \
+			-name 'libitm.la' -o \
+			-name 'libvtv.la' -o \
+			-name 'lib*san.la' \
+		')' \
+		-type f \
+		-delete \
+		2>/dev/null
 
-	# replace gcc_movelibs - currently handles only libcc1:
-	( set +f
+	# replace gcc_movelibs, currently handles only libcc1
+	(
+		set +f
+
 		einfo -- "Removing extraneous libtool '.la' files from '${PREFIX}/lib*'."
-		rm ${D%/}${PREFIX}/lib{,32,64}/*.la 2>/dev/null
+		rm "${D%/}${PREFIX}"/lib{,32,64}/*.la 2>/dev/null
+
 		einfo -- "Relocating libs to '${LIBPATH}':"
-		for l in "${D%/}${PREFIX}"/lib{,32,64}/* ; do
+
+		for l in "${D%/}${PREFIX}"/lib{,32,64}/*; do
 			[ -f "${l}" ] || continue
-			mydir="${l%/*}" ; myfile="${l##*/}"
+
+			mydir="${l%/*}"
+			myfile="${l##*/}"
+
 			einfo -- "Moving '${myfile}' from '${mydir#${D}}' to '${LIBPATH}'."
-			cd "${mydir}" && mv "${myfile}" "${D}${LIBPATH}/${myfile}" 2>/dev/null || die
+
+			cd "${mydir}" &&
+				mv \
+					"${myfile}" \
+					"${D}${LIBPATH}/${myfile}" \
+					2>/dev/null ||
+				die
 		done
 	)
 
 	# the .la files that are installed have weird embedded single quotes around abs
-	# paths on the dependency_libs line. The following code finds and fixes them:
+	# paths on the dependency_libs line. The following code finds and fixes them.
+	for x in $(find "${D}${LIBPATH}" -iname '*.la'); do
+		dep="$(grep '^dependency_libs' "${x}")"
 
-	for x in $(find ${D}${LIBPATH} -iname '*.la'); do
-		dep="$(grep ^dependency_libs $x)"
-		[ "$dep" == "" ] && continue
+		[ "${dep}" == "" ] && continue
+
 		inner_dep="${dep#dependency_libs=}"
 		inner_dep="${inner_dep//\'/}"
 		inner_dep="${inner_dep# *}"
-		sed -i -e "s:^dependency_libs=.*$:dependency_libs=\'${inner_dep}\':g" $x || die
+
+		sed -i \
+			-e "s:^dependency_libs=.*$:dependency_libs=\'${inner_dep}\':g" \
+			"${x}" || die
 	done
 
-	# Don't scan .gox files for executable stacks - false positives
+	# Don't scan .gox files for executable stacks, false positives
 	if use go; then
 		export QA_EXECSTACK="${PREFIX#/}/lib*/go/*/*.gox"
 		export QA_WX_LOAD="${PREFIX#/}/lib*/go/*/*.gox"
 	fi
 
 	# Disable RANDMMAP so PCH works.
-	pax-mark -r "${D}${PREFIX}/libexec/gcc/${CTARGET}/${GCC_CONFIG_VER}/cc1" ; \
-	pax-mark -r "${D}${PREFIX}/libexec/gcc/${CTARGET}/${GCC_CONFIG_VER}/cc1plus"
+	pax-mark -r \
+		"${D}${PREFIX}/libexec/gcc/${CTARGET}/${GCC_CONFIG_VER}/cc1"
+
+	pax-mark -r \
+		"${D}${PREFIX}/libexec/gcc/${CTARGET}/${GCC_CONFIG_VER}/cc1plus"
 }
 
 pkg_postinst() {
-	# hack from gentoo - should probably be handled better:
-	( set +f ; cp "${ROOT}${DATAPATH}"/c{89,99} "${ROOT}${PREFIX}/bin/" 2>/dev/null )
+	# hack from gentoo, should probably be handled better
+	(
+		set +f
+		cp \
+			"${ROOT}${DATAPATH}"/c{89,99} \
+			"${ROOT}${PREFIX}/bin/" \
+			2>/dev/null
+	)
 
 	PATH="${BINPATH}:${PATH}"
 	export PATH
-	compiler_auto_enable ${PV} ${CTARGET}
-}
 
+	compiler_auto_enable "${GCC_CONFIG_VER}" "${CTARGET}"
+}
 
 # GCC internal self checking options
 # Usage: gcc_checking_opts [stage1]
 gcc_checking_opts() {
 	local stage1="${1}${1:+_}"
 
-	local opts check checks
+	local opts
+	local check
+	local checks
+
 	# Setting checking_no overrides all other checks
-	if use ${stage1}checking_no ; then
+	if use ${stage1}checking_no; then
 		opts="no"
 	else
 		# Priority is all > yes > release
-		if use ${stage1}checking_all ; then
+		if use ${stage1}checking_all; then
 			checks="${CHECKS_ALL}"
-		elif use ${stage1}checking_yes ; then
+		elif use ${stage1}checking_yes; then
 			checks="${CHECKS_YES}"
-		elif use ${stage1}checking_release ; then
+		elif use ${stage1}checking_release; then
 			checks="${CHECKS_RELEASE}"
 		fi
 
-		# Check if explict use flags are set for any valid checks
-		for check in ${CHECKS_ALL} ${CHECKS_VALGRIND} ; do
-			# Check if the flag is enabled and add to list if not there; force extra to set the same for both scopes.
-			if use ${stage1}checking_${check} || ( [ -n "${CHECKS_EXTRA}" ] && [ "${check}" = "extra" ] && ( use stage1_checking_extra || use checking_extra ) ) ; then
-				has check "${checks}" || checks="${checks} ${check}"
+		# Check if explicit use flags are set for any valid checks
+		for check in ${CHECKS_ALL} ${CHECKS_VALGRIND}; do
+			if use ${stage1}checking_${check} ||
+				(
+					[ -n "${CHECKS_EXTRA}" ] &&
+					[ "${check}" = "extra" ] &&
+					(
+						use stage1_checking_extra ||
+						use checking_extra
+					)
+				); then
+
+				has check "${checks}" ||
+					checks="${checks} ${check}"
 			fi
 		done
 
 		# If no checking has been defined, set defaults
-		if [ -z "${checks}" ] ; then
-			if [ -n "${stage1}" ] ; then
+		if [ -z "${checks}" ]; then
+			if [ -n "${stage1}" ]; then
 				checks="${CHECKS_YES}"
 			else
 				checks="${CHECKS_RELEASE}"
@@ -632,14 +834,12 @@ gcc_checking_opts() {
 		fi
 
 		# build our opts string
-		for check in ${checks} ; do
+		for check in ${checks}; do
 			opts="${opts}${opts:+,}${check}"
 		done
 	fi
 
-
 	printf -- "--enable-${stage1:+${stage1%_}-}checking=${opts}"
 }
-
 
 # vim: filetype=ebuild
