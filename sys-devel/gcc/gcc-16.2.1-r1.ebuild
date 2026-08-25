@@ -7,7 +7,7 @@ inherit eutils pax-utils toolchain-enable git-r3
 DESCRIPTION="The GNU Compiler Collection"
 HOMEPAGE="https://gcc.gnu.org"
 SRC_URI="
-https://ftp.icm.edu.pl/pub/unix/languages/programming/gcc/snapshots/LATEST-16/gcc-16-20260815.tar.xz -> gcc-16-20260815.tar.xz
+https://ftp.icm.edu.pl/pub/unix/languages/programming/gcc/snapshots/LATEST-16/gcc-16-20260822.tar.xz -> gcc-16-20260822.tar.xz
 https://mirrors.kernel.org/gnu/gmp/gmp-6.3.0.tar.xz -> gmp-6.3.0.tar.xz
 https://www.mpfr.org/mpfr-4.2.2/mpfr-4.2.2.tar.xz -> mpfr-4.2.2.tar.xz
 https://mirrors.kernel.org/gnu/mpc/mpc-1.3.1.tar.gz -> mpc-1.3.1.tar.gz"
@@ -44,7 +44,7 @@ PDEPEND=">=sys-devel/gcc-config-1.5
 	
 "
 #S="${WORKDIR}/gcc-${PV}"
-S="${WORKDIR}/gcc-16-20260815"
+S="${WORKDIR}/gcc-16-20260822"
 CHECKS_ALL="all"
 CHECKS_YES="yes"
 CHECKS_RELEASE="release"
@@ -57,7 +57,7 @@ MPFR_VER="4.2.2"
 MPFR_PATCH_VER=""
 MPC_VER="1.3.1"
 #GCC_A="gcc-${PV%%-r*}.tar.xz"
-GCC_A="gcc-16-20260815.tar.xz"
+GCC_A="gcc-16-20260822.tar.xz"
 
 pkg_setup() {
 	# Capture -march -mcpu and -mtune options to pass to build later.
