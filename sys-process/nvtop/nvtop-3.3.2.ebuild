@@ -1,0 +1,57 @@
+# Distributed under the terms of the GNU General Public License v2
+
+EAPI=7
+
+inherit cmake xdg
+
+DESCRIPTION="(h)top like task monitor for AMD, NVIDIA, Intel and other GPUs"
+HOMEPAGE="https://github.com/Syllo/nvtop"
+
+SRC_URI="https://github.com/Syllo/${PN}/archive/${PV}.tar.gz -> ${P}.tar.gz"
+KEYWORDS="*"
+
+LICENSE="GPL-3+"
+SLOT="0"
+
+IUSE="
+	unicode
+	video_cards_amdgpu
+	video_cards_freedreno
+	video_cards_intel
+	video_cards_nvidia
+	video_cards_panfrost
+	video_cards_panthor
+"
+
+RDEPEND="
+	sys-libs/ncurses:=[unicode(+)?]
+	video_cards_amdgpu? ( x11-libs/libdrm[video_cards_amdgpu] )
+	video_cards_freedreno? ( x11-libs/libdrm[video_cards_freedreno] )
+	video_cards_intel?  ( virtual/udev )
+	video_cards_nvidia? ( xlibre-drivers/nvidia-drivers )
+	video_cards_panfrost? ( x11-libs/libdrm )
+	video_cards_panthor? ( x11-libs/libdrm )
+"
+
+DEPEND="${RDEPEND}"
+
+BDEPEND="virtual/pkgconfig"
+
+src_prepare() {
+	cmake_src_prepare
+}
+
+src_configure() {
+	local mycmakeargs=(
+		-DCURSES_NEED_WIDE=$(usex unicode)
+
+		-DAMDGPU_SUPPORT=$(usex video_cards_amdgpu)
+		-DINTEL_SUPPORT=$(usex video_cards_intel)
+		-DMSM_SUPPORT=$(usex video_cards_freedreno)
+		-DNVIDIA_SUPPORT=$(usex video_cards_nvidia)
+		-DPANFROST_SUPPORT=$(usex video_cards_panfrost)
+		-DPANTHOR_SUPPORT=$(usex video_cards_panthor)
+	)
+
+	cmake_src_configure
+}
