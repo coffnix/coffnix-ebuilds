@@ -12,7 +12,7 @@ SNAPSHOT="${GCC_MAJOR}-${SNAPSHOT_DATE}"
 DESCRIPTION="The GNU Compiler Collection"
 HOMEPAGE="https://gcc.gnu.org"
 SRC_URI="
-mirror://gcc/snapshots/${SNAPSHOT}/gcc-${SNAPSHOT}.tar.xz
+https://gcc.gnu.org/pub/gcc/snapshots/${SNAPSHOT}/gcc-${SNAPSHOT}.tar.xz
 https://mirrors.kernel.org/gnu/gmp/gmp-6.3.0.tar.xz
 https://www.mpfr.org/mpfr-4.2.2/mpfr-4.2.2.tar.xz
 https://mirrors.kernel.org/gnu/mpc/mpc-1.3.1.tar.gz
