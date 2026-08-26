@@ -3,7 +3,7 @@
 
 EAPI=7
 
-inherit cmake
+inherit cmake user
 
 LLAMA_BUILD="${PV##*.}"
 LLAMA_TAG="b${LLAMA_BUILD}"
@@ -58,6 +58,11 @@ BDEPEND="
 RDEPEND="${CDEPEND}"
 DEPEND="${CDEPEND}"
 
+pkg_setup() {
+	enewgroup llama-server
+	enewuser llama-server -1 -1 /var/lib/llama llama-server
+}
+
 post_src_unpack() {
 	mv ggml-org-llama.cpp-* "${S}" || die
 }
@@ -78,7 +83,6 @@ src_configure() {
 	addpredict /proc/self/task
 
 	if use blas ; then
-		# It seems that -lcblas -lblas is not injected. It's inject only -llapack
 		export LDFLAGS="${LDFLAGS} -lcblas -lblas"
 	fi
 
@@ -138,7 +142,16 @@ src_install() {
 	newinitd "${FILESDIR}/llama-server.initd" llama-server
 	newconfd "${FILESDIR}/llama-server.confd" llama-server
 
+	keepdir /var/lib/llama
 	keepdir /var/lib/llama/models
+	fowners _llama-server:_llama-server /var/lib/llama
+	fowners _llama-server:_llama-server /var/lib/llama/models
+	fperms 0755 /var/lib/llama
+	fperms 0755 /var/lib/llama/models
+
+	keepdir /var/log/llama-server
+	fowners _llama-server:_llama-server /var/log/llama-server
+	fperms 0755 /var/log/llama-server
 }
 
 # vim: filetype=ebuild

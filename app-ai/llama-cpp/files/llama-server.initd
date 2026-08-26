@@ -4,6 +4,7 @@ description="llama.cpp HTTP server"
 
 command="/usr/bin/llama-server"
 command_background="yes"
+command_user="llama-server:llama-server"
 pidfile="/run/${RC_SVCNAME}.pid"
 
 depend() {
@@ -12,8 +13,9 @@ depend() {
 
 start_pre() {
     checkpath --directory --mode 0755 /run
-    checkpath --directory --mode 0755 /var/lib/llama/models
-    checkpath --file --mode 0644 /var/log/llama-server.log
+    checkpath --directory --owner llama-server:llama-server --mode 0755 /var/lib/llama
+    checkpath --directory --owner llama-server:llama-server --mode 0755 /var/lib/llama/models
+    checkpath --file --owner llama-server:llama-server --mode 0644 /var/log/llama-server.log
 
     if [ -z "${LLAMA_MODEL}" ]; then
         eerror "LLAMA_MODEL is not configured in /etc/conf.d/llama-server"
