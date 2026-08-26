@@ -144,13 +144,13 @@ src_install() {
 
 	keepdir /var/lib/llama
 	keepdir /var/lib/llama/models
-	fowners _llama-server:_llama-server /var/lib/llama
-	fowners _llama-server:_llama-server /var/lib/llama/models
+	fowners llama-server:llama-server /var/lib/llama
+	fowners llama-server:llama-server /var/lib/llama/models
 	fperms 0755 /var/lib/llama
 	fperms 0755 /var/lib/llama/models
 
 	keepdir /var/log/llama-server
-	fowners _llama-server:_llama-server /var/log/llama-server
+	fowners llama-server:llama-server /var/log/llama-server
 	fperms 0755 /var/log/llama-server
 }
 
