@@ -17,7 +17,7 @@ SRC_URI="https://mirrors.edge.kernel.org/pub/linux/kernel/v7.x/linux-7.2.tar.xz 
 LICENSE="GPL-2"
 SLOT="7.2"
 KEYWORDS="*"
-IUSE="acpi-ec binary btrfs custom-cflags dracut ec2 +logo luks lvm mdadm savedconfig sshd sign-modules zfs"
+IUSE="acpi-ec binary btrfs custom-cflags dracut ec2 +logo luks lvm mdadm savedconfig sshd sign-modules zfs symlink"
 REQUIRED_USE="binary? (
 	^^ ( dracut )
 	btrfs? ( dracut )
@@ -117,7 +117,16 @@ src_prepare() {
 
 	# Apply USE-gated patches (applied before kernel config)
 	if use custom-cflags; then
-		eapply "${FILESDIR}/6.16+/more-ISA-levels-and-uarches-for-kernel-6.16+.patch" || die "use-patch 6.16+/more-ISA-levels-and-uarches-for-kernel-6.16+.patch failed"
+		if ver_test "${PV}" -ge 7.2; then
+			eapply "${FILESDIR}/7.2+/more-ISA-levels-and-uarches-for-kernel-7.2.x+.patch" \
+				|| die "use-patch 7.2+/more-ISA-levels-and-uarches-for-kernel-7.2.x+.patch failed"
+		elif ver_test "${PV}" -ge 7.1; then
+			eapply "${FILESDIR}/7.1+/more-ISA-levels-and-uarches-for-kernel-7.1.x+.patch" \
+				|| die "use-patch 7.1+/more-ISA-levels-and-uarches-for-kernel-7.1.x+.patch failed"
+		else
+			eapply "${FILESDIR}/6.16+/more-ISA-levels-and-uarches-for-kernel-6.16+.patch" \
+				|| die "use-patch 6.16+/more-ISA-levels-and-uarches-for-kernel-6.16+.patch failed"
+		fi
 	fi
 	# Clean source tree after patches to avoid "source tree is not clean" errors
 	# (kernel build detects stale auto.conf, .config, etc from prior partial builds)
@@ -386,15 +395,17 @@ src_install() {
 pkg_postinst() {
 	# Ensure that /boot is mounted in this phase
 	ego_pkg_preinst
+
 	# Prevent kernel and modules erasure during upgrade.
 	if use binary; then
-			# first rename the initramfs (back up .old before new one overwrites)
+		# first rename the initramfs (back up .old before new one overwrites)
 		if use dracut; then
 			if [[ -f "/boot/initramfs-${KERN_SUFFIX}" ]]; then
 				rm -f "/boot/initramfs-${KERN_SUFFIX}.old"
 				mv /boot/initramfs-${KERN_SUFFIX}{,.old} || die
 			fi
 		fi
+
 		# then rename everything else, and copy the new files into place
 		for i in {vmlinuz,System.map,config}; do
 			if [[ -f "/boot/$i-${KERN_SUFFIX}" ]]; then
@@ -409,8 +420,10 @@ pkg_postinst() {
 					rm /boot/$i-${KERN_SUFFIX} || die
 				fi
 			fi
+
 			mv /boot/$i-${KERN_SUFFIX}{.tmp,} || die
 		done
+
 		if [[ -d "/lib/modules/${MOD_DIR_NAME}" ]]; then
 			# USE=savedconfig means the config might have changed!
 			if use savedconfig; then
@@ -423,6 +436,7 @@ pkg_postinst() {
 				rm -r /lib/modules/${MOD_DIR_NAME} || die
 			fi
 		fi
+
 		mv /lib/modules/${MOD_DIR_NAME}{.tmp,} || die
 	fi
 
@@ -436,9 +450,11 @@ pkg_postinst() {
 			$(use mdadm && echo mdraid)
 			$(use sshd && echo sshd)
 		"
+
 		dracut_drivers_pre="
 			$(use luks && echo dm-crypt)
 		"
+
 		DRACUT_ADD_MODULES="$(echo ${dracut_modules_pre} | xargs)" \
 		DRACUT_ADD_DRIVERS="$(echo ${dracut_drivers_pre} | xargs)" \
 		KVER="${KERN_ARCH}-${MACARONI_KVER}" \
@@ -447,27 +463,23 @@ pkg_postinst() {
 		KMODDIR="/lib/modules/$MOD_DIR_NAME" \
 		whip h initramfs.generate_with_dracut || die
 	fi
-	if use binary && [[ -h "${ROOT}"usr/src/linux ]]; then
-		rm "${ROOT}"usr/src/linux || die
+
+	# Update /usr/src/linux independently of all other USE flags.
+	if use symlink; then
+		if [[ -e "${ROOT}usr/src/linux" || -h "${ROOT}usr/src/linux" ]]; then
+			rm -f "${ROOT}usr/src/linux" || die
+		fi
+
+		ln -s "${LINUX_SRCDIR}" "${ROOT}usr/src/linux" || die
+		einfo "/usr/src/linux -> ${LINUX_SRCDIR}"
 	fi
 
-	if use binary && [[ ! -e "${ROOT}"usr/src/linux ]]; then
-		ewarn "With binary use flag enabled /usr/src/linux"
-		ewarn "symlink automatically set to vanilla kernel"
-		ewarn "If you have external modules, don't forget to rebuild them with:"
-		ewarn ""
-		ewarn "  emerge @module-rebuild"
-		ewarn ""
-		ln -sf ${LINUX_SRCDIR} "${ROOT}"usr/src/linux || die
-	fi
-
-	if [ -e ${ROOT}lib/modules ]; then
-		depmod -a $MOD_DIR_NAME || die
+	if [ -e "${ROOT}lib/modules" ]; then
+		depmod -a "${MOD_DIR_NAME}" || die
 	fi
 
 	# Update bootloader and unmount /boot
 	ego_pkg_postinst
 }
-
 
 # vim: filetype=ebuild
