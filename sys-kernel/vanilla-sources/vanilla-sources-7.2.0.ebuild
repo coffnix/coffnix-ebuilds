@@ -2,13 +2,13 @@
 # Autogen by MARK Devkit
 
 EAPI=7
-KERNEL_TRIPLET="${PV%-*}"
+KERNEL_TRIPLET="${PV%.0}"
 MACARONI_KTYPE="vanilla"
 MACARONI_KVER="${KERNEL_TRIPLET}"
 MACARONI_KSUFFIX="mark"
 EXTRAVERSION="-mark"
-MOD_DIR_NAME="${PV%-*}-mark"
-LINUX_SRCDIR="linux-${PV%-*}-mark"
+MOD_DIR_NAME="${KERNEL_TRIPLET}-mark"
+LINUX_SRCDIR="linux-${KERNEL_TRIPLET}-mark"
 inherit check-reqs eutils ego savedconfig
 
 DESCRIPTION="Vanilla Sources (and optional binary kernel)"
