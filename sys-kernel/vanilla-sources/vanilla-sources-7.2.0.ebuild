@@ -6,32 +6,35 @@ EAPI=7
 KERNEL_TRIPLET="${PV%.0}"
 MACARONI_KTYPE="vanilla"
 MACARONI_KVER="${PV}"
-MACARONI_KSUFFIX=""
-EXTRAVERSION=""
-MOD_DIR_NAME="${KERNEL_TRIPLET}"
+MACARONI_KSUFFIX="mark"
+
+EXTRAVERSION="-vanilla-mark"
+
+MOD_DIR_NAME="${PV}-${MACARONI_KTYPE}-${MACARONI_KSUFFIX}"
 LINUX_SRCDIR="linux-${PV}"
 
 inherit check-reqs eutils ego savedconfig
 
 DESCRIPTION="Vanilla Sources (and optional binary kernel)"
 HOMEPAGE="https://kernel.org"
-SRC_URI="https://mirrors.edge.kernel.org/pub/linux/kernel/v7.x/linux-7.2.tar.xz -> linux-7.2.tar.xz"
+SRC_URI="https://mirrors.edge.kernel.org/pub/linux/kernel/v7.x/linux-${KERNEL_TRIPLET}.tar.xz -> linux-${KERNEL_TRIPLET}.tar.xz"
 
 LICENSE="GPL-2"
 SLOT="7.2"
 KEYWORDS="*"
 
-IUSE="acpi-ec binary btrfs custom-cflags dracut ec2 +logo luks lvm mdadm savedconfig sshd sign-modules zfs symlink"
+IUSE="acpi-ec binary btrfs custom-cflags dracut ec2 +logo luks lvm mdadm savedconfig sshd sign-modules symlink zfs"
 
-REQUIRED_USE="binary? (
-	^^ ( dracut )
-	btrfs? ( dracut )
-	mdadm? ( dracut )
-	luks? ( dracut )
-	lvm? ( dracut )
-	sshd? ( dracut )
-)
-sshd? ( binary )
+REQUIRED_USE="
+	binary? (
+		^^ ( dracut )
+		btrfs? ( dracut )
+		mdadm? ( dracut )
+		luks? ( dracut )
+		lvm? ( dracut )
+		sshd? ( dracut )
+	)
+	sshd? ( binary )
 "
 
 RESTRICT="binchecks strip"
@@ -64,7 +67,7 @@ tweak_config() {
 	einfo "Setting $2=$3 in kernel config."
 	case "$2" in
 		*\*)
-			# Wildcard: expand to sed pattern (e.g., CONFIG_DEBUG* → CONFIG_DEBUG.*)
+			# Wildcard: expand to sed pattern
 			local base="${2%\*}"
 			sed -i -e "s/^${base}\(.*\)=.*/${base}\1=${3}/g" "$1"
 			;;
@@ -90,7 +93,6 @@ get_vendor() {
 }
 
 pkg_pretend() {
-	# Ensure we have enough disk space to compile
 	if use binary; then
 		CHECKREQS_DISK_BUILD="6G"
 		check-reqs_pkg_setup
@@ -99,7 +101,6 @@ pkg_pretend() {
 }
 
 get_certs_dir() {
-	# find a certificate dir in /etc/kernel/certs/ that contains signing cert for modules.
 	for subdir in $PF $P linux; do
 		certdir=/etc/kernel/certs/$subdir
 
@@ -128,11 +129,7 @@ src_prepare() {
 	# Apply user patches from /etc/portage/patches/<category>/<package>/
 	eapply_user
 
-	# Apply common patches
-
-	# Apply branch-specific patches
-
-	# Apply USE-gated patches (applied before kernel config)
+	# Apply USE-gated patches
 	if use custom-cflags; then
 		if ver_test "${PV}" -ge 7.2; then
 			eapply "${FILESDIR}/7.2+/more-ISA-levels-and-uarches-for-kernel-7.2.x+.patch" \
@@ -146,12 +143,17 @@ src_prepare() {
 		fi
 	fi
 
-	# Clean source tree after patches to avoid "source tree is not clean" errors
 	cd "${S}" || die
+
 	rm -f .config >/dev/null
 	make mrproper || die "make mrproper failed"
 
-	# Detect architecture first
+	# Make the kernel release follow the Macaroni convention:
+	# 7.2.0-vanilla-mark
+	sed -i \
+		-e "s/^EXTRAVERSION[[:space:]]*=.*/EXTRAVERSION = ${EXTRAVERSION}/" \
+		Makefile || die "failed to set kernel EXTRAVERSION"
+
 	if [ "${REAL_ARCH}" = x86 ]; then
 		export KERN_ARCH="i686"
 	elif [ "${REAL_ARCH}" = amd64 ]; then
@@ -164,9 +166,8 @@ src_prepare() {
 		die "Architecture '${REAL_ARCH}' not handled in ebuild"
 	fi
 
-	# Restore saved .config if savedconfig useflag is enabled
 	if use savedconfig; then
-		einfo Restoring saved .config ...
+		einfo "Restoring saved .config ..."
 		restore_config .config
 
 		yes "" | make olddefconfig >/dev/null 2>&1 || die
@@ -178,7 +179,6 @@ src_prepare() {
 			include/config/*/ \
 			2>/dev/null || true
 	else
-		# Use defconfig as base
 		if [ "${REAL_ARCH}" = amd64 ]; then
 			local kern_arch_dir="x86"
 			local defconfig="x86_64_defconfig"
@@ -195,26 +195,25 @@ src_prepare() {
 			die "No defconfig found for architecture ${REAL_ARCH}"
 		fi
 
-		cp "${WORKDIR}"/linux-${KERNEL_TRIPLET}/arch/${kern_arch_dir}/configs/${defconfig} .config || die
+		cp \
+			"${WORKDIR}/linux-${KERNEL_TRIPLET}/arch/${kern_arch_dir}/configs/${defconfig}" \
+			.config || die
 	fi
 
-	# like "vanilla-aarch64-7.2.0"
-	export KERN_SUFFIX="${MACARONI_KTYPE}-${KERN_ARCH}-${MACARONI_KVER}"
+	# Example: vanilla-aarch64-7.2.0-mark
+	export KERN_SUFFIX="${MACARONI_KTYPE}-${KERN_ARCH}-${MACARONI_KVER}-${MACARONI_KSUFFIX}"
 
-	# Apply unconditional options
 	tweak_config .config CONFIG_DEBUG* n
 	tweak_config .config CONFIG_MODULE_COMPRESS* n
 	tweak_config .config CONFIG_MODULE_COMPRESS_NONE y
 	tweak_config .config CONFIG_CRYPTO_CRC32C y
 
-	# Apply USE-gated kernel config options
 	if use acpi-ec; then
 		tweak_config .config CONFIG_ACPI_EC_DEBUGFS m
 		tweak_config .config CONFIG_DEBUG_FS y
 	fi
 
 	if use custom-cflags; then
-		# Extract -march flag from CFLAGS
 		MARCH=""
 
 		for _flag in $(python3 -c 'import portage; print(portage.settings["CFLAGS"])'); do
@@ -234,7 +233,10 @@ src_prepare() {
 					[[ "$mch" == "native" ]] && continue
 
 					[ -n "$cfg" ] && [ -n "$mch" ] && MARCH_MAP[$mch]=$cfg
-				done < <(grep -E '^\s+cflags-\$\(CONFIG_M' arch/x86/Makefile | grep 'march=')
+				done < <(
+					grep -E '^\s+cflags-\$\(CONFIG_M' arch/x86/Makefile |
+						grep 'march='
+				)
 
 				SUBARCH=$(echo "$MARCH" | sed 's/.*-march=//')
 
@@ -258,7 +260,11 @@ src_prepare() {
 					ARM_VENDOR=""
 
 					if [ -f /proc/cpuinfo ]; then
-						ARM_VENDOR=$(grep "CPU implementer" /proc/cpuinfo | head -1 | awk '{print $3}')
+						ARM_VENDOR=$(
+							grep "CPU implementer" /proc/cpuinfo |
+								head -1 |
+								awk '{print $3}'
+						)
 
 						case $ARM_VENDOR in
 							0x41) ARM_VENDOR="arm";;
@@ -327,8 +333,10 @@ src_prepare() {
 	if use logo; then
 		tweak_config .config CONFIG_LOGO y
 
-		cp "${FILESDIR}"/latest/macaroni-os_logo_clut224.ppm \
-			"$S"/drivers/video/logo/logo_linux_clut224.ppm || die
+		cp \
+			"${FILESDIR}/latest/macaroni-os_logo_clut224.ppm" \
+			"${S}/drivers/video/logo/logo_linux_clut224.ppm" \
+			|| die
 
 		ewarn "Linux kernel frame buffer boot logo is now enabled with a custom MacaroniOS pixmap."
 		ewarn "The new logo can be viewed at /usr/src/linux/drivers/video/logo/logo_linux_clut224.ppm"
@@ -338,6 +346,13 @@ src_prepare() {
 	fi
 
 	if use sign-modules; then
+		certs_dir=$(get_certs_dir)
+
+		if [ -z "$certs_dir" ]; then
+			eerror "No certs dir found in /etc/kernel/certs; aborting."
+			die
+		fi
+
 		tweak_config .config CONFIG_MODULE_SIG y
 		tweak_config .config CONFIG_MODULE_SIG_FORCE n
 		tweak_config .config CONFIG_MODULE_SIG_ALL n
@@ -348,17 +363,8 @@ src_prepare() {
 		tweak_config .config CONFIG_SYSTEM_EXTRA_CERTIFICATE_SIZE 4096
 		tweak_config .config CONFIG_MODULE_SIG_SHA512 y
 
-		certs_dir=$(get_certs_dir)
-
 		echo
-
-		if [ -z "$certs_dir" ]; then
-			eerror "No certs dir found in /etc/kernel/certs; aborting."
-			die
-		else
-			einfo "Using certificate directory of $certs_dir for kernel module signing."
-		fi
-
+		einfo "Using certificate directory of $certs_dir for kernel module signing."
 		echo
 
 		ewarn "This kernel will ALLOW non-signed modules to be loaded with a WARNING."
@@ -376,7 +382,9 @@ src_prepare() {
 		include/config/*/ \
 		2>/dev/null || true
 
-	cp .config "${T}"/config || die
+	cp .config "${T}/config" || die
+
+	einfo "Kernel release: $(make -s kernelrelease)"
 }
 
 src_compile() {
@@ -386,133 +394,157 @@ src_compile() {
 
 	make mrproper || die "make mrproper failed"
 
-	install -d "${WORKDIR}"/build
+	install -d "${WORKDIR}/build"
 
-	cp "${T}"/config "${WORKDIR}"/build/.config \
+	cp "${T}/config" "${WORKDIR}/build/.config" \
 		|| die "couldn't copy kernel config"
 
-	make ${MAKEOPTS} O="${WORKDIR}"/build bzImage \
-		|| die "kernel build failure"
+	make ${MAKEOPTS} \
+		O="${WORKDIR}/build" \
+		bzImage || die "kernel build failure"
 
-	make ${MAKEOPTS} O="${WORKDIR}"/build modules \
-		|| die "modules build failure"
+	make ${MAKEOPTS} \
+		O="${WORKDIR}/build" \
+		modules || die "modules build failure"
 }
 
 src_install() {
-	# copy sources into place:
 	dodir /usr/src
 
-	cp -a "${S}" "${D}"/usr/src/${LINUX_SRCDIR} || die
+	cp -a \
+		"${S}" \
+		"${D}/usr/src/${LINUX_SRCDIR}" \
+		|| die
 
-	cd "${D}"/usr/src/${LINUX_SRCDIR} || die
+	cd "${D}/usr/src/${LINUX_SRCDIR}" || die
 
-	# prepare for real-world use and 3rd-party module building:
 	make mrproper || die
 
-	cp "${T}"/config .config || die
+	cp "${T}/config" .config || die
 
-	# an unconfigured state - you can't compile 3rd-party modules against it yet.
+	# Source-only installation ends here.
 	use binary || return
 
 	make ${MAKEOPTS} \
-		O="${WORKDIR}"/build \
+		O="${WORKDIR}/build" \
 		INSTALL_MOD_PATH="${D}" \
 		modules_install || die "modules install failure"
 
 	insinto /boot
 
-	newins ${WORKDIR}/build/arch/x86/boot/bzImage \
+	newins \
+		"${WORKDIR}/build/arch/x86/boot/bzImage" \
 		"vmlinuz-${KERN_SUFFIX}.tmp"
 
-	newins ${WORKDIR}/build/System.map \
+	newins \
+		"${WORKDIR}/build/System.map" \
 		"System.map-${KERN_SUFFIX}.tmp"
 
-	newins ${WORKDIR}/build/.config \
+	newins \
+		"${WORKDIR}/build/.config" \
 		"config-${KERN_SUFFIX}.tmp"
 
 	make prepare || die
 	make scripts || die
 	make modules_prepare || die
 
-	# module symlink fixup:
 	rm -f "${D}"/lib/modules/*/source || die
 	rm -f "${D}"/lib/modules/*/build || die
 
-	# use kernelrelease to match the kernel's actual module directory:
-	local moddir="$(make -s -C "${WORKDIR}"/build kernelrelease)"
+	local moddir
+	moddir="$(make -s -C "${WORKDIR}/build" kernelrelease)" || die
 
-	ln -s /usr/src/${LINUX_SRCDIR} \
-		"${D}"/lib/modules/${moddir}/source || die
+	ln -s \
+		"/usr/src/${LINUX_SRCDIR}" \
+		"${D}/lib/modules/${moddir}/source" || die
 
-	ln -s /usr/src/${LINUX_SRCDIR} \
-		"${D}"/lib/modules/${moddir}/build || die
+	ln -s \
+		"/usr/src/${LINUX_SRCDIR}" \
+		"${D}/lib/modules/${moddir}/build" || die
 
-	cp "${WORKDIR}"/build/System.map \
+	cp \
+		"${WORKDIR}/build/System.map" \
 		"${D}/usr/src/${LINUX_SRCDIR}/" || die
 
-	cp "${WORKDIR}"/build/Module.symvers \
+	cp \
+		"${WORKDIR}/build/Module.symvers" \
 		"${D}/usr/src/${LINUX_SRCDIR}/" || die
 
 	if use sign-modules; then
-		find "${D}"/lib/modules -iname '*.ko' ! -iname '*.ko.xz' \
-			-exec ${WORKDIR}/build/scripts/sign-file sha512 \
-			$certs_dir/signing_key.pem \
-			$certs_dir/signing_key.x509 {} \; || die
+		find "${D}/lib/modules" \
+			-iname '*.ko' \
+			! -iname '*.ko.xz' \
+			-exec "${WORKDIR}/build/scripts/sign-file" sha512 \
+			"${certs_dir}/signing_key.pem" \
+			"${certs_dir}/signing_key.x509" {} \; || die
 
-		exeinto /usr/src/${LINUX_SRCDIR}/scripts
-		doexe ${WORKDIR}/build/scripts/sign-file
+		exeinto "/usr/src/${LINUX_SRCDIR}/scripts"
+		doexe "${WORKDIR}/build/scripts/sign-file"
 	fi
 
-	# Move to .tmp so Portage tracks it; pkg_postinst renames it.
-	mv "${D}"/lib/modules/${moddir}{,.tmp} || die
+	mv \
+		"${D}/lib/modules/${moddir}" \
+		"${D}/lib/modules/${moddir}.tmp" || die
 }
 
 pkg_postinst() {
 	if use binary; then
-		# Ensure that /boot is mounted in this phase
+		# Mount /boot and run Macaroni binary-kernel handling only
+		# when USE=binary is enabled.
 		ego_pkg_preinst
 
-		# Prevent kernel and modules erasure during upgrade.
 		if use dracut; then
 			if [[ -f "/boot/initramfs-${KERN_SUFFIX}" ]]; then
 				rm -f "/boot/initramfs-${KERN_SUFFIX}.old"
-				mv /boot/initramfs-${KERN_SUFFIX}{,.old} || die
+
+				mv \
+					"/boot/initramfs-${KERN_SUFFIX}" \
+					"/boot/initramfs-${KERN_SUFFIX}.old" || die
 			fi
 		fi
 
-		for i in {vmlinuz,System.map,config}; do
-			if [[ -f "/boot/$i-${KERN_SUFFIX}" ]]; then
+		for i in vmlinuz System.map config; do
+			if [[ -f "/boot/${i}-${KERN_SUFFIX}" ]]; then
 				if use savedconfig; then
-					if [[ -f /boot/$i-${KERN_SUFFIX}.old ]]; then
-						rm /boot/$i-${KERN_SUFFIX}.old
+					if [[ -f "/boot/${i}-${KERN_SUFFIX}.old" ]]; then
+						rm "/boot/${i}-${KERN_SUFFIX}.old"
 					fi
 
-					einfo "Preserving: mv /boot/$i-${KERN_SUFFIX}{,.old}"
-					mv /boot/$i-${KERN_SUFFIX}{,.old} || die
+					einfo "Preserving /boot/${i}-${KERN_SUFFIX}"
+
+					mv \
+						"/boot/${i}-${KERN_SUFFIX}" \
+						"/boot/${i}-${KERN_SUFFIX}.old" || die
 				else
-					rm /boot/$i-${KERN_SUFFIX} || die
+					rm "/boot/${i}-${KERN_SUFFIX}" || die
 				fi
 			fi
 
-			mv /boot/$i-${KERN_SUFFIX}{.tmp,} || die
+			mv \
+				"/boot/${i}-${KERN_SUFFIX}.tmp" \
+				"/boot/${i}-${KERN_SUFFIX}" || die
 		done
 
 		if [[ -d "/lib/modules/${MOD_DIR_NAME}" ]]; then
 			if use savedconfig; then
 				if [[ -d "/lib/modules/${MOD_DIR_NAME}.old" ]]; then
-					rm -r /lib/modules/${MOD_DIR_NAME}.old
+					rm -r "/lib/modules/${MOD_DIR_NAME}.old"
 				fi
 
-				einfo "Preserving: mv /lib/modules/${MOD_DIR_NAME}{,.old}"
-				mv /lib/modules/${MOD_DIR_NAME}{,.old} || die
+				einfo "Preserving /lib/modules/${MOD_DIR_NAME}"
+
+				mv \
+					"/lib/modules/${MOD_DIR_NAME}" \
+					"/lib/modules/${MOD_DIR_NAME}.old" || die
 			else
-				rm -r /lib/modules/${MOD_DIR_NAME} || die
+				rm -r "/lib/modules/${MOD_DIR_NAME}" || die
 			fi
 		fi
 
-		mv /lib/modules/${MOD_DIR_NAME}{.tmp,} || die
+		mv \
+			"/lib/modules/${MOD_DIR_NAME}.tmp" \
+			"/lib/modules/${MOD_DIR_NAME}" || die
 
-		# Generate initramfs with dracut, via whip.
 		if use dracut; then
 			dracut_modules_pre="
 				$(use btrfs && echo btrfs)
@@ -540,7 +572,7 @@ pkg_postinst() {
 		fi
 	fi
 
-	# Update /usr/src/linux independently of all other USE flags.
+	# USE=symlink works independently from USE=binary.
 	if use symlink; then
 		local linux_link="${ROOT%/}/usr/src/linux"
 
@@ -548,12 +580,14 @@ pkg_postinst() {
 			rm -f "${linux_link}" || die
 		fi
 
-		ln -s "${LINUX_SRCDIR}" "${linux_link}" || die
+		ln -s \
+			"${LINUX_SRCDIR}" \
+			"${linux_link}" || die
+
 		einfo "${linux_link} -> ${LINUX_SRCDIR}"
 	fi
 
 	if use binary; then
-		# Update bootloader and unmount /boot
 		ego_pkg_postinst
 	fi
 }
