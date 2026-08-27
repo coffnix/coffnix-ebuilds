@@ -390,13 +390,27 @@ src_compile() {
 	cp "${T}/config" "${WORKDIR}/build/.config" \
 		|| die "couldn't copy kernel config"
 
-	make ${MAKEOPTS} \
-		O="${WORKDIR}/build" \
-		bzImage || die "kernel build failure"
+	if [ "${REAL_ARCH}" = amd64 ] || [ "${REAL_ARCH}" = x86 ]; then
+		make ${MAKEOPTS} \
+			O="${WORKDIR}/build" \
+			bzImage || die "kernel build failure"
+	elif [ "${REAL_ARCH}" = arm64 ]; then
+		make ${MAKEOPTS} \
+			O="${WORKDIR}/build" \
+			Image modules dtbs || die "kernel build failure"
+	elif [ "${REAL_ARCH}" = arm ]; then
+		make ${MAKEOPTS} \
+			O="${WORKDIR}/build" \
+			zImage modules dtbs || die "kernel build failure"
+	else
+		die "Binary kernel build not supported for architecture ${REAL_ARCH}"
+	fi
 
-	make ${MAKEOPTS} \
-		O="${WORKDIR}/build" \
-		modules || die "modules build failure"
+	if [ "${REAL_ARCH}" = amd64 ] || [ "${REAL_ARCH}" = x86 ]; then
+		make ${MAKEOPTS} \
+			O="${WORKDIR}/build" \
+			modules || die "modules build failure"
+	fi
 }
 
 src_install() {
@@ -422,9 +436,21 @@ src_install() {
 
 	insinto /boot
 
-	newins \
-		"${WORKDIR}/build/arch/x86/boot/bzImage" \
-		"vmlinuz-${KERN_SUFFIX}.tmp"
+	if [ "${REAL_ARCH}" = amd64 ] || [ "${REAL_ARCH}" = x86 ]; then
+		newins \
+			"${WORKDIR}/build/arch/x86/boot/bzImage" \
+			"vmlinuz-${KERN_SUFFIX}.tmp"
+	elif [ "${REAL_ARCH}" = arm64 ]; then
+		newins \
+			"${WORKDIR}/build/arch/arm64/boot/Image" \
+			"vmlinuz-${KERN_SUFFIX}.tmp"
+	elif [ "${REAL_ARCH}" = arm ]; then
+		newins \
+			"${WORKDIR}/build/arch/arm/boot/zImage" \
+			"vmlinuz-${KERN_SUFFIX}.tmp"
+	else
+		die "Binary kernel installation not supported for architecture ${REAL_ARCH}"
+	fi
 
 	newins \
 		"${WORKDIR}/build/System.map" \
