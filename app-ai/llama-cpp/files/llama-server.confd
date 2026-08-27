@@ -4,7 +4,10 @@
 LLAMA_MODEL="/var/lib/llama/models/xxxxxxxxxxxxxx.gguf"
 
 # Server log file
-LLAMA_LOG="/var/log/llama-server.log"
+LLAMA_LOG="/var/log/llama-server/llama-server.log"
 
 # Additional llama-server arguments
 LLAMA_ARGS="--host 0.0.0.0 --port 9931 -ngl all -c 4096 --webui --log-file ${LLAMA_LOG} --log-timestamps --log-prefix --log-verbosity 4"
+
+# Run --agent with --cors-origins
+#LLAMA_ARGS='--host 0.0.0.0 --port 9931 -c 100096 --cache-ram 1024 -np 1 -b 1024 -ub 512 -ctk q5_1 -ctv q5_1 --webui --reasoning-preserve --chat-template-file ${TEMPLATE} --log-file ${LLAMA_LOG} --log-timestamps --log-prefix --log-verbosity 4 --agent --cors-origins "http://192.168.200.135:9931"'
