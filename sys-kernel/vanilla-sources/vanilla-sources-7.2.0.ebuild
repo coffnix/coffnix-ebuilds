@@ -61,10 +61,9 @@ RDEPEND="
 
 S="${WORKDIR}/linux-${KERNEL_TRIPLET}"
 
-# Helper functions
-
 tweak_config() {
 	einfo "Setting $2=$3 in kernel config."
+
 	case "$2" in
 		*\*)
 			local base="${2%\*}"
@@ -79,6 +78,7 @@ tweak_config() {
 
 get_vendor() {
 	local vendor_string
+
 	vendor_string=$(grep -m1 "vendor_id" /proc/cpuinfo | cut -d ':' -f 2 | tr -d '[:space:]')
 
 	if [[ "${vendor_string}" == *"GenuineIntel"* ]]; then
@@ -88,6 +88,25 @@ get_vendor() {
 	else
 		echo ""
 	fi
+}
+
+set_kernel_arch() {
+	if [ "${REAL_ARCH}" = x86 ]; then
+		KERN_ARCH="i686"
+	elif [ "${REAL_ARCH}" = amd64 ]; then
+		KERN_ARCH="x86_64"
+	elif [ "${REAL_ARCH}" = arm ]; then
+		KERN_ARCH="arm"
+	elif [ "${REAL_ARCH}" = arm64 ]; then
+		KERN_ARCH="aarch64"
+	else
+		die "Architecture '${REAL_ARCH}' not handled in ebuild"
+	fi
+
+	KERN_SUFFIX="${MACARONI_KTYPE}-${KERN_ARCH}-${MACARONI_KVER}-${MACARONI_KSUFFIX}"
+
+	export KERN_ARCH
+	export KERN_SUFFIX
 }
 
 pkg_pretend() {
@@ -116,9 +135,13 @@ get_certs_dir() {
 
 pkg_setup() {
 	export REAL_ARCH="$ARCH"
+
 	unset ARCH
 	unset LDFLAGS
+
 	export FEATURESET="standard"
+
+	set_kernel_arch
 }
 
 src_prepare() {
@@ -148,20 +171,9 @@ src_prepare() {
 		-e "s/^EXTRAVERSION[[:space:]]*=.*/EXTRAVERSION = ${EXTRAVERSION}/" \
 		Makefile || die "failed to set kernel EXTRAVERSION"
 
-	if [ "${REAL_ARCH}" = x86 ]; then
-		export KERN_ARCH="i686"
-	elif [ "${REAL_ARCH}" = amd64 ]; then
-		export KERN_ARCH="x86_64"
-	elif [ "${REAL_ARCH}" = arm ]; then
-		export KERN_ARCH="arm"
-	elif [ "${REAL_ARCH}" = arm64 ]; then
-		export KERN_ARCH="aarch64"
-	else
-		die "Architecture '${REAL_ARCH}' not handled in ebuild"
-	fi
-
 	if use savedconfig; then
 		einfo "Restoring saved .config ..."
+
 		restore_config .config
 
 		yes "" | make olddefconfig >/dev/null 2>&1 || die
@@ -193,8 +205,6 @@ src_prepare() {
 			"${WORKDIR}/linux-${KERNEL_TRIPLET}/arch/${kern_arch_dir}/configs/${defconfig}" \
 			.config || die
 	fi
-
-	export KERN_SUFFIX="${MACARONI_KTYPE}-${KERN_ARCH}-${MACARONI_KVER}-${MACARONI_KSUFFIX}"
 
 	tweak_config .config CONFIG_DEBUG* n
 	tweak_config .config CONFIG_MODULE_COMPRESS* n
@@ -394,22 +404,23 @@ src_compile() {
 		make ${MAKEOPTS} \
 			O="${WORKDIR}/build" \
 			bzImage || die "kernel build failure"
+
+		make ${MAKEOPTS} \
+			O="${WORKDIR}/build" \
+			modules || die "modules build failure"
+
 	elif [ "${REAL_ARCH}" = arm64 ]; then
 		make ${MAKEOPTS} \
 			O="${WORKDIR}/build" \
 			Image modules dtbs || die "kernel build failure"
+
 	elif [ "${REAL_ARCH}" = arm ]; then
 		make ${MAKEOPTS} \
 			O="${WORKDIR}/build" \
 			zImage modules dtbs || die "kernel build failure"
+
 	else
 		die "Binary kernel build not supported for architecture ${REAL_ARCH}"
-	fi
-
-	if [ "${REAL_ARCH}" = amd64 ] || [ "${REAL_ARCH}" = x86 ]; then
-		make ${MAKEOPTS} \
-			O="${WORKDIR}/build" \
-			modules || die "modules build failure"
 	fi
 }
 
@@ -440,14 +451,17 @@ src_install() {
 		newins \
 			"${WORKDIR}/build/arch/x86/boot/bzImage" \
 			"vmlinuz-${KERN_SUFFIX}.tmp"
+
 	elif [ "${REAL_ARCH}" = arm64 ]; then
 		newins \
 			"${WORKDIR}/build/arch/arm64/boot/Image" \
 			"vmlinuz-${KERN_SUFFIX}.tmp"
+
 	elif [ "${REAL_ARCH}" = arm ]; then
 		newins \
 			"${WORKDIR}/build/arch/arm/boot/zImage" \
 			"vmlinuz-${KERN_SUFFIX}.tmp"
+
 	else
 		die "Binary kernel installation not supported for architecture ${REAL_ARCH}"
 	fi
