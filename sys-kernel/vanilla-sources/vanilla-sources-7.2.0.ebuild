@@ -67,12 +67,10 @@ tweak_config() {
 	einfo "Setting $2=$3 in kernel config."
 	case "$2" in
 		*\*)
-			# Wildcard: expand to sed pattern
 			local base="${2%\*}"
 			sed -i -e "s/^${base}\(.*\)=.*/${base}\1=${3}/g" "$1"
 			;;
 		*)
-			# Exact: remove old line, append new
 			sed -i -e "/^${2}=/d" "$1"
 			echo "${2}=${3}" >> "$1"
 			;;
@@ -126,10 +124,8 @@ pkg_setup() {
 src_prepare() {
 	default
 
-	# Apply user patches from /etc/portage/patches/<category>/<package>/
 	eapply_user
 
-	# Apply USE-gated patches
 	if use custom-cflags; then
 		if ver_test "${PV}" -ge 7.2; then
 			eapply "${FILESDIR}/7.2+/more-ISA-levels-and-uarches-for-kernel-7.2.x+.patch" \
@@ -148,8 +144,6 @@ src_prepare() {
 	rm -f .config >/dev/null
 	make mrproper || die "make mrproper failed"
 
-	# Make the kernel release follow the Macaroni convention:
-	# 7.2.0-vanilla-mark
 	sed -i \
 		-e "s/^EXTRAVERSION[[:space:]]*=.*/EXTRAVERSION = ${EXTRAVERSION}/" \
 		Makefile || die "failed to set kernel EXTRAVERSION"
@@ -200,7 +194,6 @@ src_prepare() {
 			.config || die
 	fi
 
-	# Example: vanilla-aarch64-7.2.0-mark
 	export KERN_SUFFIX="${MACARONI_KTYPE}-${KERN_ARCH}-${MACARONI_KVER}-${MACARONI_KSUFFIX}"
 
 	tweak_config .config CONFIG_DEBUG* n
@@ -383,8 +376,6 @@ src_prepare() {
 		2>/dev/null || true
 
 	cp .config "${T}/config" || die
-
-	einfo "Kernel release: $(make -s kernelrelease)"
 }
 
 src_compile() {
@@ -422,7 +413,6 @@ src_install() {
 
 	cp "${T}/config" .config || die
 
-	# Source-only installation ends here.
 	use binary || return
 
 	make ${MAKEOPTS} \
@@ -489,8 +479,6 @@ src_install() {
 
 pkg_postinst() {
 	if use binary; then
-		# Mount /boot and run Macaroni binary-kernel handling only
-		# when USE=binary is enabled.
 		ego_pkg_preinst
 
 		if use dracut; then
@@ -572,7 +560,6 @@ pkg_postinst() {
 		fi
 	fi
 
-	# USE=symlink works independently from USE=binary.
 	if use symlink; then
 		local linux_link="${ROOT%/}/usr/src/linux"
 
