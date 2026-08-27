@@ -90,23 +90,18 @@ get_vendor() {
 	fi
 }
 
-set_kernel_arch() {
+get_kernel_arch() {
 	if [ "${REAL_ARCH}" = x86 ]; then
-		KERN_ARCH="i686"
+		printf '%s\n' "i686"
 	elif [ "${REAL_ARCH}" = amd64 ]; then
-		KERN_ARCH="x86_64"
+		printf '%s\n' "x86_64"
 	elif [ "${REAL_ARCH}" = arm ]; then
-		KERN_ARCH="arm"
+		printf '%s\n' "arm"
 	elif [ "${REAL_ARCH}" = arm64 ]; then
-		KERN_ARCH="aarch64"
+		printf '%s\n' "aarch64"
 	else
 		die "Architecture '${REAL_ARCH}' not handled in ebuild"
 	fi
-
-	KERN_SUFFIX="${MACARONI_KTYPE}-${KERN_ARCH}-${MACARONI_KVER}-${MACARONI_KSUFFIX}"
-
-	export KERN_ARCH
-	export KERN_SUFFIX
 }
 
 pkg_pretend() {
@@ -141,7 +136,11 @@ pkg_setup() {
 
 	export FEATURESET="standard"
 
-	set_kernel_arch
+	KERN_ARCH="$(get_kernel_arch)"
+	KERN_SUFFIX="${MACARONI_KTYPE}-${KERN_ARCH}-${MACARONI_KVER}-${MACARONI_KSUFFIX}"
+
+	export KERN_ARCH
+	export KERN_SUFFIX
 }
 
 src_prepare() {
