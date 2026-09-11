@@ -49,8 +49,9 @@ PATCHES=(
 	"${FILESDIR}/${PN}-1.12_warn_cflags.patch"
 	"${FILESDIR}/${PN}_dont_create_rundir.patch"
 	"${FILESDIR}/${PN}-1.18.2-krb5-config.patch"
+	"${FILESDIR}/${PN}-1.22-openssl-4.patch"
+	"${FILESDIR}/${PN}-1.22-socket-too-long.patch"
 )
-
 
 src_prepare() {
 	default
