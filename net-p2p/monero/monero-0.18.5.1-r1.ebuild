@@ -20,8 +20,6 @@ SLOT="0"
 IUSE="+daemon hw-wallet readline +tools +wallet-cli +wallet-rpc +aes"
 REQUIRED_USE="|| ( daemon tools wallet-cli wallet-rpc )"
 RESTRICT="test"
-# Test requires python's requests, psutil, deepdiff which are packaged
-# but also monotonic & zmq which we do not have
 
 DEPEND="
 	app-crypt/libmd
@@ -51,17 +49,53 @@ PATCHES=(
 
 pkg_setup() {
 	if use daemon; then
-		# Criar grupo e usuário monero manualmente (estilo Funtoo oldschool)
 		enewgroup monero
 		enewuser monero -1 -1 /var/lib/monero monero
 	fi
 }
 
 src_prepare() {
-	# The build system does not recognize the release tarball (bug?)
-	# so we patch the GitVersion file.
-	# Change the release string from "unknown" to "gentoo-${PR}"
 	sed -i "s/unknown/gentoo-${PR}/g" cmake/GitVersion.cmake || die
+
+	einfo "Monero build: CHOST=${CHOST}"
+	einfo "Monero build: ARCH=${ARCH}"
+
+	if [[ ${ARCH} == arm64 ]]; then
+		einfo "ARM64 detected, applying Monero ARM64 fixes"
+
+		# Monero 0.18.5.1 forces C++14
+		sed -i \
+			's/set(CMAKE_CXX_STANDARD 14)/set(CMAKE_CXX_STANDARD 17)/' \
+			CMakeLists.txt || die
+
+		# Do not append Monero's ARM architecture flag.
+		# Keep -march/-mtune from Portage CFLAGS/CXXFLAGS.
+		sed -i \
+			's/set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ARCH_FLAG}")/# ARM64: use Portage CXXFLAGS/' \
+			CMakeLists.txt || die
+
+		# Same for C flags if Monero adds ARCH_FLAG there.
+		sed -i \
+			's/set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${ARCH_FLAG}")/# ARM64: use Portage CFLAGS/' \
+			CMakeLists.txt || die
+
+		# RandomX also hardcodes armv8-a+crypto
+		sed -i \
+			's/add_flag("-march=armv8-a+crypto")//' \
+			external/randomx/CMakeLists.txt || die
+
+		einfo "ARM64 patch verification:"
+		grep -n 'CMAKE_CXX_STANDARD' CMakeLists.txt | head
+		grep -n 'ARCH_FLAG' CMakeLists.txt | grep 'CMAKE_.*FLAGS' || true
+
+		if grep -Rqs -- '-march=armv8-a+crypto' .; then
+			ewarn "Still found -march=armv8-a+crypto:"
+			grep -Rni -- '-march=armv8-a+crypto' . || true
+		else
+			einfo "OK: no hardcoded -march=armv8-a+crypto remains"
+		fi
+	fi
+
 	cmake_src_prepare
 }
 
@@ -80,29 +114,14 @@ src_configure() {
 		-DCMAKE_CXX_STANDARD=17
 		-DCMAKE_POLICY_DEFAULT_CMP0148=NEW
 		-DSTACK_TRACE=OFF
+		-DCMAKE_CXX_STANDARD_REQUIRED=ON
+		-DCMAKE_CXX_EXTENSIONS=ON
 	)
 
 	use elibc_musl && mycmakeargs+=( -DSTACK_TRACE=OFF )
 
 	cmake_src_configure
 }
-#src_configure() {
-#	local mycmakeargs=(
-#		# TODO: Update CMake to install built libraries (help wanted)
-#		-DBUILD_SHARED_LIBS=OFF
-#		-DBUILD_DOCUMENTATION=OFF # easier to do it manually
-#		-DMANUAL_SUBMODULES=ON
-#		-DUSE_CCACHE=OFF
-#		-DNO_AES=$(usex !cpu_flags_x86_aes)
-#		-DUSE_DEVICE_TREZOR=$(usex hw-wallet)
-#		-DUSE_READLINE=$(usex readline)
-#		-DCMAKE_CXX_STANDARD=17
-#	)
-#
-#	use elibc_musl && mycmakeargs+=( -DSTACK_TRACE=OFF )
-#
-#	cmake_src_configure
-#}
 
 src_compile() {
 	local targets=()
