@@ -20,7 +20,8 @@ HOMEPAGE="https://kernel.org"
 SRC_URI="https://mirrors.edge.kernel.org/pub/linux/kernel/v7.x/linux-${KERNEL_TRIPLET}.tar.xz -> linux-${KERNEL_TRIPLET}.tar.xz"
 
 LICENSE="GPL-2"
-SLOT="7.2"
+#SLOT="7.2"
+SLOT="$(ver_cut 1-2)"
 KEYWORDS="*"
 
 IUSE="acpi-ec binary btrfs custom-cflags dracut ec2 +logo luks lvm mdadm savedconfig sshd sign-modules symlink zfs"
